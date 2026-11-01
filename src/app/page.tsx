@@ -53,7 +53,7 @@ export default function Home() {
     <>
       {/* hero */}
       <section className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-6xl items-center gap-14 px-5 pb-20 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-center gap-14 px-5 pb-20 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
             <div data-load>
               <Eyebrow>Compliance software for NSW agencies</Eyebrow>
@@ -118,7 +118,7 @@ export default function Home() {
       </div>
 
       {/* problem */}
-      <section className="mx-auto mt-28 grid max-w-6xl gap-14 px-5 sm:px-8 lg:grid-cols-[1fr_1fr]">
+      <section className="mx-auto mt-28 grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-14 px-5 sm:px-8 lg:grid-cols-[1fr_1fr]">
         <div data-reveal>
           <Eyebrow>The problem</Eyebrow>
           <h2 className="mt-5 font-display text-[clamp(2rem,4.2vw,3.5rem)] font-bold leading-[1.02] tracking-tight">
@@ -166,7 +166,10 @@ export default function Home() {
       {/* feature rows */}
       <section className="mx-auto mt-28 max-w-6xl space-y-28 px-5 sm:px-8">
         {rows.map((r, i) => (
-          <div key={r.n} className="grid items-center gap-12 lg:grid-cols-2">
+          <div
+            key={r.n}
+            className="grid grid-cols-[minmax(0,1fr)] items-center gap-12 lg:grid-cols-2"
+          >
             <div data-reveal className={i % 2 ? "lg:order-2" : ""}>
               <p className="font-mono text-sm text-ink-soft">{r.n}</p>
               <div className="mt-3">
@@ -231,7 +234,7 @@ export default function Home() {
 
       {/* audit */}
       <section className="mt-28 bg-ink py-24 text-bg">
-        <div className="mx-auto grid max-w-6xl items-center gap-14 px-5 sm:px-8 lg:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-center gap-14 px-5 sm:px-8 lg:grid-cols-2">
           <div data-reveal>
             <Eyebrow>Audit ready</Eyebrow>
             <h2 className="mt-5 font-display text-[clamp(2rem,4.2vw,3.5rem)] font-bold leading-[1.02] tracking-tight">

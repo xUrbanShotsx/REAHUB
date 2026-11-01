@@ -69,7 +69,8 @@ body::after {
   font-size: 0.75rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: inherit;
+  opacity: 0.7;
 }
 
 /* signature: the key word sits on survey tape */
@@ -199,4 +200,9 @@ a > svg:last-child {
   body::after {
     display: none;
   }
+}
+
+/* let grid children shrink below their content width so mockups never force sideways scroll */
+main .grid > * {
+  min-width: 0;
 }
