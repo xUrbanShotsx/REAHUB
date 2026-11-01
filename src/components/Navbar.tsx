@@ -51,7 +51,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <Link
-            href="/pricing"
+            href="/demo"
             className="hidden cursor-pointer rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition-colors duration-200 hover:bg-primary-dark sm:inline-block"
           >
             Book a demo
@@ -85,7 +85,7 @@ export function Navbar() {
             ))}
             <li>
               <Link
-                href="/pricing"
+                href="/demo"
                 onClick={() => setOpen(false)}
                 className="mt-2 block cursor-pointer rounded-lg bg-primary px-3 py-3 text-center font-semibold text-on-primary"
               >

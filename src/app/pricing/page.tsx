@@ -71,7 +71,7 @@ export default function Pricing() {
               ))}
             </ul>
             <Link
-              href="/about"
+              href={`/demo?plan=${p.name}`}
               className={`mt-8 cursor-pointer rounded-xl px-5 py-3 text-center font-semibold transition-colors duration-200 ${
                 p.featured ? "bg-primary text-on-primary hover:bg-primary-dark" : "border border-primary text-primary hover:bg-primary/10"
               }`}

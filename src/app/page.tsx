@@ -28,7 +28,7 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href="/pricing"
+                href="/demo"
                 className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-on-primary transition-colors duration-200 hover:bg-primary-dark"
               >
                 Book a demo <Icon name="arrow" className="h-4 w-4" />

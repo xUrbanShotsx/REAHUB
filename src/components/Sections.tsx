@@ -33,7 +33,7 @@ export function CtaBand() {
           See how REAHUB brings licensing, transactions and disclosures into one compliance workspace.
         </p>
         <Link
-          href="/pricing"
+          href="/demo"
           className="mt-8 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-primary-dark transition-transform duration-200 hover:scale-[1.03]"
         >
           Book a demo <Icon name="arrow" className="h-4 w-4" />
