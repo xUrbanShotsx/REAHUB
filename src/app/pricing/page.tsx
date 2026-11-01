@@ -1,9 +1,18 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbs, faqPage, software } from "@/lib/schema";
+import { pageMeta } from "@/lib/site";
+
 import { Eyebrow, PageHeader } from "@/components/Sections";
 import { Icon } from "@/components/Icons";
 import { PricingGrid } from "@/components/PricingGrid";
 
-export const metadata: Metadata = { title: "Pricing" };
+export const metadata: Metadata = pageMeta({
+  title: "Pricing from A$99 a Month, 7-Day Free Trial",
+  description:
+    "REAHUB plans from A$99 a month plus GST. 7-day free trial, no lock-in contract, cancel anytime. Priced per team, never per seat.",
+  path: "/pricing",
+});
 
 const faqs = [
   [
@@ -43,6 +52,16 @@ const limits = [
 export default function Pricing() {
   return (
     <>
+      <JsonLd
+        data={[
+          software,
+          faqPage(faqs.map(([q, a]) => ({ q, a }))),
+          breadcrumbs([
+            { name: "Home", path: "/" },
+            { name: "Pricing", path: "/pricing" },
+          ]),
+        ]}
+      />
       <PageHeader
         eyebrow="Pricing"
         title={

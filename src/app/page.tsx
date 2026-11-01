@@ -5,6 +5,10 @@ import {
   TrailMock,
   TrustMock,
 } from "@/components/Mocks";
+import Link from "next/link";
+import { guides } from "@/lib/guides";
+import { JsonLd } from "@/components/JsonLd";
+import { software } from "@/lib/schema";
 import { ButtonLink, CtaBand, Eyebrow } from "@/components/Sections";
 import { Magnetic } from "@/components/Magnetic";
 
@@ -51,6 +55,7 @@ const rows = [
 export default function Home() {
   return (
     <>
+      <JsonLd data={software} />
       {/* hero */}
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-center gap-14 px-5 pb-20 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-[1.05fr_0.95fr]">
@@ -255,6 +260,35 @@ export default function Home() {
             <TrailMock dark />
           </div>
         </div>
+      </section>
+
+      <section className="mx-auto mt-28 max-w-6xl px-5 sm:px-8">
+        <div data-reveal>
+          <Eyebrow>Guides</Eyebrow>
+          <h2 className="mt-5 max-w-2xl font-display text-[clamp(2rem,4.2vw,3.5rem)] font-bold leading-[1.02] tracking-tight">
+            Plain-language compliance guides for NSW agencies.
+          </h2>
+        </div>
+        <ul
+          data-stagger
+          className="mt-10 grid border-t border-ink md:grid-cols-2 md:gap-x-10"
+        >
+          {guides.slice(0, 4).map((g) => (
+            <li key={g.slug} className="border-b border-line">
+              <Link href={`/guides/${g.slug}`} className="row-hover block py-5">
+                <span className="eyebrow">{g.category}</span>
+                <span className="mt-2 block font-display text-2xl font-bold leading-tight">
+                  {g.h1}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-6">
+          <Link href="/guides" className="font-semibold underline">
+            All compliance guides
+          </Link>
+        </p>
       </section>
 
       <CtaBand />

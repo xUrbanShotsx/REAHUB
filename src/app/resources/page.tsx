@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbs } from "@/lib/schema";
+import { pageMeta } from "@/lib/site";
+
 import { CtaBand, Eyebrow, PageHeader } from "@/components/Sections";
 import { Icon } from "@/components/Icons";
 
-export const metadata: Metadata = { title: "Resources" };
+export const metadata: Metadata = pageMeta({
+  title: "Real Estate Compliance Resources and Docs",
+  description:
+    "Guides, docs and research for NSW licensees in charge: supervision guidelines, trust reconciliation, registers and migration. Plain language, not legal advice.",
+  path: "/resources",
+});
 
 const items = [
   [
@@ -46,6 +55,12 @@ const items = [
 export default function Resources() {
   return (
     <>
+      <JsonLd
+        data={breadcrumbs([
+          { name: "Home", path: "/" },
+          { name: "Resources", path: "/resources" },
+        ])}
+      />
       <PageHeader
         eyebrow="Resources"
         title={

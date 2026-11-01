@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { guides } from "@/lib/guides";
 
 const items = [
   ["Solutions", "/solutions"],
   ["Pricing", "/pricing"],
   ["About", "/about"],
   ["Resources", "/resources"],
+  ["Guides", "/guides"],
   ["Book a demo", "/demo"],
 ];
 
@@ -29,6 +31,27 @@ export function Footer() {
             ))}
           </ul>
         </div>
+
+        <nav
+          aria-label="Compliance guides"
+          className="mt-12 border-t border-bg/15 pt-8"
+        >
+          <h2 className="font-mono text-xs uppercase tracking-widest text-bg/60">
+            Compliance guides
+          </h2>
+          <ul className="mt-4 grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
+            {guides.map((g) => (
+              <li key={g.slug}>
+                <Link
+                  href={`/guides/${g.slug}`}
+                  className="text-bg/75 transition-colors hover:text-accent"
+                >
+                  {g.h1}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
         <p
           aria-hidden="true"
           className="mt-14 select-none font-display text-[clamp(4rem,19vw,16rem)] font-bold leading-[0.8] tracking-tighter text-bg/10"

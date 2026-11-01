@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbs } from "@/lib/schema";
+import { pageMeta } from "@/lib/site";
+
 import { CtaBand, Eyebrow, PageHeader } from "@/components/Sections";
 import { Icon } from "@/components/Icons";
 
-export const metadata: Metadata = { title: "Solutions" };
+export const metadata: Metadata = pageMeta({
+  title: "Solutions for Agent Teams and Agencies",
+  description:
+    "Compliance and trust software sized for an agent team, a boutique agency or a large multi-branch agency in NSW. Properties, trust, registers and operations on one record.",
+  path: "/solutions",
+});
 
 const audiences = [
   {
@@ -82,6 +91,12 @@ const levels = [
 export default function Solutions() {
   return (
     <>
+      <JsonLd
+        data={breadcrumbs([
+          { name: "Home", path: "/" },
+          { name: "Solutions", path: "/solutions" },
+        ])}
+      />
       <PageHeader
         eyebrow="Solutions"
         title={

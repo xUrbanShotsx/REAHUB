@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbs } from "@/lib/schema";
+import { pageMeta } from "@/lib/site";
+
 import { CtaBand, Eyebrow, PageHeader } from "@/components/Sections";
 
-export const metadata: Metadata = { title: "About" };
+export const metadata: Metadata = pageMeta({
+  title: "About REAHUB, NSW Agency Compliance Software",
+  description:
+    "REAHUB is built in Australia for the people holding the licence: one file per property, trust accounting and registers that fill from the work. Powered by Briesa.",
+  path: "/about",
+});
 
 const principles = [
   [
@@ -25,6 +34,12 @@ const principles = [
 export default function About() {
   return (
     <>
+      <JsonLd
+        data={breadcrumbs([
+          { name: "Home", path: "/" },
+          { name: "About", path: "/about" },
+        ])}
+      />
       <PageHeader
         eyebrow="About REAHUB"
         title={

@@ -1,14 +1,29 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbs } from "@/lib/schema";
+import { pageMeta } from "@/lib/site";
+
 import { PageHeader } from "@/components/Sections";
 import { Icon } from "@/components/Icons";
 import { Suspense } from "react";
 import { DemoForm } from "./DemoForm";
 
-export const metadata: Metadata = { title: "Book a demo" };
+export const metadata: Metadata = pageMeta({
+  title: "Book a Demo",
+  description:
+    "Book a 30-minute REAHUB demo. See property files, trust accounting, registers and audit packs on your own workflow.",
+  path: "/demo",
+});
 
 export default function Demo() {
   return (
     <>
+      <JsonLd
+        data={breadcrumbs([
+          { name: "Home", path: "/" },
+          { name: "Book a demo", path: "/demo" },
+        ])}
+      />
       <PageHeader
         eyebrow="Book a demo"
         title={
