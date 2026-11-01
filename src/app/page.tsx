@@ -52,21 +52,25 @@ export default function Home() {
           </div>
           <div data-load className="xl:-mr-16">
             <div data-parallax="6">
-              <BoardMock />
+              <div className="float">
+                <BoardMock />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* scope strip */}
-      <div className="border-y border-line bg-tint py-4 font-mono text-xs uppercase tracking-[0.18em]">
-        <ul className="mx-auto flex max-w-6xl flex-wrap justify-center gap-x-8 gap-y-2 px-5 sm:px-8">
-          {["Licenses", "CE credits", "Transaction files", "Disclosures", "Audit exports"].map((t) => (
-            <li key={t} className="flex items-center gap-8">
-              {t}
-              <span className="hidden text-accent last:hidden sm:inline">/</span>
-            </li>
-          ))}
+      <div className="overflow-hidden border-y border-line bg-tint py-4 font-mono text-xs uppercase tracking-[0.18em]">
+        <ul className="marquee flex w-max gap-10 whitespace-nowrap" aria-label="What REAHUB covers">
+          {[0, 1, 2, 3].flatMap((k) =>
+            ["Licenses", "CE credits", "Transaction files", "Disclosures", "Audit exports"].map((t) => (
+              <li key={`${k}-${t}`} className="flex items-center gap-10" aria-hidden={k > 0}>
+                {t}
+                <span className="text-accent">/</span>
+              </li>
+            )),
+          )}
         </ul>
       </div>
 
@@ -109,7 +113,7 @@ export default function Home() {
                 {r.title}
               </h2>
               <p className="mt-5 max-w-md text-ink-soft">{r.body}</p>
-              <ul className="mt-6 divide-y divide-line border-y border-line">
+              <ul data-stagger className="mt-6 divide-y divide-line border-y border-line">
                 {r.points.map((p) => (
                   <li key={p} className="row-hover py-3 text-sm font-medium">
                     {p}
@@ -130,7 +134,7 @@ export default function Home() {
             Set up in an afternoon. Cleared from there.
           </h2>
         </div>
-        <ol data-reveal className="mt-12 grid gap-10 border-t border-ink pt-8 md:grid-cols-3">
+        <ol data-stagger className="mt-12 grid gap-10 border-t border-ink pt-8 md:grid-cols-3">
           {[
             ["Connect", "Import agents, licenses and open transactions from the files you already keep."],
             ["Check", "REAHUB applies the right checklist to each deal and flags what is late."],

@@ -54,12 +54,11 @@ export default function Pricing() {
         Pick the plan that fits today. Prices are starting points and can change before launch.
       </PageHeader>
 
-      <section className="mx-auto mt-14 grid max-w-6xl items-end gap-6 px-5 sm:px-8 md:grid-cols-3">
+      <section data-stagger className="mx-auto mt-14 grid max-w-6xl items-end gap-6 px-5 sm:px-8 md:grid-cols-3">
         {plans.map((p) => (
           <div
             key={p.name}
-            data-reveal
-            className={`flex flex-col rounded-3xl p-8 ${
+            className={`lift flex flex-col rounded-3xl p-8 ${
               p.featured ? "bg-ink text-bg md:pb-12 md:pt-12" : "border border-line bg-surface"
             }`}
           >

@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { Icon } from "./Icons";
 
 const links = [
-  { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/pricing", label: "Pricing" },
   { href: "/solutions", label: "Solutions" },
@@ -28,17 +27,17 @@ export function Navbar() {
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        scrolled || open ? "border-b border-line bg-bg/85 backdrop-blur-md" : "border-b border-transparent"
+        scrolled || open ? "border-b border-line bg-surface shadow-sm" : "border-b border-line bg-surface"
       }`}
     >
       <nav aria-label="Main" className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
-        <Link href="/" onClick={() => setOpen(false)} className="font-display text-2xl font-bold tracking-tight">
+        <Link href="/" onClick={() => setOpen(false)} className="font-display text-2xl font-extrabold tracking-tight">
           REAHUB<span className="text-accent">.</span>
         </Link>
 
         <ul className="hidden items-center gap-8 md:flex">
           {links.map((l) => {
-            const active = l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
+            const active = pathname.startsWith(l.href);
             return (
               <li key={l.href}>
                 <Link
@@ -76,7 +75,7 @@ export function Navbar() {
       </nav>
 
       {open && (
-        <div id="mobile-menu" className="border-t border-line bg-bg md:hidden">
+        <div id="mobile-menu" className="border-t border-line bg-surface md:hidden">
           <ul className="mx-auto max-w-6xl px-5 py-3">
             {links.map((l) => (
               <li key={l.href}>

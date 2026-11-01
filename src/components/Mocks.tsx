@@ -4,7 +4,7 @@ import { Icon } from "./Icons";
 function Frame({ title, children, dark = false }: { title: string; children: React.ReactNode; dark?: boolean }) {
   return (
     <div
-      className={`overflow-hidden rounded-2xl border shadow-[0_24px_60px_-28px_oklch(0.24_0.05_258/0.45)] ${
+      className={`lift overflow-hidden rounded-2xl border shadow-[0_24px_60px_-28px_oklch(0.24_0.05_258/0.45)] ${
         dark ? "border-bg/15 bg-[oklch(0.3_0.05_258)] text-bg" : "border-line bg-surface"
       }`}
     >

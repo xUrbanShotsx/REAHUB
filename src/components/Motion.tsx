@@ -77,6 +77,22 @@ function start() {
       );
     });
 
+    gsap.utils.toArray<HTMLElement>("[data-stagger]").forEach((el) => {
+      gsap.fromTo(
+        el.children,
+        { y: 36, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: "power3.out",
+          stagger: 0.12,
+          clearProps: "transform",
+          scrollTrigger: { trigger: el, start: "top 88%", once: true },
+        },
+      );
+    });
+
     gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((el) => {
       gsap.to(el, {
         yPercent: -Number(el.dataset.parallax),

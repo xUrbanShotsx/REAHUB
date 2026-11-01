@@ -18,8 +18,8 @@
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-accent: var(--accent);
-  --font-display: var(--font-familjen), system-ui, sans-serif;
-  --font-sans: var(--font-public), system-ui, sans-serif;
+  --font-display: var(--font-manrope), system-ui, sans-serif;
+  --font-sans: var(--font-manrope), system-ui, sans-serif;
   --font-mono: var(--font-plex), ui-monospace, monospace;
 }
 
@@ -38,6 +38,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-sans);
+  letter-spacing: -0.005em;
   font-size: 1.0625rem;
   line-height: 1.6;
 }
@@ -99,15 +100,69 @@ body::after {
   }
 }
 
+/* tape wipes in across the key word */
+.motion .tape {
+  animation: wipe 0.8s 0.5s both cubic-bezier(0.7, 0, 0.2, 1);
+}
+@keyframes wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* gentle idle float on the hero board */
+.motion .float {
+  animation: float 7s ease-in-out infinite;
+}
+@keyframes float {
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* scope strip scrolls slowly */
+.motion .marquee {
+  animation: marquee 32s linear infinite;
+}
+.motion .marquee:hover {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* lift on hover */
+.lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.lift:hover {
+  transform: translateY(-6px);
+}
+
+/* arrow nudges on hover */
+a:hover > svg:last-child {
+  transform: translateX(3px);
+}
+a > svg:last-child {
+  transition: transform 0.2s;
+}
+
 /* start hidden only when JS motion is active */
 .motion [data-reveal],
-.motion [data-load] {
+.motion [data-load],
+.motion [data-stagger] > * {
   opacity: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .motion [data-reveal],
-  .motion [data-load] {
+  .motion [data-load],
+  .motion [data-stagger] > * {
     opacity: 1;
   }
   .motion .board-row {
