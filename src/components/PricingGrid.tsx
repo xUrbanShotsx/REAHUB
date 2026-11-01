@@ -135,9 +135,12 @@ export function PricingGrid() {
             <p className={`text-sm ${on ? "text-bg/75" : "text-ink-soft"}`}>
               Billed monthly · No lock-in contract · Cancel anytime
             </p>
+            <p className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs font-bold text-ink">
+              7-day free trial
+            </p>
 
             <Link
-              href={`/demo?plan=${encodeURIComponent(p.name)}`}
+              href="https://auth.briesa.com/signup"
               className={`mt-7 rounded-xl px-5 py-3.5 text-center font-semibold transition-colors duration-200 ${
                 on
                   ? "bg-bg text-ink hover:bg-surface"

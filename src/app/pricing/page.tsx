@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Eyebrow, PageHeader } from "@/components/Sections";
+import { Icon } from "@/components/Icons";
 import { PricingGrid } from "@/components/PricingGrid";
 
 export const metadata: Metadata = { title: "Pricing" };
@@ -53,6 +54,22 @@ export default function Pricing() {
         Billed monthly in Australian dollars. No lock-in contract, cancel
         anytime. Hover a plan to compare.
       </PageHeader>
+
+      <ul
+        data-reveal
+        className="mx-auto mt-10 flex max-w-6xl flex-wrap gap-x-8 gap-y-3 px-5 font-semibold sm:px-8"
+      >
+        {["7-day free trial", "No lock-in contracts", "Cancel anytime"].map(
+          (t) => (
+            <li key={t} className="flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent">
+                <Icon name="check" className="h-3.5 w-3.5" />
+              </span>
+              {t}
+            </li>
+          ),
+        )}
+      </ul>
 
       <PricingGrid />
 

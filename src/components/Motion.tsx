@@ -24,14 +24,28 @@ export function Motion() {
     };
 
     const wait = () => {
-      if (hydrated()) cleanup = start();
-      else if (performance.now() - started > 4000)
+      if (hydrated()) {
+        try {
+          cleanup = start();
+          begun = true;
+        } catch (err) {
+          // never leave content hidden if motion fails to start
+          console.error("Motion failed to start", err);
+          document.documentElement.classList.remove("motion");
+        }
+      } else if (performance.now() - started > 4000)
         document.documentElement.classList.remove("motion");
       else frame = requestAnimationFrame(wait);
     };
+    // last resort: if motion has not begun in 5s, show the content rather than leave it hidden
+    let begun = false;
+    const safety = window.setTimeout(() => {
+      if (!begun) document.documentElement.classList.remove("motion");
+    }, 5000);
     wait();
 
     return () => {
+      window.clearTimeout(safety);
       cancelAnimationFrame(frame);
       cleanup?.();
     };
@@ -48,20 +62,6 @@ function start() {
   gsap.ticker.lagSmoothing(0);
 
   const ctx = gsap.context(() => {
-    gsap.fromTo(
-      "[data-load]",
-      { y: 36, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.9,
-        ease: "power3.out",
-        stagger: 0.1,
-        delay: 0.05,
-        clearProps: "transform",
-      },
-    );
-
     gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((el) => {
       gsap.fromTo(
         el,

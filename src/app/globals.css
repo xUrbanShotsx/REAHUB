@@ -158,16 +158,40 @@ a > svg:last-child {
 
 /* start hidden only when JS motion is active */
 .motion [data-reveal],
-.motion [data-load],
 .motion [data-stagger] > * {
   opacity: 0;
 }
 
+/* hero load-in is pure CSS so it plays on first paint, before any JS arrives */
+.motion [data-load] {
+  animation: rise 0.9s both cubic-bezier(0.16, 1, 0.3, 1);
+}
+.motion [data-load]:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.motion [data-load]:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.motion [data-load]:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.motion [data-load]:nth-child(5) {
+  animation-delay: 0.4s;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(36px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .motion [data-reveal],
-  .motion [data-load],
   .motion [data-stagger] > * {
     opacity: 1;
+  }
+  .motion [data-load] {
+    animation: none;
   }
   .motion .board-row {
     animation: none;
