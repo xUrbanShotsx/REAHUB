@@ -1,14 +1,46 @@
 import type { Metadata } from "next";
 import { CtaBand, Eyebrow, PageHeader } from "@/components/Sections";
+import { Icon } from "@/components/Icons";
 
 export const metadata: Metadata = { title: "Resources" };
 
 const items = [
-  ["Template", "Transaction file checklist", "A starting list you can adapt for each transaction type."],
-  ["Guide", "Preparing for a regulatory audit", "Organize agent, trust and transaction files before the request arrives."],
-  ["Template", "Agent onboarding compliance plan", "Licensing, training and supervision in an agent's first 90 days."],
-  ["Article", "Disclosures: delivery and proof", "Why timestamps and signatures matter, and how to keep them in order."],
-  ["Article", "License renewals without the scramble", "A reminder cadence that catches CE gaps early."],
+  [
+    "Guide",
+    "The 2024 Supervision Guidelines, explained",
+    "What a licensee in charge is expected to supervise, in plain language.",
+    "https://briesa.com/guides/supervision-guidelines",
+  ],
+  [
+    "Docs",
+    "Bringing your data across",
+    "What carries from your current system, what does not, and the order to do it in.",
+    "https://briesa.com/migration",
+  ],
+  [
+    "Docs",
+    "Reconciling the trust account",
+    "Receipting, disbursements, and the month prepared as you go.",
+    "https://briesa.com/docs/trust",
+  ],
+  [
+    "Docs",
+    "Keeping the registers",
+    "The seven registers, accreditations and the audit log.",
+    "https://briesa.com/docs/compliance",
+  ],
+  [
+    "Blog",
+    "Reconciled by the month, not by the miracle",
+    "What building sales and rentals trust accounting to the NSW rules taught us.",
+    "https://briesa.com/blog",
+  ],
+  [
+    "Blog",
+    "Why you will never pay per seat",
+    "Per-seat pricing makes hiring a budget conversation. Plans should not punish growth.",
+    "https://briesa.com/blog",
+  ],
 ];
 
 export default function Resources() {
@@ -18,36 +50,56 @@ export default function Resources() {
         eyebrow="Resources"
         title={
           <>
-            Checklists and guides for people who keep the <span className="tape">files</span>.
+            Guides and docs for people who keep the{" "}
+            <span className="tape">files</span>.
           </>
         }
       >
-        Practical material for agents, brokers and compliance managers. Publishing soon.
+        Plain-language material on the rules a NSW licensee in charge answers
+        for. None of it is legal advice.
       </PageHeader>
 
       <section className="mx-auto mt-16 grid max-w-6xl gap-10 px-5 sm:px-8 lg:grid-cols-[1fr_1.1fr]">
-        <article data-reveal className="flex flex-col justify-between rounded-3xl bg-ink p-8 text-bg sm:p-10 lg:min-h-96">
-          <Eyebrow>Featured guide</Eyebrow>
+        <article
+          data-reveal
+          className="flex flex-col justify-between rounded-3xl bg-ink p-8 text-bg sm:p-10 lg:min-h-96"
+        >
+          <Eyebrow>Research</Eyebrow>
           <div className="mt-16">
             <h2 className="font-display text-[clamp(2rem,3.6vw,3rem)] font-bold leading-[1.02] tracking-tight">
-              The brokerage compliance checklist
+              NSW Fair Trading inspections: what one year of unannounced visits
+              found
             </h2>
-            <p className="mt-4 max-w-sm text-bg/75">The records every brokerage should keep, and how long to keep them.</p>
-            <span className="mt-6 inline-block rounded-full bg-accent px-3 py-1 font-mono text-[0.65rem] font-medium uppercase tracking-widest text-ink">
-              Coming soon
-            </span>
+            <p className="mt-4 max-w-sm text-bg/75">
+              The 2024 to 25 inspection year for a licensee in charge, and the
+              penalties behind it.
+            </p>
+            <a
+              href="https://briesa.com/guides"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 font-semibold text-ink"
+            >
+              Read the research <Icon name="arrow" className="h-4 w-4" />
+            </a>
           </div>
         </article>
 
-        <ul className="border-t border-ink">
-          {items.map(([type, title, desc]) => (
-            <li key={title} data-reveal className="row-hover border-b border-line py-6">
-              <div className="flex items-center justify-between gap-4">
+        <ul data-stagger className="border-t border-ink">
+          {items.map(([type, title, desc, href]) => (
+            <li key={title} className="border-b border-line">
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="row-hover block py-6"
+              >
                 <span className="eyebrow">{type}</span>
-                <span className="font-mono text-[0.65rem] uppercase tracking-widest text-ink-soft">Coming soon</span>
-              </div>
-              <h3 className="mt-2 font-display text-2xl font-bold leading-tight">{title}</h3>
-              <p className="mt-1 max-w-md text-sm text-ink-soft">{desc}</p>
+                <h3 className="mt-2 font-display text-2xl font-bold leading-tight">
+                  {title}
+                </h3>
+                <p className="mt-1 max-w-md text-sm text-ink-soft">{desc}</p>
+              </a>
             </li>
           ))}
         </ul>

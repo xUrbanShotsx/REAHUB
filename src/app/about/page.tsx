@@ -5,16 +5,20 @@ export const metadata: Metadata = { title: "About" };
 
 const principles = [
   [
-    "Clarity over cleverness",
-    "A checklist should read like a checklist. If a compliance manager needs training to use it, we built it wrong.",
+    "The record is sacred",
+    "Compliance records are never hard-deleted, every write is audited, and history is not editable. If it happened, the file says so.",
   ],
   [
-    "Every claim traceable",
-    "Nothing is marked cleared without a document, a signature or a person behind it.",
+    "New South Wales first",
+    "The rules an agency answers to are state law, so we started with NSW. The next state opens when it can be done as thoroughly.",
   ],
   [
-    "Private by default",
-    "Files hold client data. Access is by role, and every view is logged.",
+    "Priced so hiring is free",
+    "Per agency, never per head. Adding a cadet should not be a budget conversation.",
+  ],
+  [
+    "Built with licensees",
+    "Every part was checked against people who do the work, including the parts they told us were wrong.",
   ],
 ];
 
@@ -38,35 +42,32 @@ export default function About() {
         <div data-reveal className="lg:sticky lg:top-28 lg:self-start">
           <Eyebrow>Why we built it</Eyebrow>
           <h2 className="mt-5 font-display text-4xl font-bold leading-[1.05] tracking-tight">
-            Four tools, one missing page.
+            The property is the file.
           </h2>
         </div>
         <div data-reveal className="space-y-5 text-lg text-ink-soft">
           <p>
-            Rules differ by state, by brokerage and by transaction type, and
-            they keep changing. Most offices keep licenses in a spreadsheet,
-            checklists in a PDF, disclosures in email and approvals in
-            someone&apos;s head.
+            An agency&apos;s memory lives in the property, yet most systems file
+            the work under the transaction and lose it when the deal closes.
+            Licences sit in one place, trust in another and the registers in a
+            third.
           </p>
           <p>
-            When an audit comes, a person rebuilds the file by hand. REAHUB
-            keeps that file current from the first signature, so there is
-            nothing to rebuild.
+            REAHUB puts the property first, with campaigns and management
+            periods as engagements on top, and the registers falling out of the
+            work instead of being bolted on the end.
           </p>
           <p>
-            We build it with compliance managers and brokers, and we ship what
-            they ask for first.
-          </p>
-          <p>
-            REAHUB is powered by Briesa, the platform behind our checklists,
-            license tracking and audit trail.
+            REAHUB is powered by Briesa, the Australian agency platform that
+            holds the property file, both trust accounts, the seven registers
+            and the audit log. It is owned and hosted in Australia.
           </p>
         </div>
       </section>
 
       <section className="mx-auto mt-24 max-w-6xl px-5 sm:px-8">
         <div data-reveal>
-          <Eyebrow>What we hold to</Eyebrow>
+          <Eyebrow>Four things we will not compromise on</Eyebrow>
         </div>
         <ol className="mt-6 border-t border-ink">
           {principles.map(([t, d], i) => (

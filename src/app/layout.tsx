@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s | REAHUB",
   },
   description:
-    "REAHUB keeps real estate brokerages and agents audit-ready with license tracking, transaction file checks and disclosure management.",
+    "REAHUB keeps NSW real estate agencies audit-ready with one file per property, trust accounting, registers and an audit log.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

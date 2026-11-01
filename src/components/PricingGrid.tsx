@@ -21,7 +21,11 @@ const plans: Plan[] = [
     icon: "user",
     blurb: "For one sales team inside an agency, bought by its agent.",
     price: "A$99",
-    top: ["Up to 5 people, never charged per seat", "10 GB in the document vault", "500 assistant queries a month"],
+    top: [
+      "Up to 5 people, never charged per seat",
+      "10 GB in the document vault",
+      "500 assistant queries a month",
+    ],
     lead: "What's included:",
     features: [
       "One team: the agent, an associate, a PA and marketing",
@@ -34,10 +38,15 @@ const plans: Plan[] = [
   {
     name: "Boutique",
     icon: "store",
-    blurb: "For a single-office agency: a few sales teams and property management.",
+    blurb:
+      "For a single-office agency: a few sales teams and property management.",
     price: "A$249",
     badge: "Popular",
-    top: ["Up to 40 people, never charged per seat", "40 GB in the document vault", "2,000 assistant queries a month"],
+    top: [
+      "Up to 40 people, never charged per seat",
+      "40 GB in the document vault",
+      "2,000 assistant queries a month",
+    ],
     lead: "Everything in Agent Pro, for the whole agency:",
     features: [
       "Up to four teams, each seeing its own engagements",
@@ -52,7 +61,11 @@ const plans: Plan[] = [
     icon: "building",
     blurb: "For a large or multi-branch agency.",
     price: "A$369",
-    top: ["Up to 80 people, never charged per seat", "100 GB in the document vault", "Unlimited assistant queries"],
+    top: [
+      "Up to 80 people, never charged per seat",
+      "100 GB in the document vault",
+      "Unlimited assistant queries",
+    ],
     lead: "Everything in Boutique:",
     features: [
       "Agency-wide compliance reporting",
@@ -102,11 +115,23 @@ export function PricingGrid() {
               )}
             </div>
 
-            <h2 className="mt-6 font-display text-3xl font-extrabold tracking-tight">{p.name}</h2>
-            <p className={`mt-2 min-h-12 text-sm ${on ? "text-bg/75" : "text-ink-soft"}`}>{p.blurb}</p>
+            <h2 className="mt-6 font-display text-3xl font-extrabold tracking-tight">
+              {p.name}
+            </h2>
+            <p
+              className={`mt-2 min-h-12 text-sm ${on ? "text-bg/75" : "text-ink-soft"}`}
+            >
+              {p.blurb}
+            </p>
 
-            <p className="mt-6 font-display text-4xl font-extrabold tracking-tight">{p.price}</p>
-            <p className={`mt-1 text-sm ${on ? "text-bg/75" : "text-ink-soft"}`}>per month + GST</p>
+            <p className="mt-6 font-display text-4xl font-extrabold tracking-tight">
+              {p.price}
+            </p>
+            <p
+              className={`mt-1 text-sm ${on ? "text-bg/75" : "text-ink-soft"}`}
+            >
+              per month + GST
+            </p>
             <p className={`text-sm ${on ? "text-bg/75" : "text-ink-soft"}`}>
               Billed monthly · No lock-in contract · Cancel anytime
             </p>
@@ -114,7 +139,9 @@ export function PricingGrid() {
             <Link
               href={`/demo?plan=${encodeURIComponent(p.name)}`}
               className={`mt-7 rounded-xl px-5 py-3.5 text-center font-semibold transition-colors duration-200 ${
-                on ? "bg-bg text-ink hover:bg-surface" : "bg-ink text-bg hover:bg-ink/85"
+                on
+                  ? "bg-bg text-ink hover:bg-surface"
+                  : "bg-ink text-bg hover:bg-ink/85"
               }`}
             >
               Start your free trial
@@ -125,17 +152,24 @@ export function PricingGrid() {
             <ul className="space-y-3 font-medium">
               {p.top.map((t) => (
                 <li key={t} className="flex gap-3">
-                  <span className={`mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full ${on ? "bg-accent" : "bg-ink"}`} />
+                  <span
+                    className={`mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full ${on ? "bg-accent" : "bg-ink"}`}
+                  />
                   {t}
                 </li>
               ))}
             </ul>
 
             <p className="mt-7 font-bold">{p.lead}</p>
-            <ul className={`mt-4 space-y-3 text-sm ${on ? "text-bg/80" : "text-ink-soft"}`}>
+            <ul
+              className={`mt-4 space-y-3 text-sm ${on ? "text-bg/80" : "text-ink-soft"}`}
+            >
               {p.features.map((f) => (
                 <li key={f} className="flex gap-3">
-                  <Icon name="check" className={`mt-0.5 h-4 w-4 shrink-0 ${on ? "text-accent" : "text-ink"}`} />
+                  <Icon
+                    name="check"
+                    className={`mt-0.5 h-4 w-4 shrink-0 ${on ? "text-accent" : "text-ink"}`}
+                  />
                   {f}
                 </li>
               ))}

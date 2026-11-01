@@ -6,27 +6,77 @@ export const metadata: Metadata = { title: "Solutions" };
 
 const audiences = [
   {
-    title: "Independent agents",
-    line: "Your license, your files, one calm dashboard.",
-    points: ["License and CE reminders", "Guided transaction checklists", "Disclosures stored with proof of delivery"],
+    title: "Agent team",
+    line: "For the licensee who is also the admin: one team, one office, nobody spare to run the software.",
+    points: [
+      "A checklist on every campaign",
+      "Keys, gifts, material facts and complaints recorded as you work",
+      "Policies signed by person and version",
+      "Trust that reconciles, with the difference shown before you sign",
+    ],
   },
   {
-    title: "Brokerages",
-    line: "See every office and every open file without asking.",
-    points: ["Broker review queues", "Office-wide compliance board", "Agent onboarding and offboarding steps"],
+    title: "Boutique agency",
+    line: "For an office with a sales team and a rent roll, and one licensee answering for all of it.",
+    points: [
+      "Up to four teams, each working its own engagements",
+      "Accreditations that gate who may sign",
+      "The underquoting guard on every listing",
+      "One-click audit pack export",
+    ],
   },
   {
-    title: "Franchises and groups",
-    line: "One standard, applied to every market you operate in.",
-    points: ["Multi-office oversight", "Custom checklists per market", "Role-based access and audit exports"],
+    title: "Large agency",
+    line: "For an agency with several teams and branches, and a licensee who answers for all of them at once.",
+    points: [
+      "Up to eight teams on one list of properties",
+      "Compliance reporting across every team and branch",
+      "Registers rolled up across branches",
+      "Bulk import of the rent roll",
+    ],
   },
 ];
 
-const caps = [
-  ["License management", "Records for every license, state, expiration and CE requirement."],
-  ["Transaction compliance", "State and deal-type checklists with document status and review sign-off."],
-  ["Disclosures and agreements", "Track each form from request to signature with a timestamped history."],
-  ["Audit readiness", "Ordered audit packages for any agent, listing or date range."],
+const modules = [
+  [
+    "Properties",
+    "One file per address, with every campaign, management period, party and document on it.",
+  ],
+  [
+    "Trust",
+    "Sales and rentals accounts, every movement against its property, and a reconciliation that prepares itself.",
+  ],
+  [
+    "Compliance",
+    "Seven registers, accreditations that gate signing, identity checks and an audit log under all of it.",
+  ],
+  [
+    "Operations",
+    "Tasks, the calendar, meetings and KPIs, tied to the properties they are about.",
+  ],
+];
+
+const levels = [
+  [
+    "Owner",
+    "One per organisation. The only level that can close it, transfer ownership or change billing.",
+  ],
+  [
+    "Admin",
+    "Sees the whole organisation and runs it day to day, trust accounting included.",
+  ],
+  [
+    "Team Lead",
+    "Sees the agency's records and their team's work, including the team's property-linked trust entries.",
+  ],
+  [
+    "Team Member",
+    "Sees the agency's records and their own team's work, with no access to trust accounting.",
+  ],
+  [
+    "Auditor",
+    "An external, read-only, time-boxed grant. Sees everything and changes nothing.",
+  ],
 ];
 
 export default function Solutions() {
@@ -36,11 +86,13 @@ export default function Solutions() {
         eyebrow="Solutions"
         title={
           <>
-            Sized for a solo agent. Strong enough for a <span className="tape">franchise</span>.
+            Built for the licensee who answers for{" "}
+            <span className="tape">all of it</span>.
           </>
         }
       >
-        The same checklists and audit trail, arranged for how your team actually works.
+        The same system on every plan. What changes is how many people sign in
+        and how many teams they work in.
       </PageHeader>
 
       <section className="mx-auto mt-16 max-w-6xl border-t border-ink px-5 sm:px-8">
@@ -52,7 +104,9 @@ export default function Solutions() {
           >
             <span className="font-mono text-sm text-ink-soft">0{i + 1}</span>
             <div>
-              <h2 className="font-display text-[clamp(2rem,4vw,3.2rem)] font-bold leading-[1.02] tracking-tight">{a.title}</h2>
+              <h2 className="font-display text-[clamp(2rem,4vw,3.2rem)] font-bold leading-[1.02] tracking-tight">
+                {a.title}
+              </h2>
               <p className="mt-3 max-w-sm text-ink-soft">{a.line}</p>
             </div>
             <ul className="space-y-3 self-center">
@@ -69,13 +123,13 @@ export default function Solutions() {
       <section className="mt-24 bg-tint py-20">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <div data-reveal>
-            <Eyebrow>Core capabilities</Eyebrow>
+            <Eyebrow>Four modules, one record</Eyebrow>
             <h2 className="mt-5 max-w-xl font-display text-[clamp(2rem,4vw,3.2rem)] font-bold leading-[1.02] tracking-tight">
-              Four jobs, done the same way every time.
+              Every module reads and writes the same property file.
             </h2>
           </div>
           <dl className="mt-12 grid gap-x-16 gap-y-10 md:grid-cols-2">
-            {caps.map(([t, d]) => (
+            {modules.map(([t, d]) => (
               <div key={t} data-reveal className="border-t border-ink pt-4">
                 <dt className="font-display text-2xl font-bold">{t}</dt>
                 <dd className="mt-2 text-ink-soft">{d}</dd>
@@ -83,6 +137,30 @@ export default function Solutions() {
             ))}
           </dl>
         </div>
+      </section>
+
+      <section className="mx-auto mt-24 grid max-w-6xl gap-12 px-5 sm:px-8 lg:grid-cols-[0.8fr_1.2fr]">
+        <div data-reveal className="lg:sticky lg:top-28 lg:self-start">
+          <Eyebrow>Who is involved</Eyebrow>
+          <h2 className="mt-5 font-display text-4xl font-bold leading-[1.05] tracking-tight">
+            Five access levels. Accreditations decide who signs.
+          </h2>
+          <p className="mt-4 max-w-sm text-ink-soft">
+            Job roles filter what someone sees. Accreditations gate what they
+            may sign, and an expired one stops the signature.
+          </p>
+        </div>
+        <ol data-stagger className="border-t border-ink">
+          {levels.map(([t, d]) => (
+            <li
+              key={t}
+              className="row-hover grid gap-1 border-b border-line py-5 sm:grid-cols-[9rem_1fr]"
+            >
+              <h3 className="font-display text-xl font-bold">{t}</h3>
+              <p className="text-ink-soft">{d}</p>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <CtaBand />

@@ -12,7 +12,15 @@ export function Eyebrow({ children }: { children: ReactNode }) {
   );
 }
 
-export function PageHeader({ eyebrow, title, children }: { eyebrow: string; title: ReactNode; children: ReactNode }) {
+export function PageHeader({
+  eyebrow,
+  title,
+  children,
+}: {
+  eyebrow: string;
+  title: ReactNode;
+  children: ReactNode;
+}) {
   return (
     <section className="mx-auto max-w-6xl px-5 pb-6 pt-16 sm:px-8 sm:pt-24">
       <div data-load>
@@ -50,7 +58,8 @@ export function ButtonLink({
       href={href}
       className={`inline-flex items-center gap-2 rounded-full px-7 py-3.5 font-semibold transition-colors duration-200 ${styles}`}
     >
-      {children} {variant !== "ghost" && <Icon name="arrow" className="h-4 w-4" />}
+      {children}{" "}
+      {variant !== "ghost" && <Icon name="arrow" className="h-4 w-4" />}
     </Link>
   );
 }
@@ -58,12 +67,16 @@ export function ButtonLink({
 export function CtaBand() {
   return (
     <section className="mx-auto mt-28 max-w-6xl px-5 sm:px-8">
-      <div data-reveal className="relative overflow-hidden rounded-[2rem] bg-accent px-7 py-16 sm:px-14 sm:py-20">
+      <div
+        data-reveal
+        className="relative overflow-hidden rounded-[2rem] bg-accent px-7 py-16 sm:px-14 sm:py-20"
+      >
         <h2 className="max-w-3xl font-display text-[clamp(2.2rem,5vw,4.2rem)] font-bold leading-[1] tracking-tight">
           Find the gaps before someone else does.
         </h2>
         <p className="mt-5 max-w-lg text-lg">
-          Thirty minutes, your checklists, your license rules. Bring one messy file and we will clear it live.
+          Thirty minutes, your checklists, your licence rules. Bring one messy
+          file and we will clear it live.
         </p>
         <div className="mt-9">
           <Magnetic>

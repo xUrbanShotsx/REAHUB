@@ -16,12 +16,19 @@ export function DemoForm() {
 
   if (sent) {
     return (
-      <div role="status" className="rounded-3xl border border-line bg-surface p-8 text-center">
+      <div
+        role="status"
+        className="rounded-3xl border border-line bg-surface p-8 text-center"
+      >
         <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent text-ink">
           <Icon name="check" className="h-6 w-6" />
         </span>
-        <h2 className="mt-4 text-xl font-semibold text-ink">Request received</h2>
-        <p className="mt-2 text-sm text-ink-soft">Thanks! We&apos;ll reach out to schedule your demo.</p>
+        <h2 className="mt-4 text-xl font-semibold text-ink">
+          Request received
+        </h2>
+        <p className="mt-2 text-sm text-ink-soft">
+          Thanks! We&apos;ll reach out to schedule your demo.
+        </p>
       </div>
     );
   }
@@ -42,16 +49,29 @@ export function DemoForm() {
         </label>
         <label className="text-sm font-medium text-ink">
           Work email
-          <input name="email" type="email" required autoComplete="email" className={field} />
+          <input
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+            className={field}
+          />
         </label>
         <label className="text-sm font-medium text-ink">
           Company or brokerage
-          <input name="company" required autoComplete="organization" className={field} />
+          <input
+            name="company"
+            required
+            autoComplete="organization"
+            className={field}
+          />
         </label>
         <label className="text-sm font-medium text-ink">
           Number of agents
           <select name="agents" defaultValue="" required className={field}>
-            <option value="" disabled>Select a range</option>
+            <option value="" disabled>
+              Select a range
+            </option>
             <option>1</option>
             <option>2-9</option>
             <option>10-49</option>
@@ -69,7 +89,8 @@ export function DemoForm() {
           </select>
         </label>
         <label className="text-sm font-medium text-ink sm:col-span-2">
-          Anything we should know? <span className="font-normal text-ink-soft">(optional)</span>
+          Anything we should know?{" "}
+          <span className="font-normal text-ink-soft">(optional)</span>
           <textarea name="notes" rows={4} className={field} />
         </label>
       </div>
