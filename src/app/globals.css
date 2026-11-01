@@ -234,3 +234,21 @@ main .grid > * {
     top: 100%;
   }
 }
+
+/* a sheen sweeps along the dark scope strip */
+.glow-x {
+  left: 0;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.motion .glow-x {
+  animation: glow-sweep 12s ease-in-out infinite alternate;
+}
+@keyframes glow-sweep {
+  from {
+    left: 0;
+  }
+  to {
+    left: 100%;
+  }
+}

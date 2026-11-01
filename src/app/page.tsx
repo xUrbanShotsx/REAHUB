@@ -95,7 +95,11 @@ export default function Home() {
       </section>
 
       {/* scope strip */}
-      <div className="overflow-hidden border-y border-line bg-tint py-4 font-mono text-xs uppercase tracking-[0.18em]">
+      <div className="relative overflow-hidden bg-[linear-gradient(110deg,oklch(0.19_0.05_262),oklch(0.3_0.11_266)_55%,oklch(0.2_0.06_262))] py-5 font-mono text-xs uppercase tracking-[0.18em] text-bg shadow-[inset_0_1px_0_oklch(1_0_0/0.18),inset_0_-1px_0_oklch(0_0_0/0.4)]">
+        <div
+          aria-hidden="true"
+          className="glow-x pointer-events-none absolute h-24 w-72 rounded-full bg-accent/70 blur-3xl"
+        />
         <ul
           className="marquee flex w-max gap-10 whitespace-nowrap"
           aria-label="What REAHUB covers"
