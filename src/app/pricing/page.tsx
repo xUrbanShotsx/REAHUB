@@ -51,8 +51,8 @@ export default function Pricing() {
           </>
         }
       >
-        Billed monthly in Australian dollars. No lock-in contract, cancel
-        anytime. Hover a plan to compare.
+        Every plan starts with a 7-day free trial, with no lock-in contract and
+        cancel anytime. Hover a plan to compare.
       </PageHeader>
 
       <ul
