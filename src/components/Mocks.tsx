@@ -27,7 +27,7 @@ function AppWindow({
       {/* light spilling in from the left edge */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -left-12 bottom-6 h-80 w-28 -rotate-12 rounded-full bg-accent/70 blur-3xl"
+        className="glow pointer-events-none absolute h-56 w-56 rounded-full bg-accent/80 blur-3xl"
       />
       <div className="relative -mr-4 overflow-hidden rounded-tl-2xl bg-surface text-ink ring-1 ring-white/20">
         {/* browser chrome */}
