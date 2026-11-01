@@ -7,7 +7,7 @@ const items = [
   ["About", "/about"],
   ["Resources", "/resources"],
   ["Guides", "/guides"],
-  ["Book a demo", "/demo"],
+  ["Contact", "https://briesa.com/contact"],
 ];
 
 export function Footer() {
