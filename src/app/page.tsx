@@ -1,116 +1,172 @@
-import Link from "next/link";
-import { CtaBand, FeatureCard } from "@/components/Sections";
-import { Icon } from "@/components/Icons";
+import { BoardMock, ChecklistMock, LicenseMock, TrailMock } from "@/components/Mocks";
+import { ButtonLink, CtaBand, Eyebrow } from "@/components/Sections";
+import { Magnetic } from "@/components/Magnetic";
 
-const checks = [
-  ["Broker supervision file", "Complete", true],
-  ["Lead paint disclosure", "Complete", true],
-  ["Agency agreement signed", "Complete", true],
-  ["Wire fraud advisory", "Missing", false],
+const rows = [
+  {
+    n: "01",
+    eyebrow: "Licenses",
+    title: "Know who is licensed, until when, and with how many CE hours left.",
+    body: "Every agent and broker in one list. Renewals and continuing education surface 90, 60 and 30 days out, to the agent and to you.",
+    points: ["Multi-state license records", "CE hours tracked against requirements", "Reminders that stop when the renewal is filed"],
+    visual: <LicenseMock />,
+  },
+  {
+    n: "02",
+    eyebrow: "Transactions",
+    title: "A checklist for the exact deal, not a generic form.",
+    body: "Pick the state and transaction type and REAHUB builds the list. Missing items get flagged the moment they become late, not at closing.",
+    points: ["Checklists by state and deal type", "Broker review queue with sign-off", "Nothing marked cleared until it is"],
+    visual: <ChecklistMock />,
+  },
 ];
 
 export default function Home() {
   return (
     <>
+      {/* hero */}
       <section className="relative overflow-hidden">
-        <div aria-hidden className="pointer-events-none absolute -top-24 right-[-10%] h-[28rem] w-[28rem] rounded-full bg-secondary/30 blur-3xl" />
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-8 pt-16 sm:px-6 sm:pt-24 lg:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl items-center gap-14 px-5 pb-20 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold text-primary">
-              <Icon name="shield" className="h-4 w-4" /> Real estate compliance, simplified
-            </p>
-            <h1 className="mt-6 font-display text-4xl font-bold leading-tight text-ink sm:text-6xl">
-              Every file. Every license. Always audit-ready.
+            <div data-load>
+              <Eyebrow>Real estate compliance software</Eyebrow>
+            </div>
+            <h1
+              data-load
+              className="mt-6 font-display text-[clamp(2.7rem,6.4vw,5.7rem)] font-bold leading-[0.98] tracking-tight"
+            >
+              Every closing file, <span className="tape">cleared</span> before the audit.
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-              REAHUB gives brokerages and agents one workspace to track licenses, review transaction files and
-              manage disclosures, so problems surface before regulators find them.
+            <p data-load className="mt-7 max-w-lg text-lg text-ink-soft">
+              REAHUB tracks licenses, transaction files and disclosures in one place, and flags what is missing while
+              there is still time to fix it.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/demo"
-                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-on-primary transition-colors duration-200 hover:bg-primary-dark"
-              >
-                Book a demo <Icon name="arrow" className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/solutions"
-                className="inline-flex cursor-pointer items-center rounded-xl border border-primary px-6 py-3 font-semibold text-primary transition-colors duration-200 hover:bg-primary/10"
-              >
-                Explore solutions
-              </Link>
+            <div data-load className="mt-9 flex flex-wrap items-center gap-4">
+              <Magnetic>
+                <ButtonLink href="/demo">Book a demo</ButtonLink>
+              </Magnetic>
+              <ButtonLink href="/solutions" variant="ghost">
+                See how a file gets cleared
+              </ButtonLink>
             </div>
           </div>
-
-          <div className="glass relative rounded-3xl p-6 shadow-xl shadow-primary/10" role="img" aria-label="Sample transaction compliance checklist">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground">Sample transaction</p>
-                <p className="font-semibold text-ink">142 Maple Street</p>
-              </div>
-              <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">1 item open</span>
+          <div data-load className="xl:-mr-16">
+            <div data-parallax="6">
+              <BoardMock />
             </div>
-            <ul className="mt-5 space-y-3">
-              {checks.map(([label, status, ok]) => (
-                <li key={label as string} className="flex items-center justify-between rounded-xl bg-white/80 px-4 py-3 text-sm">
-                  <span className="font-medium text-ink">{label}</span>
-                  <span className={`flex items-center gap-1 font-semibold ${ok ? "text-primary" : "text-red-700"}`}>
-                    {ok && <Icon name="check" className="h-4 w-4" />}
-                    {status}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-5 h-2 overflow-hidden rounded-full bg-muted">
-              <div className="h-full w-3/4 rounded-full bg-primary" />
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">75% of required documents on file</p>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto mt-20 max-w-6xl px-4 sm:px-6">
-        <h2 className="font-display text-3xl font-bold text-ink">Compliance, covered end to end</h2>
-        <p className="mt-3 max-w-2xl text-muted-foreground">
-          Replace spreadsheets, inbox reminders and last-minute file hunts with one system your whole office uses.
-        </p>
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <FeatureCard icon="id" title="License & CE tracking">
-            Monitor agent and broker licenses, renewals and continuing education with automatic reminders.
-          </FeatureCard>
-          <FeatureCard icon="file" title="Transaction file review">
-            Checklists by transaction type and state flag missing documents and signatures before closing.
-          </FeatureCard>
-          <FeatureCard icon="scale" title="Disclosure management">
-            Deliver, collect and store required disclosures with a clear, timestamped audit trail.
-          </FeatureCard>
-          <FeatureCard icon="bell" title="Smart alerts">
-            Get notified of expiring licenses, overdue items and rule changes that affect your market.
-          </FeatureCard>
-          <FeatureCard icon="clock" title="Audit trail">
-            Every upload, review and approval is logged so you can answer any audit request in minutes.
-          </FeatureCard>
-          <FeatureCard icon="users" title="Roles & oversight">
-            Give agents, compliance managers and brokers the right level of access and visibility.
-          </FeatureCard>
-        </div>
-      </section>
+      {/* scope strip */}
+      <div className="border-y border-line bg-tint py-4 font-mono text-xs uppercase tracking-[0.18em]">
+        <ul className="mx-auto flex max-w-6xl flex-wrap justify-center gap-x-8 gap-y-2 px-5 sm:px-8">
+          {["Licenses", "CE credits", "Transaction files", "Disclosures", "Audit exports"].map((t) => (
+            <li key={t} className="flex items-center gap-8">
+              {t}
+              <span className="hidden text-accent last:hidden sm:inline">/</span>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-      <section className="mx-auto mt-24 max-w-6xl px-4 sm:px-6">
-        <h2 className="font-display text-3xl font-bold text-ink">How it works</h2>
-        <ol className="mt-10 grid gap-6 md:grid-cols-3">
+      {/* problem */}
+      <section className="mx-auto mt-28 grid max-w-6xl gap-14 px-5 sm:px-8 lg:grid-cols-[1fr_1fr]">
+        <div data-reveal>
+          <Eyebrow>The problem</Eyebrow>
+          <h2 className="mt-5 font-display text-[clamp(2rem,4.2vw,3.5rem)] font-bold leading-[1.02] tracking-tight">
+            Compliance fails in the gaps between the spreadsheet, the inbox and the folder.
+          </h2>
+          <p className="mt-6 max-w-md text-ink-soft">
+            Each tool holds a piece. Nobody holds the whole file, so the missing disclosure is found by the regulator
+            instead of by you.
+          </p>
+        </div>
+        <div data-reveal className="relative min-h-72 sm:min-h-80">
           {[
-            ["Connect", "Import your agents, licenses and open transactions."],
-            ["Check", "REAHUB applies the right checklist and flags gaps automatically."],
-            ["Prove", "Export a complete, organized audit file whenever you need it."],
+            ["Renewals.xlsx", "last edited by someone in March", "left-0 top-2 -rotate-3"],
+            ["Re: Re: signed disclosure?", "14 unread replies", "right-0 top-24 rotate-2"],
+            ["Closed files / 2024 / misc", "not sure what is in here", "left-6 bottom-0 -rotate-1"],
+          ].map(([t, s, pos]) => (
+            <div key={t} className={`absolute w-64 max-w-[80%] border border-line bg-surface p-4 shadow-md ${pos}`}>
+              <p className="font-mono text-xs uppercase tracking-wider">{t}</p>
+              <p className="mt-1 text-sm text-ink-soft">{s}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* feature rows */}
+      <section className="mx-auto mt-28 max-w-6xl space-y-28 px-5 sm:px-8">
+        {rows.map((r, i) => (
+          <div key={r.n} className="grid items-center gap-12 lg:grid-cols-2">
+            <div data-reveal className={i % 2 ? "lg:order-2" : ""}>
+              <p className="font-mono text-sm text-ink-soft">{r.n}</p>
+              <div className="mt-3">
+                <Eyebrow>{r.eyebrow}</Eyebrow>
+              </div>
+              <h2 className="mt-5 font-display text-[clamp(1.9rem,3.6vw,3rem)] font-bold leading-[1.05] tracking-tight">
+                {r.title}
+              </h2>
+              <p className="mt-5 max-w-md text-ink-soft">{r.body}</p>
+              <ul className="mt-6 divide-y divide-line border-y border-line">
+                {r.points.map((p) => (
+                  <li key={p} className="row-hover py-3 text-sm font-medium">
+                    {p}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div data-reveal>{r.visual}</div>
+          </div>
+        ))}
+      </section>
+
+      {/* how it works */}
+      <section className="mx-auto mt-28 max-w-6xl px-5 sm:px-8">
+        <div data-reveal>
+          <Eyebrow>How it works</Eyebrow>
+          <h2 className="mt-5 max-w-2xl font-display text-[clamp(2rem,4.2vw,3.5rem)] font-bold leading-[1.02] tracking-tight">
+            Set up in an afternoon. Cleared from there.
+          </h2>
+        </div>
+        <ol data-reveal className="mt-12 grid gap-10 border-t border-ink pt-8 md:grid-cols-3">
+          {[
+            ["Connect", "Import agents, licenses and open transactions from the files you already keep."],
+            ["Check", "REAHUB applies the right checklist to each deal and flags what is late."],
+            ["Prove", "Export a complete, ordered audit file for any agent, listing or date range."],
           ].map(([t, d], i) => (
-            <li key={t} className="rounded-2xl border border-border bg-card p-6">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary font-semibold text-on-primary">{i + 1}</span>
-              <h3 className="mt-4 text-lg font-semibold text-ink">{t}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{d}</p>
+            <li key={t}>
+              <span className="font-mono text-sm text-ink-soft">Step {i + 1}</span>
+              <h3 className="mt-2 font-display text-3xl font-bold">{t}</h3>
+              <p className="mt-3 max-w-xs text-ink-soft">{d}</p>
             </li>
           ))}
         </ol>
+      </section>
+
+      {/* audit */}
+      <section className="mt-28 bg-ink py-24 text-bg">
+        <div className="mx-auto grid max-w-6xl items-center gap-14 px-5 sm:px-8 lg:grid-cols-2">
+          <div data-reveal>
+            <Eyebrow>Audit ready</Eyebrow>
+            <h2 className="mt-5 font-display text-[clamp(2rem,4.2vw,3.5rem)] font-bold leading-[1.02] tracking-tight">
+              The audit letter arrives. The file is already built.
+            </h2>
+            <p className="mt-6 max-w-md text-bg/75">
+              Every upload, signature and approval is timestamped as it happens. Exporting the proof is one click, not a
+              week of digging.
+            </p>
+            <div className="mt-8">
+              <ButtonLink href="/solutions" variant="light">
+                See the capabilities
+              </ButtonLink>
+            </div>
+          </div>
+          <div data-reveal>
+            <TrailMock dark />
+          </div>
+        </div>
       </section>
 
       <CtaBand />

@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Cinzel } from "next/font/google";
+import { Familjen_Grotesk, Public_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Motion } from "@/components/Motion";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const cinzel = Cinzel({
-  variable: "--font-cinzel",
-  subsets: ["latin"],
-});
+const display = Familjen_Grotesk({ variable: "--font-familjen", subsets: ["latin"], weight: ["500", "600", "700"] });
+const sans = Public_Sans({ variable: "--font-public", subsets: ["latin"] });
+const mono = IBM_Plex_Mono({ variable: "--font-plex", subsets: ["latin"], weight: ["400", "500"] });
 
 export const metadata: Metadata = {
   title: { default: "REAHUB | Real Estate Compliance Software", template: "%s | REAHUB" },
@@ -24,11 +19,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${cinzel.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${display.variable} ${sans.variable} ${mono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('motion')",
+          }}
+        />
+      </head>
       <body className="flex min-h-full flex-col">
+        <Motion />
         <Navbar />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 pt-16">{children}</main>
         <Footer />
       </body>
     </html>

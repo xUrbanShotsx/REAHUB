@@ -1,43 +1,75 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Icon, type IconName } from "./Icons";
+import { Flag } from "./Flag";
+import { Icon } from "./Icons";
+import { Magnetic } from "./Magnetic";
 
-export function PageHeader({ eyebrow, title, children }: { eyebrow: string; title: string; children: ReactNode }) {
+export function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <section className="mx-auto max-w-6xl px-4 pb-4 pt-16 sm:px-6 sm:pt-24">
-      <p className="text-sm font-semibold uppercase tracking-widest text-primary">{eyebrow}</p>
-      <h1 className="mt-3 max-w-3xl font-display text-4xl font-bold leading-tight text-ink sm:text-5xl">{title}</h1>
-      <p className="mt-5 max-w-2xl text-lg text-muted-foreground">{children}</p>
+    <p className="eyebrow">
+      <Flag /> {children}
+    </p>
+  );
+}
+
+export function PageHeader({ eyebrow, title, children }: { eyebrow: string; title: ReactNode; children: ReactNode }) {
+  return (
+    <section className="mx-auto max-w-6xl px-5 pb-6 pt-16 sm:px-8 sm:pt-24">
+      <div data-load>
+        <Eyebrow>{eyebrow}</Eyebrow>
+      </div>
+      <h1
+        data-load
+        className="mt-5 max-w-4xl font-display text-[clamp(2.4rem,5.6vw,4.8rem)] font-bold leading-[1] tracking-tight"
+      >
+        {title}
+      </h1>
+      <p data-load className="mt-7 max-w-xl text-lg text-ink-soft">
+        {children}
+      </p>
     </section>
   );
 }
 
-export function FeatureCard({ icon, title, children }: { icon: IconName; title: string; children: ReactNode }) {
+export function ButtonLink({
+  href,
+  children,
+  variant = "ink",
+}: {
+  href: string;
+  children: ReactNode;
+  variant?: "ink" | "ghost" | "light";
+}) {
+  const styles = {
+    ink: "bg-ink text-bg hover:bg-ink/85",
+    light: "bg-bg text-ink hover:bg-surface",
+    ghost: "border border-ink/30 hover:border-ink hover:bg-tint",
+  }[variant];
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 transition-shadow duration-200 hover:shadow-lg hover:shadow-primary/10">
-      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-        <Icon name={icon} className="h-6 w-6" />
-      </span>
-      <h3 className="mt-4 text-lg font-semibold text-ink">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{children}</p>
-    </div>
+    <Link
+      href={href}
+      className={`inline-flex items-center gap-2 rounded-full px-7 py-3.5 font-semibold transition-colors duration-200 ${styles}`}
+    >
+      {children} {variant !== "ghost" && <Icon name="arrow" className="h-4 w-4" />}
+    </Link>
   );
 }
 
 export function CtaBand() {
   return (
-    <section className="mx-auto mt-24 max-w-6xl px-4 sm:px-6">
-      <div className="rounded-3xl bg-gradient-to-br from-primary to-accent px-6 py-14 text-center text-on-primary sm:px-12">
-        <h2 className="font-display text-3xl font-bold sm:text-4xl">Be audit-ready every day, not just audit week.</h2>
-        <p className="mx-auto mt-4 max-w-xl text-white/90">
-          See how REAHUB brings licensing, transactions and disclosures into one compliance workspace.
+    <section className="mx-auto mt-28 max-w-6xl px-5 sm:px-8">
+      <div data-reveal className="relative overflow-hidden rounded-[2rem] bg-accent px-7 py-16 sm:px-14 sm:py-20">
+        <h2 className="max-w-3xl font-display text-[clamp(2.2rem,5vw,4.2rem)] font-bold leading-[1] tracking-tight">
+          Find the gaps before someone else does.
+        </h2>
+        <p className="mt-5 max-w-lg text-lg">
+          Thirty minutes, your checklists, your license rules. Bring one messy file and we will clear it live.
         </p>
-        <Link
-          href="/demo"
-          className="mt-8 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-primary-dark transition-transform duration-200 hover:scale-[1.03]"
-        >
-          Book a demo <Icon name="arrow" className="h-4 w-4" />
-        </Link>
+        <div className="mt-9">
+          <Magnetic>
+            <ButtonLink href="/demo">Book a demo</ButtonLink>
+          </Magnetic>
+        </div>
       </div>
     </section>
   );

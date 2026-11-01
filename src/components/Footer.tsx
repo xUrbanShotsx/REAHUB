@@ -1,43 +1,40 @@
 import Link from "next/link";
-import { Icon } from "./Icons";
 
-const cols = [
-  { title: "Product", items: [["Solutions", "/solutions"], ["Pricing", "/pricing"]] },
-  { title: "Company", items: [["About", "/about"], ["Resources", "/resources"]] },
+const items = [
+  ["Solutions", "/solutions"],
+  ["Pricing", "/pricing"],
+  ["About", "/about"],
+  ["Resources", "/resources"],
+  ["Book a demo", "/demo"],
 ];
 
 export function Footer() {
   return (
-    <footer className="mt-24 border-t border-border bg-card">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[2fr_1fr_1fr]">
-        <div>
-          <Link href="/" className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-on-primary">
-              <Icon name="shield" />
-            </span>
-            <span className="font-display text-xl font-bold tracking-wide text-ink">REAHUB</span>
-          </Link>
-          <p className="mt-4 max-w-sm text-sm text-muted-foreground">
-            Real estate compliance software that keeps licenses, transactions and disclosures audit-ready.
+    <footer className="mt-28 overflow-hidden bg-ink text-bg">
+      <div className="mx-auto max-w-6xl px-5 pt-16 sm:px-8">
+        <div className="flex flex-col justify-between gap-10 md:flex-row">
+          <p className="max-w-sm font-display text-2xl font-semibold leading-snug">
+            Find the gap while there is still time to fix it.
           </p>
+          <ul className="grid grid-cols-2 gap-x-10 gap-y-3 text-sm">
+            {items.map(([label, href]) => (
+              <li key={href}>
+                <Link href={href} className="text-bg/75 transition-colors hover:text-accent">
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
-        {cols.map((c) => (
-          <div key={c.title}>
-            <h2 className="text-sm font-semibold text-ink">{c.title}</h2>
-            <ul className="mt-3 space-y-2">
-              {c.items.map(([label, href]) => (
-                <li key={href}>
-                  <Link href={href} className="cursor-pointer text-sm text-muted-foreground transition-colors hover:text-primary">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        <p
+          aria-hidden="true"
+          className="mt-14 select-none font-display text-[clamp(4rem,19vw,16rem)] font-bold leading-[0.8] tracking-tighter text-bg/10"
+        >
+          REAHUB
+        </p>
       </div>
-      <div className="border-t border-border py-5 text-center text-xs text-muted-foreground">
-        © 2026 REAHUB. All rights reserved.
+      <div className="border-t border-bg/15 py-5 text-center font-mono text-xs uppercase tracking-widest text-bg/60">
+        © 2026 REAHUB. Real estate compliance software.
       </div>
     </footer>
   );
