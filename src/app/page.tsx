@@ -6,6 +6,42 @@ import { software } from "@/lib/schema";
 import { ButtonLink, CtaBand, Eyebrow } from "@/components/Sections";
 import { Magnetic } from "@/components/Magnetic";
 
+/** Descriptors of the agencies REAHUB was built with. Add named customers here once they have agreed to be listed. */
+const clients = [
+  "Inner West agencies",
+  "Rent rolls",
+  "Two-office groups",
+  "Boutique offices",
+  "Licensees in charge",
+];
+
+const pains: [string, string][] = [
+  [
+    "Trust month end takes days, and starts from scratch every time.",
+    "The cash book, bank and ledger are matched as the month goes, so month end is a signature.",
+  ],
+  [
+    "The same property sits in four systems under three spellings.",
+    "One file per address, created once. Sales and management share it.",
+  ],
+  [
+    "Nobody can find the disclosure when the regulator asks.",
+    "Documents land on the property, under the engagement, with who filed them and when.",
+  ],
+  [
+    "Inspections, arrears and repairs live in an inbox.",
+    "They sit on the property where the next person would look for them.",
+  ],
+  [
+    "A licence lapses because the reminder was in someone's calendar.",
+    "Alerts at 90, 60, 30 and 7 days, and an expired accreditation stops the signature.",
+  ],
+  [
+    "An audit means days of digging through folders.",
+    "Every write is logged with the previous value, and the audit pack is an export.",
+  ],
+];
+
 export default function Home() {
   return (
     <>
@@ -123,6 +159,62 @@ export default function Home() {
               <p className="mt-1 text-sm text-ink-soft">{s}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* who we build with + pain points */}
+      <section className="mx-auto mt-28 max-w-6xl px-5 sm:px-8">
+        <div
+          data-reveal
+          className="flex flex-col gap-4 border-y border-line py-6 lg:flex-row lg:items-center lg:gap-10"
+        >
+          <p className="shrink-0 font-mono text-xs uppercase tracking-widest text-ink-soft">
+            Built with licensees at
+          </p>
+          <ul className="flex flex-wrap gap-2">
+            {clients.map((c) => (
+              <li
+                key={c}
+                className="rounded-full bg-tint px-4 py-2 text-sm font-semibold"
+              >
+                {c}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-20 grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+          <div data-reveal className="lg:sticky lg:top-28 lg:self-start">
+            <Eyebrow>Where it goes wrong</Eyebrow>
+            <h2 className="mt-5 font-display text-[clamp(2rem,4vw,3.2rem)] font-bold leading-[1.02] tracking-tight">
+              Six places agencies lose the file.
+            </h2>
+            <p className="mt-5 max-w-sm text-ink-soft">
+              These are the gaps licensees tell us about. Each one has a fix
+              that does not depend on someone remembering.
+            </p>
+          </div>
+          <ol data-stagger className="border-t border-ink">
+            {pains.map(([pain, fix], i) => (
+              <li
+                key={pain}
+                className="row-hover grid gap-3 border-b border-line py-6 md:grid-cols-[2.5rem_1fr_1fr] md:gap-6"
+              >
+                <span className="font-mono text-sm text-ink-soft">
+                  0{i + 1}
+                </span>
+                <p className="font-display text-xl font-bold leading-snug">
+                  {pain}
+                </p>
+                <p className="text-ink-soft">
+                  <span className="mb-1 block font-mono text-[0.7rem] uppercase tracking-widest text-ink">
+                    With REAHUB
+                  </span>
+                  {fix}
+                </p>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
