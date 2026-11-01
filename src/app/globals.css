@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --bg: oklch(0.965 0.014 245);
-  --surface: oklch(0.99 0.006 245);
+  --bg: oklch(1 0 0);
+  --surface: oklch(1 0 0);
   --tint: oklch(0.93 0.025 247);
   --line: oklch(0.87 0.02 250);
   --ink: oklch(0.24 0.05 258);

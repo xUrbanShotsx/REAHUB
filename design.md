@@ -12,8 +12,8 @@ Voice: plain, dry, specific. The product does the talking.
 Brokers, compliance managers and independent agents. One job: book a demo.
 
 ## Palette (OKLCH, named roles)
-- bg: oklch(0.965 0.014 245) chalk blue, page background
-- surface: oklch(0.99 0.006 245) panels and forms
+- bg: oklch(1 0 0) white, page background (client request)
+- surface: oklch(1 0 0) white, panels and forms
 - tint: oklch(0.93 0.025 247) quiet fills
 - line: oklch(0.87 0.02 250) rules
 - ink: oklch(0.24 0.05 258) text and dark sections
