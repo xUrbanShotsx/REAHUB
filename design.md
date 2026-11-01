@@ -5,7 +5,7 @@ Source of truth for every UI change. Read before building.
 ## Brand & thesis
 REAHUB is real estate compliance software for brokerages and agents.
 Thesis: **Every closing file, cleared before the audit.**
-Scene: a compliance manager at a desk, a closing file open, a surveyor's orange flag on the one thing still missing.
+Scene: a compliance manager at a desk, a closing file open, a survey flag on the one thing still missing.
 Voice: plain, dry, specific. The product does the talking.
 
 ## Audience & the one job
@@ -18,7 +18,7 @@ Brokers, compliance managers and independent agents. One job: book a demo.
 - line: oklch(0.87 0.02 250) rules
 - ink: oklch(0.24 0.05 258) text and dark sections
 - ink-soft: oklch(0.44 0.035 256) secondary text
-- accent: oklch(0.74 0.18 55) survey-flag orange. The only saturated colour. Used for flags, the tape highlight and the closing band. Never as text on light backgrounds.
+- accent: #5170ff brand blue (client-specified, matches the logo). The only saturated colour. Used for flags, the tape highlight and the closing band. Text on accent fills is white.
 Never pure #000 or #fff. Neutrals are tinted toward blue.
 
 ## Type
@@ -32,7 +32,7 @@ Never pure #000 or #fff. Neutrals are tinted toward blue.
 Max width 72rem. Asymmetric splits, a product board that bleeds past the grid. Section rhythm 6 to 9rem. Alternate row direction. No identical card grids.
 
 ## Signature element
-The survey flag: an orange pennant on a stake marks every eyebrow and every open item. The key word of a headline sits on an orange "tape" strip, slightly rotated.
+The survey flag: a blue pennant on a stake marks every eyebrow and every open item. The key word of a headline sits on a blue "tape" strip, slightly rotated.
 
 ## Motion
 Structural: Lenis inertia scroll, GSAP reveals on scroll, hero board parallax, hero load-in, nav becomes a blurred bar after the hero.

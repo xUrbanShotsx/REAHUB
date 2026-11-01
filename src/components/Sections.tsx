@@ -69,7 +69,7 @@ export function CtaBand() {
     <section className="mx-auto mt-28 max-w-6xl px-5 sm:px-8">
       <div
         data-reveal
-        className="relative overflow-hidden rounded-[2rem] bg-accent px-7 py-16 sm:px-14 sm:py-20"
+        className="relative overflow-hidden rounded-[2rem] bg-accent text-bg px-7 py-16 sm:px-14 sm:py-20"
       >
         <h2 className="max-w-3xl font-display text-[clamp(2.2rem,5vw,4.2rem)] font-bold leading-[1] tracking-tight">
           Find the gaps before someone else does.

@@ -109,7 +109,7 @@ export function PricingGrid() {
                 <Icon name={p.icon} className="h-9 w-9" />
               </span>
               {p.badge && (
-                <span className="rounded-full bg-accent px-3 py-1 font-mono text-[0.65rem] font-medium uppercase tracking-widest text-ink">
+                <span className="rounded-full bg-accent px-3 py-1 font-mono text-[0.65rem] font-medium uppercase tracking-widest text-bg">
                   {p.badge}
                 </span>
               )}
@@ -135,7 +135,7 @@ export function PricingGrid() {
             <p className={`text-sm ${on ? "text-bg/75" : "text-ink-soft"}`}>
               Billed monthly · No lock-in contract · Cancel anytime
             </p>
-            <p className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs font-bold text-ink">
+            <p className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs font-bold text-bg">
               7-day free trial
             </p>
 

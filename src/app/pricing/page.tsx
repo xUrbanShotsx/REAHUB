@@ -62,7 +62,7 @@ export default function Pricing() {
         {["7-day free trial", "No lock-in contracts", "Cancel anytime"].map(
           (t) => (
             <li key={t} className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent text-bg">
                 <Icon name="check" className="h-3.5 w-3.5" />
               </span>
               {t}

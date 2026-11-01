@@ -7,7 +7,7 @@
   --line: oklch(0.87 0.02 250);
   --ink: oklch(0.24 0.05 258);
   --ink-soft: oklch(0.44 0.035 256);
-  --accent: oklch(0.74 0.18 55);
+  --accent: #5170ff;
 }
 
 @theme inline {
@@ -76,7 +76,7 @@ body::after {
 .tape {
   display: inline-block;
   background: var(--accent);
-  color: var(--ink);
+  color: #fff;
   padding: 0 0.18em;
   transform: rotate(-1.2deg);
 }

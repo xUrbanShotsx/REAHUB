@@ -78,7 +78,7 @@ export default function Resources() {
               href="https://briesa.com/guides"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 font-semibold text-ink"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 font-semibold text-bg"
             >
               Read the research <Icon name="arrow" className="h-4 w-4" />
             </a>

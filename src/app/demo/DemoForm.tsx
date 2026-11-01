@@ -20,7 +20,7 @@ export function DemoForm() {
         role="status"
         className="rounded-3xl border border-line bg-surface p-8 text-center"
       >
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent text-ink">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent text-bg">
           <Icon name="check" className="h-6 w-6" />
         </span>
         <h2 className="mt-4 text-xl font-semibold text-ink">

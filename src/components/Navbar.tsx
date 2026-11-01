@@ -46,9 +46,16 @@ export function Navbar() {
           <Link
             href="/"
             onClick={() => setOpen(false)}
-            className={`font-display font-extrabold tracking-tight transition-all duration-500 ${pill ? "text-2xl" : "text-3xl"}`}
+            aria-label="REAHUB home"
           >
-            REAHUB<span className="text-accent">.</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo.svg"
+              alt="REAHUB"
+              width={403}
+              height={82}
+              className={`w-auto transition-all duration-500 ${pill ? "h-8" : "h-9 sm:h-11"}`}
+            />
           </Link>
 
           <ul className="hidden items-center gap-8 md:flex">
