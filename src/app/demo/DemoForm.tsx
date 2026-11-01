@@ -7,7 +7,7 @@ import { Icon } from "@/components/Icons";
 const field =
   "mt-1 w-full rounded-lg border border-line bg-bg px-3 py-3 text-ink focus:border-ink";
 
-const plans = ["Agent", "Brokerage", "Enterprise"];
+const plans = ["Agent Pro", "Boutique", "Large"];
 
 export function DemoForm() {
   const plan = useSearchParams().get("plan") ?? "";
@@ -62,9 +62,9 @@ export function DemoForm() {
         <label className="text-sm font-medium text-ink sm:col-span-2">
           Plan of interest
           <select name="plan" defaultValue={defaultPlan} className={field}>
-            <option>Agent</option>
-            <option>Brokerage</option>
-            <option>Enterprise</option>
+            <option>Agent Pro</option>
+            <option>Boutique</option>
+            <option>Large</option>
             <option>Not sure yet</option>
           </select>
         </label>
