@@ -1,15 +1,10 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Flag } from "./Flag";
 import { Icon } from "./Icons";
 import { Magnetic } from "./Magnetic";
 
 export function Eyebrow({ children }: { children: ReactNode }) {
-  return (
-    <p className="eyebrow">
-      <Flag /> {children}
-    </p>
-  );
+  return <p className="eyebrow">{children}</p>;
 }
 
 export function PageHeader({

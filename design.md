@@ -32,7 +32,7 @@ Never pure #000 or #fff. Neutrals are tinted toward blue.
 Max width 72rem. Asymmetric splits, a product board that bleeds past the grid. Section rhythm 6 to 9rem. Alternate row direction. No identical card grids.
 
 ## Signature element
-The survey flag: a blue pennant on a stake marks every eyebrow and every open item. The key word of a headline sits on a blue "tape" strip, slightly rotated.
+The tape: the key word of a headline sits on a blue "tape" strip, slightly rotated. Open items are marked by a tinted row.
 
 ## Motion
 Structural: Lenis inertia scroll, GSAP reveals on scroll, hero board parallax, hero load-in, nav becomes a blurred bar after the hero.

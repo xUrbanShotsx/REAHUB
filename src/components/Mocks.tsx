@@ -1,4 +1,3 @@
-import { Flag } from "./Flag";
 import { Icon } from "./Icons";
 
 function Frame({
@@ -54,14 +53,7 @@ export function BoardMock() {
               kind === "flag" ? "bg-accent/25" : ""
             }`}
           >
-            <span className="flex items-center gap-3 font-medium">
-              {kind === "flag" ? (
-                <Flag className="h-5 w-5" />
-              ) : (
-                <span className="h-5 w-5" />
-              )}
-              {name}
-            </span>
+            <span className="flex items-center gap-3 font-medium">{name}</span>
             <span className="flex items-center gap-1.5 text-ink-soft">
               {kind === "ok" && (
                 <Icon name="check" className="h-4 w-4 text-ink" />
@@ -146,9 +138,6 @@ export function ChecklistMock() {
             >
               {label}
             </span>
-            {label === "Contract for sale on file" && (
-              <Flag className="ml-auto h-5 w-5" />
-            )}
           </li>
         ))}
       </ul>
