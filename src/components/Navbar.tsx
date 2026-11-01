@@ -39,14 +39,14 @@ export function Navbar() {
       >
         <nav
           aria-label="Main"
-          className={`mx-auto flex h-16 max-w-6xl items-center justify-between transition-all duration-500 ${
-            pill ? "px-6" : "px-2 sm:px-8"
+          className={`mx-auto flex max-w-6xl items-center justify-between transition-all duration-500 ${
+            pill ? "h-16 px-6" : "h-20 px-2 sm:h-24 sm:px-8"
           }`}
         >
           <Link
             href="/"
             onClick={() => setOpen(false)}
-            className="font-display text-2xl font-extrabold tracking-tight"
+            className={`font-display font-extrabold tracking-tight transition-all duration-500 ${pill ? "text-2xl" : "text-3xl"}`}
           >
             REAHUB<span className="text-accent">.</span>
           </Link>
@@ -59,7 +59,7 @@ export function Navbar() {
                   <Link
                     href={l.href}
                     aria-current={active ? "page" : undefined}
-                    className={`relative py-1 text-sm font-medium after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:bg-accent after:transition-transform after:duration-200 ${
+                    className={`relative py-1 font-medium transition-all duration-500 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:bg-accent after:transition-transform after:duration-200 ${
                       active
                         ? "after:scale-x-100"
                         : "after:scale-x-0 hover:after:scale-x-100"
@@ -75,13 +75,13 @@ export function Navbar() {
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="hidden rounded-full border border-line px-5 py-2 text-sm font-semibold transition-colors duration-200 hover:bg-tint sm:inline-block"
+              className={`hidden rounded-full border border-line font-semibold transition-all duration-500 hover:bg-tint sm:inline-block ${pill ? "px-5 py-2 text-sm" : "px-6 py-2.5 text-base"}`}
             >
               Login
             </Link>
             <Link
               href="/signup"
-              className="hidden rounded-full bg-ink px-5 py-2 text-sm font-semibold text-bg transition-colors duration-200 hover:bg-ink/85 sm:inline-block"
+              className={`hidden rounded-full bg-ink font-semibold text-bg transition-all duration-500 hover:bg-ink/85 sm:inline-block ${pill ? "px-5 py-2 text-sm" : "px-6 py-2.5 text-base"}`}
             >
               Sign up
             </Link>
