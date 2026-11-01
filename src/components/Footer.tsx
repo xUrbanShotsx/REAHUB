@@ -19,7 +19,10 @@ export function Footer() {
           <ul className="grid grid-cols-2 gap-x-10 gap-y-3 text-sm">
             {items.map(([label, href]) => (
               <li key={href}>
-                <Link href={href} className="text-bg/75 transition-colors hover:text-accent">
+                <Link
+                  href={href}
+                  className="text-bg/75 transition-colors hover:text-accent"
+                >
                   {label}
                 </Link>
               </li>
@@ -34,7 +37,7 @@ export function Footer() {
         </p>
       </div>
       <div className="border-t border-bg/15 py-5 text-center font-mono text-xs uppercase tracking-widest text-bg/60">
-        © 2026 REAHUB. Real estate compliance software.
+        © 2026 REAHUB. Powered by Briesa.
       </div>
     </footer>
   );
