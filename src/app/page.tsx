@@ -58,7 +58,7 @@ export default function Home() {
       <JsonLd data={software} />
       {/* hero */}
       <section className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-center gap-14 px-5 pb-20 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-center gap-14 px-5 pb-20 pt-14 sm:px-8 sm:pt-20 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <div data-load>
               <Eyebrow>Compliance software for NSW agencies</Eyebrow>
@@ -84,7 +84,7 @@ export default function Home() {
               </ButtonLink>
             </div>
           </div>
-          <div data-load className="xl:-mr-16">
+          <div data-load className="">
             <div data-parallax="6">
               <div className="float">
                 <BoardMock />
@@ -257,7 +257,7 @@ export default function Home() {
             </div>
           </div>
           <div data-reveal>
-            <TrailMock dark />
+            <TrailMock />
           </div>
         </div>
       </section>

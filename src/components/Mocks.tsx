@@ -1,79 +1,133 @@
 import type { ReactNode } from "react";
-import { Icon } from "./Icons";
+import { Icon, type IconName } from "./Icons";
 
-/* ---------- shared building blocks ---------- */
+/* ---------- stage + browser window (the screenshot treatment) ---------- */
 
-function Frame({
-  crumbs,
+const NAV: { icon: IconName; id: string }[] = [
+  { icon: "home", id: "properties" },
+  { icon: "scale", id: "trust" },
+  { icon: "shield", id: "compliance" },
+  { icon: "clock", id: "operations" },
+  { icon: "users", id: "people" },
+];
+
+function AppWindow({
+  url,
+  tab,
+  active,
   children,
-  dark = false,
 }: {
-  crumbs: ReactNode;
+  url: string;
+  tab: string;
+  active: string;
   children: ReactNode;
-  dark?: boolean;
 }) {
   return (
-    <div
-      className={`lift overflow-hidden rounded-[1.4rem] ring-1 shadow-[0_2px_6px_oklch(0.24_0.05_258/0.06),0_40px_80px_-32px_oklch(0.24_0.05_258/0.45)] ${
-        dark
-          ? "bg-[oklch(0.28_0.05_258)] text-bg ring-bg/10"
-          : "bg-surface ring-ink/10"
-      }`}
-    >
+    <div className="lift relative overflow-hidden rounded-[1.75rem] bg-[linear-gradient(140deg,oklch(0.19_0.05_262),oklch(0.3_0.11_266))] pl-4 pt-5 shadow-[0_40px_90px_-40px_oklch(0.24_0.05_258/0.7)] sm:pl-8 sm:pt-8">
+      {/* light spilling in from the left edge */}
       <div
-        className={`flex items-center gap-3 border-b px-4 py-3 ${
-          dark ? "border-bg/10 bg-bg/[0.03]" : "border-line bg-bg"
-        }`}
-      >
-        <span className="flex gap-1.5" aria-hidden="true">
-          {[0, 1, 2].map((i) => (
-            <span
-              key={i}
-              className={`h-2.5 w-2.5 rounded-full ${dark ? "bg-bg/20" : "bg-ink/15"}`}
-            />
-          ))}
-        </span>
-        <div className="min-w-0 flex-1 truncate text-[13px] font-semibold">
-          {crumbs}
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-12 bottom-6 h-80 w-28 -rotate-12 rounded-full bg-accent/70 blur-3xl"
+      />
+      <div className="relative -mr-4 overflow-hidden rounded-tl-2xl bg-surface text-ink ring-1 ring-white/20">
+        {/* browser chrome */}
+        <div className="bg-[oklch(0.93_0.012_250)] px-3 pt-2.5">
+          <div className="flex items-end gap-3">
+            <span className="mb-2 flex gap-1.5" aria-hidden="true">
+              <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.7_0.18_25)]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.82_0.15_85)]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[oklch(0.75_0.16_150)]" />
+            </span>
+            <span className="flex min-w-0 items-center gap-2 rounded-t-lg bg-surface px-3 py-1.5 text-[11px] font-medium">
+              <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] bg-accent text-[8px] font-bold text-bg">
+                R
+              </span>
+              <span className="truncate">{tab}</span>
+              <Icon name="close" className="h-3 w-3 shrink-0 text-ink-soft" />
+            </span>
+          </div>
         </div>
-        <span
-          className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium ${
-            dark ? "bg-bg/10 text-bg/70" : "bg-tint text-ink-soft"
-          }`}
-        >
-          Sample data
-        </span>
+        <div className="flex items-center gap-2.5 border-b border-line bg-surface px-3 py-2 text-ink-soft">
+          <Icon name="arrow" className="h-3.5 w-3.5 rotate-180" />
+          <Icon name="arrow" className="h-3.5 w-3.5" />
+          <span className="flex min-w-0 flex-1 items-center gap-1.5 rounded-full bg-bg px-3 py-1 text-[11px]">
+            <Icon name="lock" className="h-3 w-3 shrink-0" />
+            <span className="truncate">{url}</span>
+          </span>
+        </div>
+
+        {/* app header */}
+        <div className="flex items-center gap-3 border-b border-line px-4 py-2.5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.svg"
+            alt=""
+            width={403}
+            height={82}
+            className="h-3.5 w-auto"
+          />
+          <span className="ml-auto hidden items-center gap-1.5 rounded-full bg-bg px-3 py-1 text-[11px] text-ink-soft sm:flex">
+            <Icon name="search" className="h-3 w-3" /> Search
+          </span>
+          <span className="rounded-full bg-tint px-2.5 py-1 text-[10px] font-semibold text-ink-soft">
+            Sample data
+          </span>
+        </div>
+
+        <div className="flex">
+          <nav
+            aria-hidden="true"
+            className="hidden w-12 shrink-0 flex-col items-center gap-1 border-r border-line bg-bg py-3 sm:flex"
+          >
+            {NAV.map((n) => (
+              <span
+                key={n.id}
+                className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+                  n.id === active ? "bg-accent/15 text-ink" : "text-ink-soft"
+                }`}
+              >
+                <Icon name={n.icon} className="h-4 w-4" />
+              </span>
+            ))}
+          </nav>
+          <div className="min-w-0 flex-1">{children}</div>
+        </div>
       </div>
-      {children}
     </div>
   );
 }
 
-function Crumbs({ parent, current }: { parent: string; current: string }) {
+function PageTitle({
+  title,
+  sub,
+  right,
+}: {
+  title: string;
+  sub?: string;
+  right?: ReactNode;
+}) {
   return (
-    <>
-      <span className="font-medium opacity-55">{parent}</span>
-      <span className="mx-1.5 opacity-40">/</span>
-      {current}
-    </>
+    <div className="flex items-start justify-between gap-3 px-5 pt-5">
+      <div className="min-w-0">
+        <h3 className="font-display text-lg font-extrabold leading-tight tracking-tight">
+          {title}
+        </h3>
+        {sub && <p className="mt-0.5 text-[13px] text-ink-soft">{sub}</p>}
+      </div>
+      {right}
+    </div>
   );
 }
 
+/* ---------- small parts ---------- */
+
 type Tone = "ok" | "owed" | "neutral" | "solid";
 
-function Pill({
-  tone,
-  children,
-  dark = false,
-}: {
-  tone: Tone;
-  children: ReactNode;
-  dark?: boolean;
-}) {
+function Pill({ tone, children }: { tone: Tone; children: ReactNode }) {
   const styles: Record<Tone, string> = {
     ok: "bg-ink/[0.06] text-ink",
     owed: "bg-accent/15 text-ink",
-    neutral: dark ? "bg-bg/10 text-bg/80" : "bg-tint text-ink-soft",
+    neutral: "bg-tint text-ink-soft",
     solid: "bg-ink text-bg",
   };
   return (
@@ -92,17 +146,15 @@ function Pill({
 function Avatar({
   initials,
   tone = 0,
-  dark = false,
 }: {
   initials: string;
   tone?: 0 | 1 | 2;
-  dark?: boolean;
 }) {
-  const t = dark
-    ? ["bg-bg/15 text-bg", "bg-accent text-bg", "bg-bg/25 text-bg"][tone]
-    : ["bg-accent/15 text-ink", "bg-ink/10 text-ink", "bg-tint text-ink-soft"][
-        tone
-      ];
+  const t = [
+    "bg-accent/15 text-ink",
+    "bg-ink/10 text-ink",
+    "bg-tint text-ink-soft",
+  ][tone];
   return (
     <span
       className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${t}`}
@@ -113,11 +165,9 @@ function Avatar({
   );
 }
 
-function Progress({ pct, dark = false }: { pct: number; dark?: boolean }) {
+function Progress({ pct }: { pct: number }) {
   return (
-    <div
-      className={`h-1.5 overflow-hidden rounded-full ${dark ? "bg-bg/15" : "bg-tint"}`}
-    >
+    <div className="h-1.5 overflow-hidden rounded-full bg-tint">
       <div
         className="h-full rounded-full bg-accent"
         style={{ width: `${pct}%` }}
@@ -172,84 +222,98 @@ export function BoardMock() {
       who: "JA",
     },
   ];
+  const properties: [string, string][] = [
+    ["12 Smith Street, Newtown", "Listed"],
+    ["41 Norton Street, Leichhardt", "Under offer"],
+    ["3 Bay Street, Rozelle", "Managed"],
+    ["22 Hill Street, Balmain", "Appraised"],
+  ];
   return (
-    <Frame
-      crumbs={<Crumbs parent="Properties" current="12 Smith St, Newtown" />}
+    <AppWindow
+      url="app.reahub.com.au/properties/12-smith-st"
+      tab="12 Smith St · REAHUB"
+      active="properties"
     >
-      <div className="px-5 pt-5">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="font-display text-lg font-extrabold leading-tight tracking-tight">
-              12 Smith Street, Newtown
-            </h3>
-            <p className="mt-0.5 text-[13px] text-ink-soft">
-              Sales campaign · Listed 29 Aug
-            </p>
-          </div>
-          <Pill tone="neutral">3 of 5 filed</Pill>
-        </div>
-        <div className="mt-4">
-          <Progress pct={60} />
-        </div>
-        <div className="mt-4 flex gap-5 overflow-hidden whitespace-nowrap border-b border-line text-[13px] font-medium text-ink-soft">
-          {[
-            "Overview",
-            "Checklist",
-            "Parties",
-            "Documents",
-            "Trust",
-            "Activity",
-          ].map((t) => (
-            <span
-              key={t}
-              className={`-mb-px border-b-2 pb-2.5 ${t === "Checklist" ? "border-accent text-ink" : "border-transparent"}`}
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-      </div>
-      <ul>
-        {rows.map((r, i) => (
-          <li
-            key={r.name}
-            style={{ animationDelay: `${0.5 + i * 0.28}s` }}
-            className={`board-row flex items-center gap-3 border-b border-line px-5 py-3.5 last:border-0 ${
-              r.tone === "owed"
-                ? "bg-accent/[0.07] shadow-[inset_3px_0_0_var(--accent)]"
-                : ""
-            }`}
-          >
-            <span
-              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                r.tone === "ok"
-                  ? "bg-ink text-bg"
-                  : "border-[1.5px] border-dashed border-ink-soft/60"
-              }`}
-              aria-hidden="true"
-            >
-              {r.tone === "ok" && <Icon name="check" className="h-3 w-3" />}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">{r.name}</p>
-              <p className="truncate text-xs text-ink-soft">{r.note}</p>
+      <div className="flex">
+        {/* property list, like the prospect list in a CRM */}
+        <aside className="hidden w-44 shrink-0 border-r border-line bg-bg p-3 xl:block">
+          <p className="px-1 pb-2 text-[11px] font-bold uppercase tracking-wider text-ink-soft">
+            Every property
+          </p>
+          <ul className="space-y-1">
+            {properties.map(([a, s], i) => (
+              <li
+                key={a}
+                className={`rounded-lg px-2 py-2 ${i === 0 ? "bg-surface shadow-sm ring-1 ring-line" : ""}`}
+              >
+                <p className="truncate text-xs font-semibold">{a}</p>
+                <p className="text-[11px] text-ink-soft">{s}</p>
+              </li>
+            ))}
+          </ul>
+        </aside>
+
+        <div className="min-w-0 flex-1">
+          <PageTitle
+            title="12 Smith Street, Newtown"
+            sub="Sales campaign · Listed 29 Aug"
+            right={<Pill tone="neutral">3 of 5 filed</Pill>}
+          />
+          <div className="px-5 pt-4">
+            <Progress pct={60} />
+            <div className="mt-4 flex gap-5 overflow-hidden whitespace-nowrap border-b border-line text-[13px] font-medium text-ink-soft">
+              {[
+                "Overview",
+                "Checklist",
+                "Parties",
+                "Documents",
+                "Trust",
+                "Activity",
+              ].map((t) => (
+                <span
+                  key={t}
+                  className={`-mb-px border-b-2 pb-2.5 ${t === "Checklist" ? "border-accent text-ink" : "border-transparent"}`}
+                >
+                  {t}
+                </span>
+              ))}
             </div>
-            <span className="hidden sm:block">
-              <Pill tone={r.tone}>{r.status}</Pill>
-            </span>
-            <Avatar initials={r.who} tone={(i % 3) as 0 | 1 | 2} />
-          </li>
-        ))}
-      </ul>
-      <div className="flex items-center justify-between gap-3 border-t border-line bg-bg px-5 py-3">
-        <span className="text-xs text-ink-soft">
-          3 filed · 1 owed · 1 renewing
-        </span>
-        <span className="rounded-full bg-ink px-3.5 py-1.5 text-xs font-semibold text-bg">
-          Request ID check
-        </span>
+          </div>
+          <ul>
+            {rows.map((r, i) => (
+              <li
+                key={r.name}
+                style={{ animationDelay: `${0.5 + i * 0.28}s` }}
+                className={`board-row flex items-center gap-3 border-b border-line px-5 py-3 last:border-0 ${
+                  r.tone === "owed"
+                    ? "bg-accent/[0.07] shadow-[inset_3px_0_0_var(--accent)]"
+                    : ""
+                }`}
+              >
+                <span
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+                    r.tone === "ok"
+                      ? "bg-ink text-bg"
+                      : "border-[1.5px] border-dashed border-ink-soft/60"
+                  }`}
+                  aria-hidden="true"
+                >
+                  {r.tone === "ok" && <Icon name="check" className="h-3 w-3" />}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold">{r.name}</p>
+                  <p className="truncate text-xs text-ink-soft">{r.note}</p>
+                </div>
+                <span className="hidden sm:block">
+                  <Pill tone={r.tone}>{r.status}</Pill>
+                </span>
+                <Avatar initials={r.who} tone={(i % 3) as 0 | 1 | 2} />
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-    </Frame>
+    </AppWindow>
   );
 }
 
@@ -312,19 +376,22 @@ export function ChecklistMock() {
     },
   ];
   return (
-    <Frame crumbs={<Crumbs parent="Sales campaign" current="12 Smith St" />}>
-      <div className="px-5 py-5">
-        <div className="flex items-baseline justify-between">
-          <h3 className="font-display text-lg font-extrabold tracking-tight">
-            Compliance checklist
-          </h3>
+    <AppWindow
+      url="app.reahub.com.au/campaigns/12-smith-st"
+      tab="Campaign · REAHUB"
+      active="properties"
+    >
+      <PageTitle
+        title="Compliance checklist"
+        sub="Sales campaign · 12 Smith St"
+        right={
           <span className="text-[13px] font-semibold tabular-nums">
             4 of 6 done
           </span>
-        </div>
-        <div className="mt-3">
-          <Progress pct={66} />
-        </div>
+        }
+      />
+      <div className="px-5 pb-4 pt-3">
+        <Progress pct={66} />
       </div>
       {groups.map((g) => (
         <section key={g.title} className="border-t border-line">
@@ -354,7 +421,7 @@ export function ChecklistMock() {
                   {it.t}
                 </span>
                 {it.file && (
-                  <span className="hidden items-center gap-1 rounded-md bg-tint px-2 py-1 text-[11px] font-medium text-ink-soft sm:inline-flex">
+                  <span className="hidden items-center gap-1 rounded-md bg-tint px-2 py-1 text-[11px] font-medium text-ink-soft md:inline-flex">
                     <Icon name="clip" className="h-3 w-3" />
                     {it.file}
                   </span>
@@ -366,7 +433,7 @@ export function ChecklistMock() {
           </ul>
         </section>
       ))}
-    </Frame>
+    </AppWindow>
   );
 }
 
@@ -393,32 +460,37 @@ export function TrustMock() {
     ["Trust ledger", "A$292,000"],
   ];
   return (
-    <Frame crumbs={<Crumbs parent="Trust" current="Sales account" />}>
-      <div className="grid grid-cols-2 border-b border-line">
-        <div className="border-r border-line px-5 py-4">
+    <AppWindow
+      url="app.reahub.com.au/trust/sales"
+      tab="Sales trust · REAHUB"
+      active="trust"
+    >
+      <PageTitle
+        title="Sales trust account"
+        sub="September"
+        right={<Pill tone="ok">Matched</Pill>}
+      />
+      <div className="mt-4 grid grid-cols-2 border-y border-line">
+        <div className="border-r border-line px-5 py-3.5">
           <p className="text-xs font-medium text-ink-soft">Held in trust</p>
-          <p className="mt-1 font-display text-2xl font-extrabold tabular-nums tracking-tight">
+          <p className="mt-1 font-display text-xl font-extrabold tabular-nums tracking-tight">
             A$292,000
           </p>
         </div>
-        <div className="px-5 py-4">
+        <div className="px-5 py-3.5">
           <p className="text-xs font-medium text-ink-soft">Unreconciled</p>
-          <p className="mt-1 font-display text-2xl font-extrabold tabular-nums tracking-tight">
+          <p className="mt-1 font-display text-xl font-extrabold tabular-nums tracking-tight">
             A$0
           </p>
         </div>
-      </div>
-
-      <div className="px-5 pb-1 pt-4 text-xs font-bold uppercase tracking-wider text-ink-soft">
-        Recent receipts
       </div>
       <ul>
         {receipts.map((r) => (
           <li
             key={r.ref}
-            className="flex items-center gap-3 border-t border-line px-5 py-3 text-sm"
+            className="flex items-center gap-3 border-b border-line px-5 py-3 text-sm"
           >
-            <span className="w-14 shrink-0 font-mono text-xs text-ink-soft">
+            <span className="hidden w-14 shrink-0 font-mono text-xs text-ink-soft sm:block">
               {r.ref}
             </span>
             <span className="min-w-0 flex-1">
@@ -431,12 +503,8 @@ export function TrustMock() {
           </li>
         ))}
       </ul>
-
       <div className="m-4 rounded-2xl border border-line bg-bg p-4">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-bold">September reconciliation</p>
-          <Pill tone="ok">Matched</Pill>
-        </div>
+        <p className="text-sm font-bold">September reconciliation</p>
         <dl className="mt-3 space-y-2 text-sm">
           {recon.map(([k, v]) => (
             <div key={k} className="flex justify-between">
@@ -458,7 +526,7 @@ export function TrustMock() {
           </span>
         </div>
       </div>
-    </Frame>
+    </AppWindow>
   );
 }
 
@@ -504,8 +572,13 @@ export function LicenseMock() {
     },
   ];
   return (
-    <Frame crumbs={<Crumbs parent="Compliance" current="Accreditations" />}>
-      <div className="m-4 flex items-start gap-3 rounded-2xl border border-accent/25 bg-accent/[0.08] p-3.5">
+    <AppWindow
+      url="app.reahub.com.au/compliance/accreditations"
+      tab="Accreditations · REAHUB"
+      active="compliance"
+    >
+      <PageTitle title="Accreditations" sub="Inner West office" />
+      <div className="mx-4 mb-3 mt-4 flex items-start gap-3 rounded-2xl border border-accent/25 bg-accent/[0.08] p-3.5">
         <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-bg">
           <Icon name="bell" className="h-4 w-4" />
         </span>
@@ -534,17 +607,19 @@ export function LicenseMock() {
                 <Progress pct={p.pct} />
               </div>
             </div>
-            <Pill tone={p.tone}>{p.status}</Pill>
+            <span className="hidden sm:block">
+              <Pill tone={p.tone}>{p.status}</Pill>
+            </span>
           </li>
         ))}
       </ul>
-    </Frame>
+    </AppWindow>
   );
 }
 
 /* ---------- audit log ---------- */
 
-export function TrailMock({ dark = false }: { dark?: boolean }) {
+export function TrailMock() {
   const events = [
     {
       t: "11:41",
@@ -580,83 +655,62 @@ export function TrailMock({ dark = false }: { dark?: boolean }) {
     },
   ];
   return (
-    <Frame
-      crumbs={<Crumbs parent="Compliance" current="Audit log" />}
-      dark={dark}
+    <AppWindow
+      url="app.reahub.com.au/compliance/audit-log"
+      tab="Audit log · REAHUB"
+      active="compliance"
     >
-      <div
-        className={`flex items-center justify-between gap-3 border-b px-5 py-3 ${dark ? "border-bg/10" : "border-line"}`}
-      >
-        <div className="flex gap-1.5 text-xs font-semibold">
-          {["All", "Trust", "Registers"].map((f, i) => (
-            <span
-              key={f}
-              className={`rounded-full px-3 py-1 ${
-                i === 0
-                  ? dark
-                    ? "bg-bg text-ink"
-                    : "bg-ink text-bg"
-                  : dark
-                    ? "text-bg/60"
-                    : "text-ink-soft"
-              }`}
-            >
-              {f}
-            </span>
-          ))}
-        </div>
-        <span
-          className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ${
-            dark ? "bg-accent text-bg" : "bg-ink text-bg"
-          }`}
-        >
-          <Icon name="download" className="h-3.5 w-3.5" /> Export pack
-        </span>
+      <PageTitle
+        title="Audit log"
+        sub="Every write, who made it and what it was before"
+        right={
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-ink px-3 py-1.5 text-xs font-semibold text-bg">
+            <Icon name="download" className="h-3.5 w-3.5" /> Export pack
+          </span>
+        }
+      />
+      <div className="mt-4 flex gap-1.5 border-b border-line px-5 pb-3 text-xs font-semibold">
+        {["All", "Trust", "Registers"].map((f, i) => (
+          <span
+            key={f}
+            className={`rounded-full px-3 py-1 ${i === 0 ? "bg-ink text-bg" : "text-ink-soft"}`}
+          >
+            {f}
+          </span>
+        ))}
       </div>
       <ol>
         {events.map((e) => (
           <li
             key={e.t + e.act}
-            className={`flex gap-3 border-b px-5 py-3.5 last:border-0 ${dark ? "border-bg/10" : "border-line"}`}
+            className="flex gap-3 border-b border-line px-5 py-3.5 last:border-0"
           >
-            <Avatar initials={e.who} tone={1} dark={dark} />
+            <Avatar initials={e.who} tone={1} />
             <div className="min-w-0 flex-1">
               <p className="text-sm leading-snug">
                 <span className="font-semibold">{e.name}</span>{" "}
-                <span className={dark ? "text-bg/70" : "text-ink-soft"}>
-                  {e.act}
-                </span>
+                <span className="text-ink-soft">{e.act}</span>
               </p>
-              <p
-                className={`mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] font-medium ${dark ? "text-bg/80" : ""}`}
-              >
-                <span
-                  className={`rounded-md px-1.5 py-0.5 line-through ${dark ? "bg-bg/10" : "bg-tint text-ink-soft"}`}
-                >
+              <p className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] font-medium">
+                <span className="rounded-md bg-tint px-1.5 py-0.5 text-ink-soft line-through">
                   {e.from}
                 </span>
                 <Icon name="arrow" className="h-3 w-3 opacity-50" />
-                <span
-                  className={`rounded-md px-1.5 py-0.5 ${dark ? "bg-accent/30" : "bg-accent/15"}`}
-                >
+                <span className="rounded-md bg-accent/15 px-1.5 py-0.5">
                   {e.to}
                 </span>
               </p>
             </div>
-            <span
-              className={`shrink-0 pt-0.5 font-mono text-xs ${dark ? "text-bg/55" : "text-ink-soft"}`}
-            >
+            <span className="shrink-0 pt-0.5 font-mono text-xs text-ink-soft">
               {e.t}
             </span>
           </li>
         ))}
       </ol>
-      <div
-        className={`flex items-center gap-2 px-5 py-3 text-xs ${dark ? "bg-bg/[0.04] text-bg/65" : "bg-bg text-ink-soft"}`}
-      >
+      <div className="flex items-center gap-2 bg-bg px-5 py-3 text-xs text-ink-soft">
         <Icon name="lock" className="h-3.5 w-3.5" /> Entries cannot be edited or
         deleted
       </div>
-    </Frame>
+    </AppWindow>
   );
 }
