@@ -40,7 +40,7 @@ export default function Demo() {
           {[
             "A 30-minute walkthrough tailored to your market",
             "Your checklists and licence rules, not a generic tour",
-            "Answers on migration, roles and audit exports",
+            "Answers on teams, roles and audit exports",
           ].map((t) => (
             <li key={t} className="flex items-start gap-3 text-ink">
               <Icon name="check" className="mt-1 h-5 w-5 shrink-0 text-ink" />{" "}

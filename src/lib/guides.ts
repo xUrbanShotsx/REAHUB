@@ -64,7 +64,7 @@ export const guides: Guide[] = [
       },
       {
         q: "Does it replace my CRM?",
-        a: "REAHUB runs the property file, trust, registers and daily tasks in one system. Ask us how your current CRM data carries across.",
+        a: "REAHUB runs the property file, trust, registers and daily tasks in one system. Ask us how it fits with the tools you use today.",
       },
     ],
     related: [
@@ -427,12 +427,6 @@ export const guides: Guide[] = [
           "Rent receipted into the rentals trust account",
         ],
       },
-      {
-        h: "Bring the rent roll across",
-        p: [
-          "Larger portfolios can bulk import the rent roll so the file starts populated rather than retyped.",
-        ],
-      },
     ],
     faqs: [
       {
@@ -446,7 +440,6 @@ export const guides: Guide[] = [
     ],
     related: [
       "real-estate-trust-accounting-software-nsw",
-      "switching-real-estate-software-data-migration",
       "nsw-real-estate-compliance-software",
     ],
   },
@@ -660,57 +653,6 @@ export const guides: Guide[] = [
       "nsw-fair-trading-inspection-checklist",
       "real-estate-policy-library-sign-off",
       "real-estate-agency-audit-checklist-nsw",
-    ],
-  },
-  {
-    slug: "switching-real-estate-software-data-migration",
-    title: "Switching Real Estate Software and Data",
-    h1: "Switching agency software without losing your history",
-    description:
-      "What carries across when you move agency software, what does not, and the order to do it in. A practical guide to migrating properties, parties and documents.",
-    category: "Getting started",
-    intro:
-      "A property's history is the whole point, so migration is the part to take most seriously. Here is a sensible order of work.",
-    sections: [
-      {
-        h: "A sensible order",
-        p: ["Move in layers so each one can be checked before the next."],
-        bullets: [
-          "Agency set-up: name, jurisdiction, teams and access levels",
-          "People, licences and accreditations",
-          "Properties and their parties",
-          "Open campaigns and management periods",
-          "Documents against the property",
-          "Trust balances, switched at a month end",
-        ],
-      },
-      {
-        h: "Be honest about what carries",
-        p: [
-          "Structured records such as properties and parties carry cleanly. Free-text notes and documents without an address can need tidying. Ask for a straight answer before committing.",
-        ],
-      },
-      {
-        h: "No second migration",
-        p: [
-          "Changing plan or moving a team under an agency does not need another migration. A plan is a limit, not a different system.",
-        ],
-      },
-    ],
-    faqs: [
-      {
-        q: "How long does migration take?",
-        a: "It depends on your current system and volume. Tell us what you use now and we will give you a straight answer.",
-      },
-      {
-        q: "When should we switch the trust account?",
-        a: "At a month end, so the opening balance is a reconciled one.",
-      },
-    ],
-    related: [
-      "property-management-compliance-software-nsw",
-      "nsw-real-estate-compliance-software",
-      "real-estate-trust-accounting-software-nsw",
     ],
   },
 ];

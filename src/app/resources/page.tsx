@@ -9,7 +9,7 @@ import { Icon } from "@/components/Icons";
 export const metadata: Metadata = pageMeta({
   title: "Real Estate Compliance Resources and Docs",
   description:
-    "Guides, docs and research for NSW licensees in charge: supervision guidelines, trust reconciliation, registers and migration. Plain language, not legal advice.",
+    "Guides, docs and research for NSW licensees in charge: supervision guidelines, trust reconciliation, registers and setting up your agency. Plain language, not legal advice.",
   path: "/resources",
 });
 
@@ -22,9 +22,9 @@ const items = [
   ],
   [
     "Docs",
-    "Bringing your data across",
-    "What carries from your current system, what does not, and the order to do it in.",
-    "https://briesa.com/migration",
+    "Setting up your agency",
+    "Teams, access levels and what each one decides, before the first property goes in.",
+    "https://briesa.com/docs/getting-started",
   ],
   [
     "Docs",

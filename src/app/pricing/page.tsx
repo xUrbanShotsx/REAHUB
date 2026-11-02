@@ -33,7 +33,7 @@ const faqs = [
   ],
   [
     "Can we change plan later?",
-    "Yes. A plan is a limit, not a different system, so nothing is migrated when you move up or down.",
+    "Yes. A plan is a limit, not a different system, so your data stays exactly as it is when you move up or down.",
   ],
   [
     "Does our auditor need a seat?",

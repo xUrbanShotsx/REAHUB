@@ -69,7 +69,6 @@ const plans: Plan[] = [
     lead: "Everything in Boutique:",
     features: [
       "Agency-wide compliance reporting",
-      "Bulk import of the rent roll",
       "Registers rolled up across branches",
       "Unlimited assistant queries",
       "Priority support",

@@ -42,7 +42,7 @@ const audiences = [
       "Up to eight teams on one list of properties",
       "Compliance reporting across every team and branch",
       "Registers rolled up across branches",
-      "Bulk import of the rent roll",
+      "Priority support",
     ],
   },
 ];
