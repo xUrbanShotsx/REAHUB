@@ -67,7 +67,9 @@ export default function Home() {
             </p>
             <div data-load className="mt-9 flex flex-wrap items-center gap-4">
               <Magnetic>
-                <ButtonLink href="https://auth.briesa.com/signup">Sign up</ButtonLink>
+                <ButtonLink href="https://auth.briesa.com/signup">
+                  Sign up
+                </ButtonLink>
               </Magnetic>
               <ButtonLink href="/solutions" variant="ghost">
                 See how a file gets cleared
@@ -232,8 +234,8 @@ export default function Home() {
         >
           {[
             [
-              "Bring across",
-              "Properties, parties and open campaigns come over from the system you use now.",
+              "Add your properties",
+              "Enter your properties, parties and open campaigns, and set up your teams and who sees what.",
             ],
             [
               "Work",
