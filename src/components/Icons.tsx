@@ -93,6 +93,12 @@ const paths: Record<string, ReactNode> = {
     </>
   ),
   list: <path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01" />,
+  sparkle: (
+    <>
+      <path d="M12 3l1.900 5.100L19 10l-5.100 1.900L12 17l-1.900-5.100L5 10l5.100-1.900L12 3z" />
+      <path d="M19 15l.8 2.200L22 18l-2.200.8L19 21l-.8-2.200L16 18l2.200-.8L19 15z" />
+    </>
+  ),
   home: <path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10" />,
   arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,

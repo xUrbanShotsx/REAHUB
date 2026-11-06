@@ -75,6 +75,24 @@ export function AppShell({ children }: { children: ReactNode }) {
         })}
       </nav>
 
+      <div className="px-3 pb-1">
+        <Link
+          href="/dashboard/assistant"
+          onClick={() => setOpen(false)}
+          aria-current={
+            pathname.startsWith("/dashboard/assistant") ? "page" : undefined
+          }
+          className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${
+            pathname.startsWith("/dashboard/assistant")
+              ? "bg-accent/15 text-ink"
+              : "text-ink-soft hover:bg-tint hover:text-ink"
+          }`}
+        >
+          <Icon name="sparkle" className="h-[18px] w-[18px]" />
+          Assistance
+        </Link>
+      </div>
+
       <div className="m-3 rounded-xl border border-line bg-surface p-3">
         <div className="flex items-center gap-3">
           <Avatar initials={me.initials} tone={0} />
