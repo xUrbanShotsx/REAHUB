@@ -21,6 +21,13 @@ import {
 } from "@/lib/demo-data";
 import { clearProofs, deleteProof, putProof } from "@/lib/proofs";
 import {
+  addYears,
+  seedAccreditations,
+  type Accreditation,
+  type CpdEntry,
+  type Renewal,
+} from "@/lib/accreditations";
+import {
   registerById,
   seedEntries,
   type EntryFile,
@@ -28,19 +35,21 @@ import {
   type Values,
 } from "@/lib/registers";
 
-const KEY = "reahub-demo-v3";
+const KEY = "reahub-demo-v4";
 
 type Saved = {
   properties: Property[];
   templates: Template[];
   entries: RegisterEntry[];
   audit: AuditEvent[];
+  accreditations: Accreditation[];
 };
 const SEED: Saved = {
   properties: seedProperties,
   templates: seedTemplates,
   entries: seedEntries,
   audit: seedAudit,
+  accreditations: seedAccreditations,
 };
 
 export type NewProperty = {
@@ -61,6 +70,7 @@ type Store = {
   templates: Template[];
   entries: RegisterEntry[];
   audit: AuditEvent[];
+  accreditations: Accreditation[];
   addProperty: (input: NewProperty) => string;
   updateProperty: (id: string, patch: Partial<Property>) => void;
   deleteProperty: (id: string) => void;
@@ -82,6 +92,10 @@ type Store = {
     values: Values,
     files: Files,
   ) => Promise<void>;
+  addAccreditation: (values: Values, files: Files) => Promise<string>;
+  addCpd: (id: string, values: Values, files: Files) => Promise<void>;
+  recordRenewal: (id: string, values: Values, files: Files) => Promise<void>;
+  startNextCpdYear: (id: string) => void;
   resetDemo: () => void;
 };
 
@@ -108,6 +122,7 @@ function readSaved(): Saved | null {
       Array.isArray(p.properties) &&
       Array.isArray(p.templates) &&
       Array.isArray(p.entries) &&
+      Array.isArray(p.accreditations) &&
       Array.isArray(p.audit)
         ? p
         : null;
@@ -203,7 +218,7 @@ async function storeFiles(files: Files): Promise<Record<string, EntryFile>> {
 
 const actions: Omit<
   Store,
-  "ready" | "properties" | "templates" | "entries" | "audit"
+  "ready" | "properties" | "templates" | "entries" | "audit" | "accreditations"
 > = {
   addProperty: (input) => {
     const tpl = current().templates.find((t) => t.id === input.templateId);
@@ -462,6 +477,120 @@ const actions: Omit<
     );
   },
 
+  addAccreditation: async (values, files) => {
+    const stored = await storeFiles(files);
+    const num = Number(values.cpdRequired);
+    const acc: Accreditation = {
+      id: `acc-${uid()}`,
+      person: String(values.person),
+      type: String(values.type),
+      typeOther: values.typeOther ? String(values.typeOther) : undefined,
+      number: values.number ? String(values.number) : undefined,
+      issuedBy: String(values.issuedBy),
+      acquiredOn: String(values.acquiredOn),
+      expiresOn: String(values.expiresOn),
+      cpdRequired: Number.isFinite(num) && num > 0 ? num : 0,
+      cpdYearEnd: values.cpdYearEnd
+        ? String(values.cpdYearEnd)
+        : String(values.expiresOn),
+      file: stored.file,
+      cpdLog: [],
+      renewals: [],
+    };
+    update((s) =>
+      withEvent(
+        { ...s, accreditations: [acc, ...s.accreditations] },
+        event(
+          "Registers",
+          `added the ${acc.type === "Other" ? acc.typeOther : acc.type} for ${acc.person}`,
+          "No record",
+          `Expires ${acc.expiresOn}`,
+        ),
+      ),
+    );
+    return acc.id;
+  },
+
+  addCpd: async (id, values, files) => {
+    const stored = await storeFiles(files);
+    const entry: CpdEntry = {
+      id: uid(),
+      date: String(values.date),
+      activity: String(values.activity),
+      provider: String(values.provider),
+      category: String(values.category),
+      hours: Number(values.hours),
+      file: stored.file,
+    };
+    const acc = current().accreditations.find((a) => a.id === id);
+    update((s) =>
+      withEvent(
+        {
+          ...s,
+          accreditations: s.accreditations.map((a) =>
+            a.id === id
+              ? {
+                  ...a,
+                  cpdLog: [entry, ...a.cpdLog].sort((x, y) =>
+                    y.date.localeCompare(x.date),
+                  ),
+                }
+              : a,
+          ),
+        },
+        event(
+          "Registers",
+          `logged ${entry.hours} CPD hours for ${acc?.person ?? "a team member"}`,
+          "CPD",
+          entry.activity,
+        ),
+      ),
+    );
+  },
+
+  recordRenewal: async (id, values, files) => {
+    const stored = await storeFiles(files);
+    const renewal: Renewal = {
+      id: uid(),
+      renewedOn: String(values.renewedOn),
+      newExpiry: String(values.newExpiry),
+      reference: values.reference ? String(values.reference) : undefined,
+      by: me.name,
+      file: stored.file,
+    };
+    const acc = current().accreditations.find((a) => a.id === id);
+    update((s) =>
+      withEvent(
+        {
+          ...s,
+          accreditations: s.accreditations.map((a) =>
+            a.id === id
+              ? {
+                  ...a,
+                  expiresOn: renewal.newExpiry,
+                  renewals: [renewal, ...a.renewals],
+                }
+              : a,
+          ),
+        },
+        event(
+          "Registers",
+          `renewed the ${acc ? acc.type : "accreditation"} for ${acc?.person ?? "a team member"}`,
+          acc?.expiresOn ?? "Expiring",
+          `Expires ${renewal.newExpiry}`,
+        ),
+      ),
+    );
+  },
+
+  startNextCpdYear: (id) =>
+    update((s) => ({
+      ...s,
+      accreditations: s.accreditations.map((a) =>
+        a.id === id ? { ...a, cpdYearEnd: addYears(a.cpdYearEnd, 1) } : a,
+      ),
+    })),
+
   resetDemo: () => {
     clearProofs().catch(() => {});
     writeSaved(SEED);
@@ -486,6 +615,7 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       templates: state.templates,
       entries: state.entries,
       audit: state.audit,
+      accreditations: state.accreditations,
       ...actions,
     }),
     [ready, state],

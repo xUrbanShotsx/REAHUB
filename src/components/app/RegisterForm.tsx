@@ -17,7 +17,14 @@ import { btnDark, btnLight } from "./ui";
 const input =
   "mt-1.5 w-full rounded-lg border bg-bg px-3 py-2.5 text-sm text-ink focus:border-ink aria-[invalid=true]:border-ink aria-[invalid=true]:bg-accent/[0.06]";
 
-const BLANK_DATE = ["docExpiry", "followDue"];
+const BLANK_DATE = [
+  "docExpiry",
+  "followDue",
+  "acquiredOn",
+  "expiresOn",
+  "newExpiry",
+  "cpdYearEnd",
+];
 const BLANK_DATETIME = ["expectedBack", "endAt"];
 const DEFAULT_ME = [
   "recordedBy",

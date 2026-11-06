@@ -6,6 +6,7 @@ import { useState, type ReactNode } from "react";
 import { agency, me } from "@/lib/demo-data";
 import { Icon, type IconName } from "../Icons";
 import { useStore } from "./DemoStore";
+import { NotificationsBell } from "./NotificationsBell";
 import { Avatar } from "./ui";
 
 const NAV: { href: string; label: string; icon: IconName }[] = [
@@ -134,14 +135,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="hidden rounded-full bg-tint px-3 py-1 text-[11px] font-semibold text-ink-soft sm:inline">
               Sample data
             </span>
-            <button
-              type="button"
-              aria-label="Notifications"
-              className="relative flex h-10 w-10 items-center justify-center rounded-full hover:bg-tint"
-            >
-              <Icon name="bell" className="h-5 w-5" />
-              <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-accent" />
-            </button>
+            <NotificationsBell />
             <Avatar initials={me.initials} tone={0} />
           </span>
         </header>

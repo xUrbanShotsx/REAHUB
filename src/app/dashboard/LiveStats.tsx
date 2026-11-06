@@ -3,10 +3,15 @@
 import { useStore } from "@/components/app/DemoStore";
 import { Stat } from "@/components/app/ui";
 import { aud, trust } from "@/lib/demo-data";
+import { remindersFor } from "@/lib/accreditations";
 
 /** Stat cards that follow whatever is in the demo workspace right now. */
 export function LiveStats() {
-  const { properties } = useStore();
+  const { properties, accreditations, ready } = useStore();
+  const renewals = ready
+    ? remindersFor(accreditations).filter((r) => r.kind === "renewal")
+    : [];
+  const next = renewals[0];
   const open = properties.reduce(
     (n, p) => n + p.checklist.filter((c) => !c.done).length,
     0,
@@ -44,9 +49,13 @@ export function LiveStats() {
       />
       <Stat
         label="Licences expiring"
-        value="1"
-        note="J. Alvarez, in 25 days"
-        tone="owed"
+        value={String(renewals.length)}
+        note={
+          next
+            ? `${next.person}, ${next.daysLeft < 0 ? "expired" : `in ${next.daysLeft} days`}`
+            : "None in 90 days"
+        }
+        tone={renewals.length ? "owed" : undefined}
       />
     </div>
   );

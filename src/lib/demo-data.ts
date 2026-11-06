@@ -63,6 +63,7 @@ export const team = [
   { name: "Alex Chen", initials: "AC" },
   { name: "Dana Whitfield", initials: "DW" },
   { name: "Tom Becker", initials: "TB" },
+  { name: "J. Alvarez", initials: "JA" },
 ];
 export const initialsOf = (name: string) =>
   team.find((t) => t.name === name)?.initials ??

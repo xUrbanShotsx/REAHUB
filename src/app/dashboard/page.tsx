@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ExpiringSoon } from "./ExpiringSoon";
 import { LiveStats } from "./LiveStats";
 import { RecentActivity } from "./RecentActivity";
 import { Icon } from "@/components/Icons";
@@ -12,7 +13,7 @@ import {
   Pill,
   Progress,
 } from "@/components/app/ui";
-import { aud, kpis, me, people, trust, upcoming } from "@/lib/demo-data";
+import { aud, kpis, me, trust } from "@/lib/demo-data";
 
 const attention = [
   {
@@ -160,35 +161,7 @@ export default function DashboardHome() {
           </ul>
         </Card>
 
-        <Card>
-          <CardHead title="Expiring soon" sub="Licences, insurances, reviews" />
-          <ul>
-            {people.slice(0, 3).map((p, i) => (
-              <li
-                key={p.n}
-                className="flex items-center gap-3 border-b border-line px-5 py-3.5 last:border-0"
-              >
-                <Avatar initials={p.i} tone={(i % 3) as 0 | 1 | 2} />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold">
-                    {p.n}
-                  </span>
-                  <span className="block truncate text-xs text-ink-soft">
-                    {p.role} · exp. {p.exp}
-                  </span>
-                </span>
-              </li>
-            ))}
-          </ul>
-          <ul className="border-t border-line bg-bg px-5 py-3 text-xs text-ink-soft">
-            {upcoming.slice(0, 2).map((u) => (
-              <li key={u.t} className="flex justify-between gap-3 py-0.5">
-                <span className="truncate">{u.t}</span>
-                <span className="shrink-0 font-mono">{u.d}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
+        <ExpiringSoon />
 
         <RecentActivity />
       </div>

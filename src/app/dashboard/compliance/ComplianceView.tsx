@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Icon } from "@/components/Icons";
 import { useStore } from "@/components/app/DemoStore";
+import { AccreditationsPanel } from "@/components/app/AccreditationsPanel";
 import { RegistersTable } from "@/components/app/RegistersTable";
 import {
   Avatar,
@@ -12,7 +13,7 @@ import {
   Pill,
   Progress,
 } from "@/components/app/ui";
-import { people, policies } from "@/lib/demo-data";
+import { policies } from "@/lib/demo-data";
 
 const TABS = ["Accreditations", "Registers", "Policies", "Audit log"] as const;
 const AREAS = ["All", "Trust", "Registers", "Properties"] as const;
@@ -52,45 +53,7 @@ export function ComplianceView() {
         ))}
       </div>
 
-      {tab === "Accreditations" && (
-        <>
-          <div className="mb-4 flex items-start gap-3 rounded-2xl border border-accent/25 bg-accent/[0.08] p-4">
-            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-bg">
-              <Icon name="bell" className="h-4 w-4" />
-            </span>
-            <p className="text-sm">
-              <span className="font-bold">
-                J. Alvarez&apos;s Class 2 licence renews in 25 days.
-              </span>{" "}
-              <span className="text-ink-soft">
-                Alerts go out at 90, 60, 30 and 7 days.
-              </span>
-            </p>
-          </div>
-          <Card>
-            <ul>
-              {people.map((p, i) => (
-                <li
-                  key={p.n}
-                  className="flex items-center gap-4 border-b border-line px-5 py-4 last:border-0"
-                >
-                  <Avatar initials={p.i} tone={(i % 3) as 0 | 1 | 2} />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold">{p.n}</p>
-                    <p className="truncate text-xs text-ink-soft">
-                      {p.role} · exp. {p.exp}
-                    </p>
-                    <div className="mt-2 max-w-[14rem]">
-                      <Progress pct={p.pct} />
-                    </div>
-                  </div>
-                  <Pill tone={p.tone}>{p.status}</Pill>
-                </li>
-              ))}
-            </ul>
-          </Card>
-        </>
-      )}
+      {tab === "Accreditations" && <AccreditationsPanel />}
 
       {tab === "Registers" && <RegistersTable />}
 

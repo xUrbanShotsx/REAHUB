@@ -48,3 +48,14 @@ export function formatSize(bytes?: number) {
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
+
+/** Open a stored proof file in a new tab. Returns false if it is no longer in this browser. */
+export async function openProofFile(proofId: string): Promise<boolean> {
+  if (!proofId) return false;
+  const blob = await getProof(proofId).catch(() => undefined);
+  if (!blob) return false;
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank", "noopener");
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  return true;
+}

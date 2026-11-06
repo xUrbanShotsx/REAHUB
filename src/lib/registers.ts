@@ -1,5 +1,7 @@
 /** Register definitions: what each register records, and how much detail an entry must carry. */
 
+import { todayISO } from "./format";
+
 export type FieldType =
   | "text"
   | "textarea"
@@ -30,6 +32,12 @@ export type Field = {
   showWhen?: Condition;
   /** Required only when another field has one of these values. */
   requiredWhen?: Condition;
+  /** Required only when another field has been filled in. */
+  requiredIfFilled?: string;
+  /** The date must be later than this other date field. */
+  after?: string;
+  /** The date cannot be in the future. */
+  notFuture?: boolean;
 };
 
 export type RegisterAction = {
@@ -848,6 +856,10 @@ export function isVisible(f: Field, v: Values) {
 export function isRequired(f: Field, v: Values) {
   if (!isVisible(f, v)) return false;
   if (f.required) return true;
+  if (f.requiredIfFilled) {
+    const other = v[f.requiredIfFilled];
+    if (typeof other === "string" && other.trim() !== "") return true;
+  }
   if (f.requiredWhen) {
     const cur = v[f.requiredWhen.field];
     return typeof cur === "string" && f.requiredWhen.in.includes(cur);
@@ -861,30 +873,48 @@ export function validate(
   files: Record<string, File | undefined>,
 ) {
   const errors: Record<string, string> = {};
+  const today = todayISO();
   for (const f of fields) {
-    if (!isRequired(f, v)) continue;
+    if (!isVisible(f, v)) continue;
+    const required = isRequired(f, v);
     if (f.type === "file") {
-      if (!files[f.name]) errors[f.name] = "Attach the file.";
+      if (required && !files[f.name]) errors[f.name] = "Attach the file.";
       continue;
     }
     const val = v[f.name];
     if (f.type === "check") {
-      if (val !== true) errors[f.name] = "Confirm this before saving.";
+      if (required && val !== true)
+        errors[f.name] = "Confirm this before saving.";
       continue;
     }
     if (f.type === "checks") {
-      if (!Array.isArray(val) || val.length === 0)
+      if (required && (!Array.isArray(val) || val.length === 0))
         errors[f.name] = "Choose at least one.";
       continue;
     }
     const s = typeof val === "string" ? val.trim() : "";
-    if (!s) errors[f.name] = "This is required.";
-    else if (f.minLength && s.length < f.minLength)
+    if (!s) {
+      if (required) errors[f.name] = "This is required.";
+      continue;
+    }
+    if (f.minLength && s.length < f.minLength)
       errors[f.name] =
         `Add more detail (${s.length} of ${f.minLength} characters).`;
     else if (f.type === "money" || f.type === "number") {
       if (Number.isNaN(Number(s)) || Number(s) < 0)
         errors[f.name] = "Enter a number.";
+    } else if (f.type === "date" || f.type === "datetime") {
+      if (f.notFuture && s.slice(0, 10) > today)
+        errors[f.name] = "This cannot be a future date.";
+      const base = f.after ? v[f.after] : "";
+      if (
+        !errors[f.name] &&
+        f.after &&
+        typeof base === "string" &&
+        base &&
+        s <= base
+      )
+        errors[f.name] = "This must be later than the earlier date.";
     }
   }
   return errors;
