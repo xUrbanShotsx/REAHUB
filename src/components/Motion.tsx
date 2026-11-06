@@ -11,6 +11,7 @@ export function Motion() {
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (pathname.startsWith("/dashboard")) return;
     gsap.registerPlugin(ScrollTrigger);
 
     let cleanup: (() => void) | undefined;

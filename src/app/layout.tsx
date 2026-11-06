@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Manrope, IBM_Plex_Mono } from "next/font/google";
 import { Motion } from "@/components/Motion";
 import { Navbar } from "@/components/Navbar";
+import { SiteChrome } from "@/components/SiteChrome";
 import { Footer } from "@/components/Footer";
 import { JsonLd } from "@/components/JsonLd";
 import { organization, website } from "@/lib/schema";
@@ -100,9 +101,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <JsonLd data={[organization, website]} />
         <Motion />
-        <Navbar />
-        <main className="flex-1 pt-20 sm:pt-24">{children}</main>
-        <Footer />
+        <SiteChrome nav={<Navbar />} footer={<Footer />}>
+          {children}
+        </SiteChrome>
       </body>
     </html>
   );

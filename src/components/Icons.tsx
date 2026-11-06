@@ -68,6 +68,18 @@ const paths: Record<string, ReactNode> = {
   clip: (
     <path d="M20 11l-8 8a5 5 0 01-7-7l8.500-8.500a3.500 3.500 0 015 5L10 17a2 2 0 01-3-3l7.500-7.500" />
   ),
+  grid: (
+    <>
+      <rect x="4" y="4" width="7" height="7" rx="1.500" />
+      <rect x="13" y="4" width="7" height="7" rx="1.500" />
+      <rect x="4" y="13" width="7" height="7" rx="1.500" />
+      <rect x="13" y="13" width="7" height="7" rx="1.500" />
+    </>
+  ),
+  logout: (
+    <path d="M10 4H6a2 2 0 00-2 2v12a2 2 0 002 2h4M15 8l4 4-4 4M19 12H9" />
+  ),
+  plus: <path d="M12 5v14M5 12h14" />,
   home: <path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10" />,
   arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
   menu: <path d="M4 7h16M4 12h16M4 17h16" />,
