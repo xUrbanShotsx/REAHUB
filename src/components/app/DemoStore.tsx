@@ -8,20 +8,40 @@ import {
   type ReactNode,
 } from "react";
 import {
+  audit as seedAudit,
   initialsOf,
+  me,
   properties as seedProperties,
   STATUSES,
   templates as seedTemplates,
+  type AuditEvent,
   type Property,
   type PropertyType,
   type Template,
 } from "@/lib/demo-data";
 import { clearProofs, deleteProof, putProof } from "@/lib/proofs";
+import {
+  registerById,
+  seedEntries,
+  type EntryFile,
+  type RegisterEntry,
+  type Values,
+} from "@/lib/registers";
 
-const KEY = "reahub-demo-v2";
+const KEY = "reahub-demo-v3";
 
-type Saved = { properties: Property[]; templates: Template[] };
-const SEED: Saved = { properties: seedProperties, templates: seedTemplates };
+type Saved = {
+  properties: Property[];
+  templates: Template[];
+  entries: RegisterEntry[];
+  audit: AuditEvent[];
+};
+const SEED: Saved = {
+  properties: seedProperties,
+  templates: seedTemplates,
+  entries: seedEntries,
+  audit: seedAudit,
+};
 
 export type NewProperty = {
   type: PropertyType;
@@ -33,10 +53,14 @@ export type NewProperty = {
   templateId: string;
 };
 
+type Files = Record<string, File | undefined>;
+
 type Store = {
   ready: boolean;
   properties: Property[];
   templates: Template[];
+  entries: RegisterEntry[];
+  audit: AuditEvent[];
   addProperty: (input: NewProperty) => string;
   updateProperty: (id: string, patch: Partial<Property>) => void;
   deleteProperty: (id: string) => void;
@@ -47,6 +71,17 @@ type Store = {
   renameItem: (pid: string, itemId: string, text: string) => void;
   saveTemplate: (name: string, type: PropertyType, items: string[]) => Template;
   deleteTemplate: (id: string) => void;
+  addEntry: (
+    registerId: string,
+    values: Values,
+    files: Files,
+  ) => Promise<string>;
+  applyAction: (
+    entryId: string,
+    actionId: string,
+    values: Values,
+    files: Files,
+  ) => Promise<void>;
   resetDemo: () => void;
 };
 
@@ -67,12 +102,14 @@ function readSaved(): Saved | null {
   if (raw === cacheRaw) return cacheVal;
   cacheRaw = raw;
   try {
-    const parsed = raw ? (JSON.parse(raw) as Saved) : null;
+    const p = raw ? (JSON.parse(raw) as Saved) : null;
     cacheVal =
-      parsed &&
-      Array.isArray(parsed.properties) &&
-      Array.isArray(parsed.templates)
-        ? parsed
+      p &&
+      Array.isArray(p.properties) &&
+      Array.isArray(p.templates) &&
+      Array.isArray(p.entries) &&
+      Array.isArray(p.audit)
+        ? p
         : null;
   } catch {
     cacheVal = null;
@@ -113,13 +150,61 @@ const slug = (s: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
+const nowTime = () =>
+  new Date().toLocaleTimeString("en-AU", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+function event(
+  area: AuditEvent["area"],
+  act: string,
+  from: string,
+  to: string,
+): AuditEvent {
+  return {
+    t: nowTime(),
+    day: "Today",
+    who: me.initials,
+    name: me.name,
+    act,
+    from,
+    to,
+    area,
+  };
+}
+const withEvent = (s: Saved, e: AuditEvent): Saved => ({
+  ...s,
+  audit: [e, ...s.audit],
+});
+
 const patchProperty = (id: string, fn: (p: Property) => Property) =>
   update((s) => ({
     ...s,
     properties: s.properties.map((p) => (p.id === id ? fn(p) : p)),
   }));
 
-const actions: Omit<Store, "ready" | "properties" | "templates"> = {
+const findItem = (pid: string, itemId: string) =>
+  current()
+    .properties.find((p) => p.id === pid)
+    ?.checklist.find((c) => c.id === itemId);
+
+async function storeFiles(files: Files): Promise<Record<string, EntryFile>> {
+  const out: Record<string, EntryFile> = {};
+  for (const [name, file] of Object.entries(files)) {
+    if (!file) continue;
+    const proofId = uid();
+    await putProof(proofId, file);
+    out[name] = { name: file.name, size: file.size, mime: file.type, proofId };
+  }
+  return out;
+}
+
+const actions: Omit<
+  Store,
+  "ready" | "properties" | "templates" | "entries" | "audit"
+> = {
   addProperty: (input) => {
     const tpl = current().templates.find((t) => t.id === input.templateId);
     const id = `${slug(input.address) || "property"}-${uid()}`;
@@ -143,65 +228,114 @@ const actions: Omit<Store, "ready" | "properties" | "templates"> = {
         done: false,
       })),
     };
-    update((s) => ({ ...s, properties: [property, ...s.properties] }));
+    update((s) =>
+      withEvent(
+        { ...s, properties: [property, ...s.properties] },
+        event(
+          "Properties",
+          `added ${property.address} with the ${property.templateName} checklist`,
+          "No file",
+          "Property file",
+        ),
+      ),
+    );
     return id;
   },
 
   updateProperty: (id, patch) => patchProperty(id, (p) => ({ ...p, ...patch })),
 
-  deleteProperty: (id) =>
+  deleteProperty: (id) => {
+    current()
+      .properties.find((p) => p.id === id)
+      ?.checklist.forEach(
+        (c) => c.proofId && deleteProof(c.proofId).catch(() => {}),
+      );
     update((s) => ({
       ...s,
       properties: s.properties.filter((p) => p.id !== id),
-    })),
+    }));
+  },
 
   attachProof: async (pid, itemId, file) => {
     const proofId = uid();
     await putProof(proofId, file);
-    // replacing proof frees the old file
-    const old = current()
-      .properties.find((p) => p.id === pid)
-      ?.checklist.find((c) => c.id === itemId)?.proofId;
-    if (old) deleteProof(old).catch(() => {});
-    patchProperty(pid, (p) => ({
-      ...p,
-      checklist: p.checklist.map((c) =>
-        c.id === itemId
-          ? {
-              ...c,
-              done: true,
-              file: file.name,
-              proofId,
-              size: file.size,
-              mime: file.type,
-              addedAt: "Today",
-            }
-          : c,
-      ),
-    }));
+    const old = findItem(pid, itemId);
+    if (old?.proofId) deleteProof(old.proofId).catch(() => {});
+    update((s) => {
+      const prop = s.properties.find((p) => p.id === pid);
+      const next: Saved = {
+        ...s,
+        properties: s.properties.map((p) =>
+          p.id !== pid
+            ? p
+            : {
+                ...p,
+                checklist: p.checklist.map((c) =>
+                  c.id === itemId
+                    ? {
+                        ...c,
+                        done: true,
+                        file: file.name,
+                        proofId,
+                        size: file.size,
+                        mime: file.type,
+                        addedAt: "Today",
+                      }
+                    : c,
+                ),
+              },
+        ),
+      };
+      return withEvent(
+        next,
+        event(
+          "Properties",
+          `completed "${old?.t ?? "an item"}" on ${prop?.address ?? "a property"} with proof`,
+          "Owed",
+          file.name,
+        ),
+      );
+    });
   },
 
   removeProof: (pid, itemId) => {
-    const old = current()
-      .properties.find((p) => p.id === pid)
-      ?.checklist.find((c) => c.id === itemId)?.proofId;
-    if (old) deleteProof(old).catch(() => {});
-    patchProperty(pid, (p) => ({
-      ...p,
-      checklist: p.checklist.map((c) =>
-        c.id === itemId
-          ? {
-              ...c,
-              done: false,
-              file: undefined,
-              proofId: undefined,
-              size: undefined,
-              mime: undefined,
-              addedAt: undefined,
-            }
-          : c,
-      ),
-    }));
+    const old = findItem(pid, itemId);
+    if (old?.proofId) deleteProof(old.proofId).catch(() => {});
+    update((s) => {
+      const prop = s.properties.find((p) => p.id === pid);
+      const next: Saved = {
+        ...s,
+        properties: s.properties.map((p) =>
+          p.id !== pid
+            ? p
+            : {
+                ...p,
+                checklist: p.checklist.map((c) =>
+                  c.id === itemId
+                    ? {
+                        ...c,
+                        done: false,
+                        file: undefined,
+                        proofId: undefined,
+                        size: undefined,
+                        mime: undefined,
+                        addedAt: undefined,
+                      }
+                    : c,
+                ),
+              },
+        ),
+      };
+      return withEvent(
+        next,
+        event(
+          "Properties",
+          `removed the proof for "${old?.t ?? "an item"}" on ${prop?.address ?? "a property"}`,
+          old?.file ?? "Done",
+          "Owed",
+        ),
+      );
+    });
   },
 
   addItem: (pid, text) =>
@@ -213,11 +347,14 @@ const actions: Omit<Store, "ready" | "properties" | "templates"> = {
       ],
     })),
 
-  removeItem: (pid, itemId) =>
+  removeItem: (pid, itemId) => {
+    const old = findItem(pid, itemId);
+    if (old?.proofId) deleteProof(old.proofId).catch(() => {});
     patchProperty(pid, (p) => ({
       ...p,
       checklist: p.checklist.filter((c) => c.id !== itemId),
-    })),
+    }));
+  },
 
   renameItem: (pid, itemId, text) =>
     patchProperty(pid, (p) => ({
@@ -244,6 +381,87 @@ const actions: Omit<Store, "ready" | "properties" | "templates"> = {
       templates: s.templates.filter((t) => t.id !== id),
     })),
 
+  addEntry: async (registerId, values, files) => {
+    const def = registerById(registerId);
+    if (!def) throw new Error("Unknown register");
+    const stored = await storeFiles(files);
+    const status = def.status(values);
+    const entry: RegisterEntry = {
+      id: `e-${uid()}`,
+      registerId,
+      createdAt: new Date().toISOString().slice(0, 16),
+      createdBy: me.name,
+      status,
+      values,
+      files: stored,
+      history: [
+        {
+          at: `Today ${nowTime()}`,
+          by: me.name,
+          act:
+            status === def.statuses[0]
+              ? "Recorded the entry"
+              : `Recorded the entry as ${status}`,
+        },
+      ],
+    };
+    update((s) =>
+      withEvent(
+        { ...s, entries: [entry, ...s.entries] },
+        event(
+          "Registers",
+          `added an entry to the ${def.name} register`,
+          "No entry",
+          status,
+        ),
+      ),
+    );
+    return entry.id;
+  },
+
+  applyAction: async (entryId, actionId, values, files) => {
+    const entry = current().entries.find((e) => e.id === entryId);
+    const def = entry && registerById(entry.registerId);
+    const action = def?.actions.find((a) => a.id === actionId);
+    if (!entry || !def || !action) throw new Error("Unknown action");
+    const stored = await storeFiles(files);
+    const to =
+      typeof action.to === "string"
+        ? action.to
+        : String(values[action.to.fromField] ?? entry.status);
+    update((s) =>
+      withEvent(
+        {
+          ...s,
+          entries: s.entries.map((e) =>
+            e.id !== entryId
+              ? e
+              : {
+                  ...e,
+                  status: to,
+                  values: { ...e.values, ...values },
+                  files: { ...e.files, ...stored },
+                  history: [
+                    ...e.history,
+                    {
+                      at: `Today ${nowTime()}`,
+                      by: me.name,
+                      act: `${action.label}: now ${to}`,
+                    },
+                  ],
+                },
+          ),
+        },
+        event(
+          "Registers",
+          `${action.label.toLowerCase()} in the ${def.name} register`,
+          entry.status,
+          to,
+        ),
+      ),
+    );
+  },
+
   resetDemo: () => {
     clearProofs().catch(() => {});
     writeSaved(SEED);
@@ -266,6 +484,8 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       ready,
       properties: state.properties,
       templates: state.templates,
+      entries: state.entries,
+      audit: state.audit,
       ...actions,
     }),
     [ready, state],

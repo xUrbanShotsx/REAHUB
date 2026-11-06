@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/Icons";
+import { useStore } from "@/components/app/DemoStore";
+import { RegistersTable } from "@/components/app/RegistersTable";
 import {
   Avatar,
   Card,
@@ -10,13 +12,14 @@ import {
   Pill,
   Progress,
 } from "@/components/app/ui";
-import { audit, people, policies, registers } from "@/lib/demo-data";
+import { people, policies } from "@/lib/demo-data";
 
 const TABS = ["Accreditations", "Registers", "Policies", "Audit log"] as const;
 const AREAS = ["All", "Trust", "Registers", "Properties"] as const;
 
 export function ComplianceView() {
   const [tab, setTab] = useState<(typeof TABS)[number]>("Accreditations");
+  const { audit } = useStore();
   const [area, setArea] = useState<(typeof AREAS)[number]>("All");
 
   return (
@@ -89,42 +92,7 @@ export function ComplianceView() {
         </>
       )}
 
-      {tab === "Registers" && (
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[34rem] text-left text-sm">
-              <thead>
-                <tr className="border-b border-line text-xs text-ink-soft">
-                  {["Register", "Entries", "Latest entry", "Open"].map((h) => (
-                    <th key={h} className="px-5 py-3 font-medium">
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {registers.map((r) => (
-                  <tr
-                    key={r.name}
-                    className="border-b border-line last:border-0 hover:bg-tint/60"
-                  >
-                    <td className="px-5 py-3.5 font-semibold">{r.name}</td>
-                    <td className="px-5 py-3.5 tabular-nums">{r.entries}</td>
-                    <td className="px-5 py-3.5 text-ink-soft">{r.latest}</td>
-                    <td className="px-5 py-3.5">
-                      {r.open ? (
-                        <Pill tone="owed">{r.open} open</Pill>
-                      ) : (
-                        <Pill tone="ok">Clear</Pill>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      )}
+      {tab === "Registers" && <RegistersTable />}
 
       {tab === "Policies" && (
         <Card>

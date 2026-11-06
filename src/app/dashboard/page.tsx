@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LiveStats } from "./LiveStats";
+import { RecentActivity } from "./RecentActivity";
 import { Icon } from "@/components/Icons";
 import {
   Avatar,
@@ -11,7 +12,7 @@ import {
   Pill,
   Progress,
 } from "@/components/app/ui";
-import { aud, audit, kpis, me, people, trust, upcoming } from "@/lib/demo-data";
+import { aud, kpis, me, people, trust, upcoming } from "@/lib/demo-data";
 
 const attention = [
   {
@@ -189,37 +190,7 @@ export default function DashboardHome() {
           </ul>
         </Card>
 
-        <Card>
-          <CardHead
-            title="Recent activity"
-            sub="From the audit log"
-            right={
-              <Link
-                href="/dashboard/compliance"
-                className="text-xs font-semibold underline"
-              >
-                All
-              </Link>
-            }
-          />
-          <ol>
-            {audit.slice(0, 4).map((e) => (
-              <li
-                key={e.t + e.act}
-                className="flex gap-3 border-b border-line px-5 py-3 last:border-0"
-              >
-                <Avatar initials={e.who} tone={1} />
-                <p className="min-w-0 flex-1 text-sm leading-snug">
-                  <span className="font-semibold">{e.name}</span>{" "}
-                  <span className="text-ink-soft">{e.act}</span>
-                </p>
-                <span className="shrink-0 pt-0.5 font-mono text-xs text-ink-soft">
-                  {e.t}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </Card>
+        <RecentActivity />
       </div>
     </>
   );
