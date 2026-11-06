@@ -3,11 +3,11 @@
 import { useStore } from "@/components/app/DemoStore";
 import { useReminders } from "@/components/app/useReminders";
 import { Stat } from "@/components/app/ui";
-import { aud, trust } from "@/lib/demo-data";
+import { cashBook, money } from "@/lib/trust";
 
 /** Stat cards that follow whatever is in the demo workspace right now. */
 export function LiveStats() {
-  const { properties } = useStore();
+  const { properties, trust } = useStore();
   const renewals = useReminders().filter((r) => r.kind === "renewal");
   const next = renewals[0];
   const open = properties.reduce(
@@ -25,13 +25,13 @@ export function LiveStats() {
   );
   const sales = properties.filter((p) => p.type === "sale").length;
   const managed = properties.length - sales;
-  const held = trust.sales.held + trust.rentals.held;
+  const held = cashBook(trust, "sales") + cashBook(trust, "rentals");
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
       <Stat
         label="Held in trust"
-        value={aud(held)}
+        value={money(held)}
         note="Both accounts reconciled"
       />
       <Stat

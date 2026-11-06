@@ -59,9 +59,11 @@ export function RegisterForm({
   onSubmit,
   onCancel,
   defaults,
+  extraValidate,
 }: {
   fields: Field[];
   defaults?: Values;
+  extraValidate?: (values: Values) => Record<string, string>;
   submitLabel: string;
   intro?: string;
   onSubmit: (
@@ -87,7 +89,10 @@ export function RegisterForm({
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const found = validate(fields, values, files);
+    const found = {
+      ...validate(fields, values, files),
+      ...(extraValidate?.(values) ?? {}),
+    };
     setErrors(found);
     if (Object.keys(found).length) {
       document.getElementById(`field-${Object.keys(found)[0]}`)?.focus();
@@ -105,9 +110,11 @@ export function RegisterForm({
     setFail("");
     try {
       await onSubmit(clean, keep);
-    } catch {
+    } catch (err) {
       setFail(
-        "Could not save. This browser may have blocked storage for the file. Try again.",
+        err instanceof Error && err.message
+          ? err.message
+          : "Could not save. Try again.",
       );
       setSaving(false);
     }

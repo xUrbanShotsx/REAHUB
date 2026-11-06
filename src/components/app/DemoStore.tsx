@@ -36,6 +36,22 @@ import {
 } from "@/lib/demo-data";
 import { clearProofs, deleteProof, putProof } from "@/lib/proofs";
 import {
+  autoMatchPairs,
+  cents,
+  ledgers,
+  lockedUntil,
+  money,
+  nextRef,
+  seedTrust,
+  summarise,
+  type AccountId,
+  type BankLine,
+  type EntryKind,
+  type ParsedLine,
+  type TrustEntry,
+  type TrustState,
+} from "@/lib/trust";
+import {
   addYears,
   seedAccreditations,
   type Accreditation,
@@ -50,7 +66,7 @@ import {
   type Values,
 } from "@/lib/registers";
 
-const KEY = "reahub-demo-v6";
+const KEY = "reahub-demo-v7";
 
 type Saved = {
   properties: Property[];
@@ -64,6 +80,7 @@ type Saved = {
   events: CalEvent[];
   meetings: Meeting[];
   diary: DiaryEntry[];
+  trust: TrustState;
 };
 const SEED: Saved = {
   properties: seedProperties,
@@ -77,6 +94,7 @@ const SEED: Saved = {
   events: seedEvents,
   meetings: seedMeetings,
   diary: seedDiary,
+  trust: seedTrust,
 };
 
 export type NewProperty = {
@@ -104,6 +122,7 @@ type Store = {
   events: CalEvent[];
   meetings: Meeting[];
   diary: DiaryEntry[];
+  trust: TrustState;
   addProperty: (input: NewProperty) => string;
   updateProperty: (id: string, patch: Partial<Property>) => void;
   deleteProperty: (id: string) => void;
@@ -150,7 +169,35 @@ type Store = {
   addMeeting: (input: Omit<Meeting, "id">) => string;
   addDiary: (input: Omit<DiaryEntry, "id" | "time">) => void;
   dropDiary: (id: string) => void;
+  addTrustEntry: (input: NewTrustEntry) => string;
+  importStatement: (account: AccountId, lines: ParsedLine[]) => number;
+  matchLine: (lineId: string, entryId: string) => void;
+  unmatchLine: (lineId: string) => void;
+  autoMatch: (account: AccountId) => number;
+  recordFromLine: (
+    lineId: string,
+    input: Omit<NewTrustEntry, "account" | "kind" | "amount" | "date">,
+  ) => void;
+  signReconciliation: (
+    account: AccountId,
+    periodEnd: string,
+    statementClosing: number,
+  ) => void;
   resetDemo: () => void;
+};
+
+export type NewTrustEntry = {
+  account: AccountId;
+  kind: EntryKind;
+  date: string;
+  propertyId: string;
+  party: string;
+  amount: number;
+  method: string;
+  authority?: string;
+  authorityRef?: string;
+  payee?: string;
+  narration: string;
 };
 
 /* ---- a tiny external store over localStorage, so state survives navigation and reloads ---- */
@@ -183,6 +230,8 @@ function readSaved(): Saved | null {
       Array.isArray(p.events) &&
       Array.isArray(p.meetings) &&
       Array.isArray(p.diary) &&
+      !!p.trust &&
+      Array.isArray(p.trust.entries) &&
       Array.isArray(p.audit)
         ? p
         : null;
@@ -288,6 +337,7 @@ const actions: Omit<
   | "events"
   | "meetings"
   | "diary"
+  | "trust"
   | "members"
   | "settings"
 > = {
@@ -813,6 +863,208 @@ const actions: Omit<
   dropDiary: (id) =>
     update((s) => ({ ...s, diary: s.diary.filter((d) => d.id !== id) })),
 
+  addTrustEntry: (input) => {
+    const t = current().trust;
+    const lock = lockedUntil(t, input.account);
+    if (input.date <= lock)
+      throw new Error(
+        `That period is signed. Entries must be dated after ${lock}.`,
+      );
+    if (input.kind === "payment") {
+      const held =
+        ledgers(t, input.account).find(
+          (l) => l.propertyId === input.propertyId && l.party === input.party,
+        )?.balance ?? 0;
+      if (cents(input.amount) > cents(held))
+        throw new Error(
+          `Only ${money(held)} is held for that client, so ${money(input.amount)} cannot be paid out.`,
+        );
+    }
+    const entry: TrustEntry = {
+      id: `te-${uid()}`,
+      account: input.account,
+      kind: input.kind,
+      date: input.date,
+      ref: nextRef(t, input.kind),
+      propertyId: input.propertyId,
+      party: input.party,
+      amount: input.amount,
+      method: input.method,
+      engagement:
+        input.account === "sales" ? "Sales campaign" : "Management period",
+      authority: input.authority,
+      authorityRef: input.authorityRef,
+      payee: input.payee,
+      narration: input.narration,
+      by: me.name,
+    };
+    update((s) =>
+      withEvent(
+        { ...s, trust: { ...s.trust, entries: [entry, ...s.trust.entries] } },
+        event(
+          "Trust",
+          `${input.kind === "receipt" ? "receipted" : "paid out"} ${money(input.amount)} (${entry.ref})`,
+          "No entry",
+          entry.ref,
+        ),
+      ),
+    );
+    return entry.id;
+  },
+
+  importStatement: (account, lines) => {
+    const have = new Set(
+      current()
+        .trust.lines.filter((l) => l.account === account)
+        .map((l) => `${l.date}|${l.description}|${cents(l.amount)}`),
+    );
+    const fresh: BankLine[] = lines
+      .filter((l) => !have.has(`${l.date}|${l.description}|${cents(l.amount)}`))
+      .map((l) => ({
+        id: `bl-${uid()}`,
+        account,
+        date: l.date,
+        description: l.description,
+        amount: l.amount,
+        balance: l.balance,
+      }));
+    if (fresh.length)
+      update((s) =>
+        withEvent(
+          { ...s, trust: { ...s.trust, lines: [...s.trust.lines, ...fresh] } },
+          event(
+            "Trust",
+            `imported ${fresh.length} bank statement lines`,
+            "No lines",
+            `${fresh.length} lines`,
+          ),
+        ),
+      );
+    return fresh.length;
+  },
+
+  matchLine: (lineId, entryId) =>
+    update((s) => ({
+      ...s,
+      trust: {
+        ...s.trust,
+        lines: s.trust.lines.map((l) =>
+          l.id === lineId ? { ...l, entryId } : l,
+        ),
+        entries: s.trust.entries.map((e) =>
+          e.id === entryId ? { ...e, lineId } : e,
+        ),
+      },
+    })),
+
+  unmatchLine: (lineId) =>
+    update((s) => {
+      const line = s.trust.lines.find((l) => l.id === lineId);
+      const entry = s.trust.entries.find((e) => e.id === line?.entryId);
+      if (!line || !entry || entry.reconId) return s;
+      return {
+        ...s,
+        trust: {
+          ...s.trust,
+          lines: s.trust.lines.map((l) =>
+            l.id === lineId ? { ...l, entryId: undefined } : l,
+          ),
+          entries: s.trust.entries.map((e) =>
+            e.id === entry.id ? { ...e, lineId: undefined } : e,
+          ),
+        },
+      };
+    }),
+
+  autoMatch: (account) => {
+    const pairs = autoMatchPairs(current().trust, account);
+    if (!pairs.length) return 0;
+    update((s) => {
+      const byLine = new Map(pairs.map((p) => [p.lineId, p.entryId]));
+      const byEntry = new Map(pairs.map((p) => [p.entryId, p.lineId]));
+      return withEvent(
+        {
+          ...s,
+          trust: {
+            ...s.trust,
+            lines: s.trust.lines.map((l) =>
+              byLine.has(l.id) ? { ...l, entryId: byLine.get(l.id) } : l,
+            ),
+            entries: s.trust.entries.map((e) =>
+              byEntry.has(e.id) ? { ...e, lineId: byEntry.get(e.id) } : e,
+            ),
+          },
+        },
+        event(
+          "Trust",
+          `matched ${pairs.length} bank lines to the cash book`,
+          "Unmatched",
+          "Matched",
+        ),
+      );
+    });
+    return pairs.length;
+  },
+
+  recordFromLine: (lineId, input) => {
+    const t = current().trust;
+    const line = t.lines.find((l) => l.id === lineId);
+    if (!line) return;
+    const kind: EntryKind = line.amount > 0 ? "receipt" : "payment";
+    const id = actions.addTrustEntry({
+      ...input,
+      account: line.account,
+      kind,
+      amount: Math.abs(line.amount),
+      date: line.date,
+    });
+    actions.matchLine(lineId, id);
+  },
+
+  signReconciliation: (account, periodEnd, statementClosing) => {
+    const t = current().trust;
+    const sum = summarise(t, account, periodEnd, statementClosing);
+    if (!sum.canSign) throw new Error(sum.blockers[0]);
+    const id = `rc-${uid()}`;
+    update((s) =>
+      withEvent(
+        {
+          ...s,
+          trust: {
+            ...s.trust,
+            entries: s.trust.entries.map((e) =>
+              e.account === account && e.date <= periodEnd && !e.reconId
+                ? { ...e, reconId: id }
+                : e,
+            ),
+            recons: [
+              {
+                id,
+                account,
+                periodEnd,
+                statementClosing,
+                cashBook: sum.cashBook,
+                outstandingDeposits: sum.outstandingDeposits,
+                outstandingPayments: sum.outstandingPayments,
+                difference: sum.difference,
+                signedBy: me.name,
+                signedAt: new Date().toISOString().slice(0, 16),
+                entryCount: sum.entriesInPeriod,
+              },
+              ...s.trust.recons,
+            ],
+          },
+        },
+        event(
+          "Trust",
+          `signed and locked the ${account} reconciliation to ${periodEnd}`,
+          "Draft",
+          "Locked",
+        ),
+      ),
+    );
+  },
+
   resetDemo: () => {
     clearProofs().catch(() => {});
     writeSaved(SEED);
@@ -844,6 +1096,7 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       events: state.events,
       meetings: state.meetings,
       diary: state.diary,
+      trust: state.trust,
       ...actions,
     }),
     [ready, state],

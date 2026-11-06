@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ExpiringSoon } from "./ExpiringSoon";
 import { LiveStats } from "./LiveStats";
 import { RecentActivity } from "./RecentActivity";
+import { TrustPosition } from "./TrustPosition";
 import { Icon } from "@/components/Icons";
 import {
   Avatar,
@@ -13,7 +14,7 @@ import {
   Pill,
   Progress,
 } from "@/components/app/ui";
-import { aud, kpis, me, trust } from "@/lib/demo-data";
+import { kpis, me } from "@/lib/demo-data";
 
 const attention = [
   {
@@ -109,37 +110,7 @@ export default function DashboardHome() {
           </ul>
         </Card>
 
-        <Card>
-          <CardHead
-            title="Trust position"
-            sub="October"
-            right={<Pill tone="ok">Matched</Pill>}
-          />
-          <div className="divide-y divide-line">
-            {[trust.sales, trust.rentals].map((a) => (
-              <div
-                key={a.label}
-                className="flex items-center justify-between px-5 py-4"
-              >
-                <div>
-                  <p className="text-sm font-semibold">{a.label}</p>
-                  <p className="text-xs text-ink-soft">Difference A$0</p>
-                </div>
-                <p className="font-display text-lg font-extrabold tabular-nums">
-                  {aud(a.held)}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className="p-4">
-            <Link
-              href="/dashboard/trust"
-              className={`${btnDark} w-full justify-center`}
-            >
-              Open trust accounts
-            </Link>
-          </div>
-        </Card>
+        <TrustPosition />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
