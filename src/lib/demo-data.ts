@@ -13,7 +13,13 @@ export type ChecklistItem = {
   who: string;
   done: boolean;
   due?: string;
+  /** Name of the file that proves the item is done. Every ticked item has one. */
   file?: string;
+  /** Key of the stored file in this browser. Sample files have none. */
+  proofId?: string;
+  size?: number;
+  mime?: string;
+  addedAt?: string;
 };
 export type PropertyType = "sale" | "management";
 
@@ -134,7 +140,23 @@ const item = (
   who: string,
   done: boolean,
   extra: Partial<ChecklistItem> = {},
-): ChecklistItem => ({ id, t, who, done, ...extra });
+): ChecklistItem => ({
+  id,
+  t,
+  who,
+  done,
+  // a ticked item always carries proof, so sample items get a sample file name
+  ...(done
+    ? {
+        file: `${t
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, "")}.pdf`,
+        addedAt: "Earlier",
+      }
+    : {}),
+  ...extra,
+});
 
 export const properties: Property[] = [
   {

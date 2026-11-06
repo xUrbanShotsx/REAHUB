@@ -16,6 +16,7 @@ import {
   type PropertyType,
   type Template,
 } from "@/lib/demo-data";
+import { clearProofs, deleteProof, putProof } from "@/lib/proofs";
 
 const KEY = "reahub-demo-v2";
 
@@ -39,7 +40,8 @@ type Store = {
   addProperty: (input: NewProperty) => string;
   updateProperty: (id: string, patch: Partial<Property>) => void;
   deleteProperty: (id: string) => void;
-  toggleItem: (pid: string, itemId: string) => void;
+  attachProof: (pid: string, itemId: string, file: File) => Promise<void>;
+  removeProof: (pid: string, itemId: string) => void;
   addItem: (pid: string, text: string) => void;
   removeItem: (pid: string, itemId: string) => void;
   renameItem: (pid: string, itemId: string, text: string) => void;
@@ -153,13 +155,54 @@ const actions: Omit<Store, "ready" | "properties" | "templates"> = {
       properties: s.properties.filter((p) => p.id !== id),
     })),
 
-  toggleItem: (pid, itemId) =>
+  attachProof: async (pid, itemId, file) => {
+    const proofId = uid();
+    await putProof(proofId, file);
+    // replacing proof frees the old file
+    const old = current()
+      .properties.find((p) => p.id === pid)
+      ?.checklist.find((c) => c.id === itemId)?.proofId;
+    if (old) deleteProof(old).catch(() => {});
     patchProperty(pid, (p) => ({
       ...p,
       checklist: p.checklist.map((c) =>
-        c.id === itemId ? { ...c, done: !c.done } : c,
+        c.id === itemId
+          ? {
+              ...c,
+              done: true,
+              file: file.name,
+              proofId,
+              size: file.size,
+              mime: file.type,
+              addedAt: "Today",
+            }
+          : c,
       ),
-    })),
+    }));
+  },
+
+  removeProof: (pid, itemId) => {
+    const old = current()
+      .properties.find((p) => p.id === pid)
+      ?.checklist.find((c) => c.id === itemId)?.proofId;
+    if (old) deleteProof(old).catch(() => {});
+    patchProperty(pid, (p) => ({
+      ...p,
+      checklist: p.checklist.map((c) =>
+        c.id === itemId
+          ? {
+              ...c,
+              done: false,
+              file: undefined,
+              proofId: undefined,
+              size: undefined,
+              mime: undefined,
+              addedAt: undefined,
+            }
+          : c,
+      ),
+    }));
+  },
 
   addItem: (pid, text) =>
     patchProperty(pid, (p) => ({
@@ -201,7 +244,10 @@ const actions: Omit<Store, "ready" | "properties" | "templates"> = {
       templates: s.templates.filter((t) => t.id !== id),
     })),
 
-  resetDemo: () => writeSaved(SEED),
+  resetDemo: () => {
+    clearProofs().catch(() => {});
+    writeSaved(SEED);
+  },
 };
 
 const Ctx = createContext<Store | null>(null);
