@@ -8,6 +8,7 @@ export type FieldType =
   | "select"
   | "date"
   | "datetime"
+  | "time"
   | "number"
   | "money"
   | "property"

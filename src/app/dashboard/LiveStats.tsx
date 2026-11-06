@@ -1,16 +1,14 @@
 "use client";
 
 import { useStore } from "@/components/app/DemoStore";
+import { useReminders } from "@/components/app/useReminders";
 import { Stat } from "@/components/app/ui";
 import { aud, trust } from "@/lib/demo-data";
-import { remindersFor } from "@/lib/accreditations";
 
 /** Stat cards that follow whatever is in the demo workspace right now. */
 export function LiveStats() {
-  const { properties, accreditations, ready } = useStore();
-  const renewals = ready
-    ? remindersFor(accreditations).filter((r) => r.kind === "renewal")
-    : [];
+  const { properties } = useStore();
+  const renewals = useReminders().filter((r) => r.kind === "renewal");
   const next = renewals[0];
   const open = properties.reduce(
     (n, p) => n + p.checklist.filter((c) => !c.done).length,

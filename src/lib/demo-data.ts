@@ -1,6 +1,162 @@
 /** Sample data for the demo workspace. Nothing here is a real agency, person or amount. */
 
 export const agency = { name: "Inner West Realty", plan: "Boutique" };
+
+export type PlanName = "Agent Pro" | "Boutique" | "Large";
+
+export const PLANS: Record<
+  PlanName,
+  {
+    price: number;
+    people: number;
+    teams: number;
+    vaultGb: number;
+    queries: number | null;
+    blurb: string;
+  }
+> = {
+  "Agent Pro": {
+    price: 99,
+    people: 5,
+    teams: 1,
+    vaultGb: 10,
+    queries: 500,
+    blurb: "One sales team inside an agency.",
+  },
+  Boutique: {
+    price: 249,
+    people: 40,
+    teams: 4,
+    vaultGb: 40,
+    queries: 2000,
+    blurb: "A single-office agency with a few teams.",
+  },
+  Large: {
+    price: 369,
+    people: 80,
+    teams: 8,
+    vaultGb: 100,
+    queries: null,
+    blurb: "A large or multi-branch agency.",
+  },
+};
+
+export const ACCESS_LEVELS = [
+  "Owner",
+  "Admin",
+  "Team Lead",
+  "Team Member",
+  "Auditor",
+] as const;
+export type AccessLevel = (typeof ACCESS_LEVELS)[number];
+
+export const ACCESS_NOTE: Record<AccessLevel, string> = {
+  Owner: "One per agency. Can close it, transfer ownership and change billing.",
+  Admin:
+    "Sees the whole agency and runs it day to day, trust accounting included.",
+  "Team Lead": "Sees the agency's records and their team's work.",
+  "Team Member":
+    "Sees the agency's records and their own team's work. No trust accounting.",
+  Auditor:
+    "External, read-only and time-boxed. Free, and sees everything without changing anything.",
+};
+
+export const TEAMS = ["Sales", "Property management", "Office"];
+
+export type Member = {
+  id: string;
+  name: string;
+  email: string;
+  access: AccessLevel;
+  team: string;
+  status: "Active" | "Invited";
+  lastActive: string;
+  /** Auditors only: when their access ends. */
+  until?: string;
+};
+
+export const seedMembers: Member[] = [
+  {
+    id: "m-dana",
+    name: "Dana Whitfield",
+    email: "dana@innerwestrealty.example",
+    access: "Owner",
+    team: "Office",
+    status: "Active",
+    lastActive: "Today",
+  },
+  {
+    id: "m-sam",
+    name: "Sam Taylor",
+    email: "sam@innerwestrealty.example",
+    access: "Team Lead",
+    team: "Sales",
+    status: "Active",
+    lastActive: "Today",
+  },
+  {
+    id: "m-priya",
+    name: "Priya Nair",
+    email: "priya@innerwestrealty.example",
+    access: "Team Member",
+    team: "Sales",
+    status: "Active",
+    lastActive: "Yesterday",
+  },
+  {
+    id: "m-alex",
+    name: "Alex Chen",
+    email: "alex@innerwestrealty.example",
+    access: "Team Lead",
+    team: "Property management",
+    status: "Active",
+    lastActive: "Today",
+  },
+  {
+    id: "m-tom",
+    name: "Tom Becker",
+    email: "tom@innerwestrealty.example",
+    access: "Team Member",
+    team: "Property management",
+    status: "Active",
+    lastActive: "3 days ago",
+  },
+  {
+    id: "m-alvarez",
+    name: "J. Alvarez",
+    email: "j.alvarez@innerwestrealty.example",
+    access: "Admin",
+    team: "Office",
+    status: "Active",
+    lastActive: "Today",
+  },
+];
+
+export type Settings = {
+  agency: {
+    name: string;
+    trading: string;
+    licenceNo: string;
+    abn: string;
+    address: string;
+    phone: string;
+  };
+  plan: PlanName;
+  notify: { renewals: boolean; cpd: boolean };
+};
+
+export const seedSettings: Settings = {
+  agency: {
+    name: "Inner West Realty",
+    trading: "Inner West Realty Pty Ltd",
+    licenceNo: "10234567",
+    abn: "51 824 753 556",
+    address: "14 Darling Street, Balmain NSW 2041",
+    phone: "02 9555 0123",
+  },
+  plan: "Boutique",
+  notify: { renewals: true, cpd: true },
+};
 export const me = {
   name: "Dana Whitfield",
   initials: "DW",
@@ -464,7 +620,7 @@ export type AuditEvent = {
   act: string;
   from: string;
   to: string;
-  area: "Trust" | "Registers" | "Properties";
+  area: "Trust" | "Registers" | "Properties" | "Settings";
 };
 export const audit: AuditEvent[] = [
   {
@@ -529,12 +685,16 @@ export const audit: AuditEvent[] = [
   },
 ];
 
+export type TaskStatus = "Open" | "In progress" | "Done";
 export type Task = {
   id: string;
   t: string;
-  from: "Checklist" | "By hand" | "Review";
-  status: "Open" | "In progress" | "Done";
+  from: "Checklist" | "By hand" | "Review" | "Meeting";
+  status: TaskStatus;
   where: string;
+  assignee: string;
+  due?: string;
+  meetingId?: string;
 };
 export const tasks: Task[] = [
   {
@@ -543,6 +703,8 @@ export const tasks: Task[] = [
     from: "Checklist",
     status: "Open",
     where: "12 Smith St",
+    assignee: "J. Alvarez",
+    due: "2026-11-10",
   },
   {
     id: "t2",
@@ -550,13 +712,18 @@ export const tasks: Task[] = [
     from: "Checklist",
     status: "Open",
     where: "12 Smith St",
+    assignee: "Alex Chen",
+    due: "2026-11-07",
   },
   {
     id: "t3",
     t: "Order the signboard",
-    from: "Checklist",
+    from: "Meeting",
     status: "Open",
     where: "22 Hill St",
+    assignee: "Sam Taylor",
+    due: "2026-11-10",
+    meetingId: "mt-sales-1103",
   },
   {
     id: "t4",
@@ -564,6 +731,8 @@ export const tasks: Task[] = [
     from: "By hand",
     status: "In progress",
     where: "3 Bay St",
+    assignee: "Alex Chen",
+    due: "2026-11-04",
   },
   {
     id: "t5",
@@ -571,6 +740,8 @@ export const tasks: Task[] = [
     from: "Review",
     status: "In progress",
     where: "Policies",
+    assignee: "Dana Whitfield",
+    due: "2026-11-20",
   },
   {
     id: "t6",
@@ -578,6 +749,8 @@ export const tasks: Task[] = [
     from: "By hand",
     status: "Done",
     where: "41 Norton St",
+    assignee: "Priya Nair",
+    due: "2026-11-05",
   },
   {
     id: "t7",
@@ -585,6 +758,180 @@ export const tasks: Task[] = [
     from: "By hand",
     status: "Done",
     where: "6 Rose St",
+    assignee: "Dana Whitfield",
+    due: "2026-11-02",
+  },
+];
+
+export type CalEvent = {
+  id: string;
+  title: string;
+  date: string;
+  time?: string;
+  kind:
+    | "Inspection"
+    | "Open home"
+    | "Settlement"
+    | "Statutory"
+    | "Appointment"
+    | "Other";
+  property?: string;
+  notes?: string;
+};
+export const EVENT_KINDS: CalEvent["kind"][] = [
+  "Inspection",
+  "Open home",
+  "Settlement",
+  "Statutory",
+  "Appointment",
+  "Other",
+];
+export const seedEvents: CalEvent[] = [
+  {
+    id: "ev1",
+    title: "Open home, 12 Smith St",
+    date: "2026-11-07",
+    time: "10:00",
+    kind: "Open home",
+    property: "12-smith-st",
+  },
+  {
+    id: "ev2",
+    title: "Cooling-off release, 41 Norton St",
+    date: "2026-11-10",
+    kind: "Statutory",
+    property: "41-norton-st",
+  },
+  {
+    id: "ev3",
+    title: "Smoke alarm check, 12 Smith St",
+    date: "2026-11-12",
+    time: "09:30",
+    kind: "Inspection",
+    property: "12-smith-st",
+  },
+  {
+    id: "ev4",
+    title: "Routine inspection, 4/8 Jones Ave",
+    date: "2026-11-18",
+    time: "11:00",
+    kind: "Inspection",
+    property: "8-jones-ave",
+  },
+  {
+    id: "ev5",
+    title: "Vendor meeting, 22 Hill St",
+    date: "2026-11-13",
+    time: "14:00",
+    kind: "Appointment",
+    property: "22-hill-st",
+  },
+  {
+    id: "ev6",
+    title: "Settlement, 15 Wharf Rd",
+    date: "2026-12-09",
+    kind: "Settlement",
+    property: "15-wharf-rd",
+  },
+];
+
+export type MeetingAction = { id: string; taskId: string };
+export type Meeting = {
+  id: string;
+  title: string;
+  type: string;
+  date: string;
+  time?: string;
+  attendees: string[];
+  notes: string;
+  status: "Scheduled" | "Held";
+};
+export const MEETING_TYPES = [
+  "Weekly sales meeting",
+  "Property management review",
+  "Team meeting",
+  "Licensee review",
+  "Vendor or landlord meeting",
+  "Other",
+];
+export const seedMeetings: Meeting[] = [
+  {
+    id: "mt-sales-1103",
+    title: "Weekly sales meeting",
+    type: "Weekly sales meeting",
+    date: "2026-11-03",
+    time: "09:00",
+    attendees: ["Dana Whitfield", "Sam Taylor", "Priya Nair"],
+    notes:
+      "Pipeline reviewed. 22 Hill St agreement due this week. 41 Norton St offer accepted subject to finance. Open home numbers strong at 12 Smith St.",
+    status: "Held",
+  },
+  {
+    id: "mt-pm-1027",
+    title: "Property management review",
+    type: "Property management review",
+    date: "2026-10-27",
+    time: "15:00",
+    attendees: ["Dana Whitfield", "Alex Chen", "Tom Becker"],
+    notes:
+      "Arrears list reviewed. Two routine inspections to book. Maintenance backlog down to four jobs.",
+    status: "Held",
+  },
+  {
+    id: "mt-sales-1110",
+    title: "Weekly sales meeting",
+    type: "Weekly sales meeting",
+    date: "2026-11-10",
+    time: "09:00",
+    attendees: ["Dana Whitfield", "Sam Taylor", "Priya Nair"],
+    notes: "",
+    status: "Scheduled",
+  },
+];
+
+export type DiaryEntry = {
+  id: string;
+  date: string;
+  time: string;
+  tag: string;
+  text: string;
+};
+export const DIARY_TAGS = [
+  "Note",
+  "Call",
+  "Viewing",
+  "Follow-up",
+  "Reminder",
+  "Other",
+];
+export const seedDiary: DiaryEntry[] = [
+  {
+    id: "d1",
+    date: "2026-11-06",
+    time: "16:20",
+    tag: "Call",
+    text: "Spoke to R. Hargreaves about the contract. He is happy with the guide and wants the Saturday open home extended by 15 minutes.",
+  },
+  {
+    id: "d2",
+    date: "2026-11-06",
+    time: "11:05",
+    tag: "Follow-up",
+    text: "Neighbour at 22 Hill St raised a boundary fence concern. Logged as a material fact and told Sam.",
+  },
+  {
+    id: "d3",
+    date: "2026-11-05",
+    time: "09:40",
+    tag: "Viewing",
+    text: "Private inspection at 41 Norton St with the Bianchis' buyer. They asked about the cooling-off period.",
+  },
+  {
+    id: "d4",
+    date: "2026-11-04",
+    time: "14:10",
+    tag: "Note",
+    text: "Trust reconciliation for October prepared. Difference nil, ready to sign on the first.",
   },
 ];
 

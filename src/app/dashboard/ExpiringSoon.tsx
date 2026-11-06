@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { useStore } from "@/components/app/DemoStore";
 import { ReminderRow } from "@/components/app/Reminders";
+import { useReminders } from "@/components/app/useReminders";
 import { Card, CardHead } from "@/components/app/ui";
-import { remindersFor } from "@/lib/accreditations";
 import { upcoming } from "@/lib/demo-data";
 
 /** Renewal and CPD reminders from the accreditation records, plus a few upcoming dates. */
 export function ExpiringSoon() {
-  const { accreditations, ready } = useStore();
-  const reminders = ready ? remindersFor(accreditations) : [];
+  const { ready } = useStore();
+  const reminders = useReminders();
   return (
     <Card>
       <CardHead

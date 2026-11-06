@@ -24,6 +24,7 @@ const BLANK_DATE = [
   "expiresOn",
   "newExpiry",
   "cpdYearEnd",
+  "due",
 ];
 const BLANK_DATETIME = ["expectedBack", "endAt"];
 const DEFAULT_ME = [
@@ -32,6 +33,7 @@ const DEFAULT_ME = [
   "receivedBy",
   "closedBy",
   "disclosedBy",
+  "assignee",
 ];
 
 function initial(fields: Field[]): Values {
@@ -56,8 +58,10 @@ export function RegisterForm({
   intro,
   onSubmit,
   onCancel,
+  defaults,
 }: {
   fields: Field[];
+  defaults?: Values;
   submitLabel: string;
   intro?: string;
   onSubmit: (
@@ -67,7 +71,10 @@ export function RegisterForm({
   onCancel: () => void;
 }) {
   const { properties } = useStore();
-  const [values, setValues] = useState<Values>(() => initial(fields));
+  const [values, setValues] = useState<Values>(() => ({
+    ...initial(fields),
+    ...defaults,
+  }));
   const [files, setFiles] = useState<Record<string, File | undefined>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
@@ -257,7 +264,9 @@ export function RegisterForm({
                             ? "datetime-local"
                             : f.type === "date"
                               ? "date"
-                              : "text"
+                              : f.type === "time"
+                                ? "time"
+                                : "text"
                       }
                       min={
                         f.type === "money" || f.type === "number"

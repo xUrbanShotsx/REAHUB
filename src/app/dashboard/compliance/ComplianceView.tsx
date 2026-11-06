@@ -16,7 +16,7 @@ import {
 import { policies } from "@/lib/demo-data";
 
 const TABS = ["Accreditations", "Registers", "Policies", "Audit log"] as const;
-const AREAS = ["All", "Trust", "Registers", "Properties"] as const;
+const AREAS = ["All", "Trust", "Registers", "Properties", "Settings"] as const;
 
 export function ComplianceView() {
   const [tab, setTab] = useState<(typeof TABS)[number]>("Accreditations");

@@ -83,7 +83,7 @@ export function Card({
 }) {
   return (
     <section
-      className={`rounded-2xl border border-line bg-surface ${className}`}
+      className={`overflow-hidden rounded-2xl border border-line bg-surface ${className}`}
     >
       {children}
     </section>

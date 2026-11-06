@@ -43,10 +43,33 @@ body {
   line-height: 1.6;
 }
 
+/* Focus: never change an element's shape (the old rule squared off rounded controls). */
+:root {
+  accent-color: var(--accent);
+}
 :focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 3px;
-  border-radius: 4px;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* Form fields get a soft ring instead of an outline, so clicking one never draws a hard black box. */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 28%, transparent);
+}
+/* fields that live inside a pill wrapper show the ring on the wrapper instead */
+.outline-none:focus-visible {
+  box-shadow: none;
+}
+/* 16px fields stop iOS zooming the page on focus */
+@media (max-width: 640px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 
 /* film grain, static and faint */

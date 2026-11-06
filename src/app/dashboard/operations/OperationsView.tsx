@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useStore } from "@/components/app/DemoStore";
 import { Icon } from "@/components/Icons";
 import {
   Card,
@@ -9,7 +9,7 @@ import {
   Pill,
   Progress,
 } from "@/components/app/ui";
-import { kpis, tasks as seed, upcoming, type Task } from "@/lib/demo-data";
+import { kpis, upcoming, type Task } from "@/lib/demo-data";
 
 const COLUMNS: Task["status"][] = ["Open", "In progress", "Done"];
 const NEXT: Record<Task["status"], Task["status"]> = {
@@ -19,11 +19,11 @@ const NEXT: Record<Task["status"], Task["status"]> = {
 };
 
 export function OperationsView() {
-  const [tasks, setTasks] = useState<Task[]>(seed);
-  const advance = (id: string) =>
-    setTasks((all) =>
-      all.map((t) => (t.id === id ? { ...t, status: NEXT[t.status] } : t)),
-    );
+  const { tasks, setTaskStatus } = useStore();
+  const advance = (id: string) => {
+    const t = tasks.find((x) => x.id === id);
+    if (t) setTaskStatus(id, NEXT[t.status]);
+  };
 
   return (
     <>

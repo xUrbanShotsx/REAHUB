@@ -77,7 +77,7 @@ export function NewPropertyForm() {
               {(["sale", "management"] as PropertyType[]).map((t) => (
                 <label
                   key={t}
-                  className={`cursor-pointer rounded-xl border p-4 text-sm transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent ${
+                  className={`cursor-pointer rounded-xl border p-4 text-sm transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent has-[:focus-visible]:ring-offset-1 ${
                     type === t
                       ? "border-ink bg-accent/[0.08]"
                       : "border-line hover:bg-tint/60"
@@ -177,7 +177,7 @@ export function NewPropertyForm() {
             {options.map((t) => (
               <label
                 key={t.id}
-                className={`block cursor-pointer rounded-xl border p-4 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent ${
+                className={`block cursor-pointer rounded-xl border p-4 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent has-[:focus-visible]:ring-offset-1 ${
                   templateId === t.id
                     ? "border-ink bg-accent/[0.08]"
                     : "border-line hover:bg-tint/60"

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Icon } from "@/components/Icons";
 import { useStore } from "@/components/app/DemoStore";
 import { ReminderRow } from "@/components/app/Reminders";
+import { useReminders } from "@/components/app/useReminders";
 import {
   Avatar,
   btnDark,
@@ -12,19 +13,14 @@ import {
   Pill,
   Progress,
 } from "@/components/app/ui";
-import {
-  cpdDone,
-  remindersFor,
-  statusOf,
-  typeName,
-} from "@/lib/accreditations";
+import { cpdDone, statusOf, typeName } from "@/lib/accreditations";
 import { fmtDate } from "@/lib/format";
 import { initialsOf } from "@/lib/demo-data";
 
 /** The Accreditations tab: what needs doing, then everyone's accreditations. */
 export function AccreditationsPanel() {
   const { accreditations, ready } = useStore();
-  const reminders = ready ? remindersFor(accreditations) : [];
+  const reminders = useReminders();
 
   return (
     <>

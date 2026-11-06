@@ -3,16 +3,14 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/Icons";
-import { useStore } from "@/components/app/DemoStore";
 import { ReminderRow } from "@/components/app/Reminders";
-import { remindersFor } from "@/lib/accreditations";
+import { useReminders } from "@/components/app/useReminders";
 
 /** The bell: renewal and CPD reminders, with a dot when something needs action. */
 export function NotificationsBell() {
-  const { accreditations, ready } = useStore();
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
-  const reminders = ready ? remindersFor(accreditations) : [];
+  const reminders = useReminders();
   const urgent = reminders.filter((r) => r.urgency !== "upcoming").length;
 
   useEffect(() => {
@@ -34,7 +32,7 @@ export function NotificationsBell() {
     <div ref={box} className="relative">
       <button
         type="button"
-        aria-label={`Notifications${reminders.length ? `, ${reminders.length} reminders` : ""}`}
+        aria-label={`Notifications${reminders.length ? `, ${reminders.length} reminder${reminders.length === 1 ? "" : "s"}` : ""}`}
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
         className="relative flex h-10 w-10 items-center justify-center rounded-full hover:bg-tint"

@@ -14,7 +14,22 @@ import {
   properties as seedProperties,
   STATUSES,
   templates as seedTemplates,
+  seedDiary,
+  seedEvents,
+  seedMeetings,
+  tasks as seedTasks,
+  seedMembers,
+  seedSettings,
+  PLANS,
   type AuditEvent,
+  type CalEvent,
+  type DiaryEntry,
+  type Meeting,
+  type Task,
+  type TaskStatus,
+  type Member,
+  type PlanName,
+  type Settings,
   type Property,
   type PropertyType,
   type Template,
@@ -35,7 +50,7 @@ import {
   type Values,
 } from "@/lib/registers";
 
-const KEY = "reahub-demo-v4";
+const KEY = "reahub-demo-v6";
 
 type Saved = {
   properties: Property[];
@@ -43,6 +58,12 @@ type Saved = {
   entries: RegisterEntry[];
   audit: AuditEvent[];
   accreditations: Accreditation[];
+  members: Member[];
+  settings: Settings;
+  tasks: Task[];
+  events: CalEvent[];
+  meetings: Meeting[];
+  diary: DiaryEntry[];
 };
 const SEED: Saved = {
   properties: seedProperties,
@@ -50,6 +71,12 @@ const SEED: Saved = {
   entries: seedEntries,
   audit: seedAudit,
   accreditations: seedAccreditations,
+  members: seedMembers,
+  settings: seedSettings,
+  tasks: seedTasks,
+  events: seedEvents,
+  meetings: seedMeetings,
+  diary: seedDiary,
 };
 
 export type NewProperty = {
@@ -71,6 +98,12 @@ type Store = {
   entries: RegisterEntry[];
   audit: AuditEvent[];
   accreditations: Accreditation[];
+  members: Member[];
+  settings: Settings;
+  tasks: Task[];
+  events: CalEvent[];
+  meetings: Meeting[];
+  diary: DiaryEntry[];
   addProperty: (input: NewProperty) => string;
   updateProperty: (id: string, patch: Partial<Property>) => void;
   deleteProperty: (id: string) => void;
@@ -96,6 +129,27 @@ type Store = {
   addCpd: (id: string, values: Values, files: Files) => Promise<void>;
   recordRenewal: (id: string, values: Values, files: Files) => Promise<void>;
   startNextCpdYear: (id: string) => void;
+  updateAgency: (patch: Partial<Settings["agency"]>) => void;
+  setPlan: (plan: PlanName) => void;
+  setNotify: (patch: Partial<Settings["notify"]>) => void;
+  inviteMember: (input: Omit<Member, "id" | "status" | "lastActive">) => void;
+  updateMember: (id: string, patch: Partial<Member>) => void;
+  dropMember: (id: string) => void;
+  addTask: (input: {
+    t: string;
+    assignee: string;
+    due?: string;
+    where?: string;
+    from?: Task["from"];
+    meetingId?: string;
+  }) => void;
+  setTaskStatus: (id: string, status: TaskStatus) => void;
+  dropTask: (id: string) => void;
+  addEvent: (input: Omit<CalEvent, "id">) => void;
+  dropEvent: (id: string) => void;
+  addMeeting: (input: Omit<Meeting, "id">) => string;
+  addDiary: (input: Omit<DiaryEntry, "id" | "time">) => void;
+  dropDiary: (id: string) => void;
   resetDemo: () => void;
 };
 
@@ -123,6 +177,12 @@ function readSaved(): Saved | null {
       Array.isArray(p.templates) &&
       Array.isArray(p.entries) &&
       Array.isArray(p.accreditations) &&
+      Array.isArray(p.members) &&
+      !!p.settings &&
+      Array.isArray(p.tasks) &&
+      Array.isArray(p.events) &&
+      Array.isArray(p.meetings) &&
+      Array.isArray(p.diary) &&
       Array.isArray(p.audit)
         ? p
         : null;
@@ -218,7 +278,18 @@ async function storeFiles(files: Files): Promise<Record<string, EntryFile>> {
 
 const actions: Omit<
   Store,
-  "ready" | "properties" | "templates" | "entries" | "audit" | "accreditations"
+  | "ready"
+  | "properties"
+  | "templates"
+  | "entries"
+  | "audit"
+  | "accreditations"
+  | "tasks"
+  | "events"
+  | "meetings"
+  | "diary"
+  | "members"
+  | "settings"
 > = {
   addProperty: (input) => {
     const tpl = current().templates.find((t) => t.id === input.templateId);
@@ -591,6 +662,157 @@ const actions: Omit<
       ),
     })),
 
+  updateAgency: (patch) =>
+    update((s) =>
+      withEvent(
+        {
+          ...s,
+          settings: {
+            ...s.settings,
+            agency: { ...s.settings.agency, ...patch },
+          },
+        },
+        event(
+          "Settings",
+          "updated the agency details",
+          "Details",
+          Object.keys(patch).join(", "),
+        ),
+      ),
+    ),
+
+  setPlan: (plan) =>
+    update((s) => {
+      const from = s.settings.plan;
+      return withEvent(
+        { ...s, settings: { ...s.settings, plan } },
+        event(
+          "Settings",
+          `changed the plan to ${plan} (A$${PLANS[plan].price} a month + GST)`,
+          from,
+          plan,
+        ),
+      );
+    }),
+
+  setNotify: (patch) =>
+    update((s) => ({
+      ...s,
+      settings: { ...s.settings, notify: { ...s.settings.notify, ...patch } },
+    })),
+
+  inviteMember: (input) =>
+    update((s) =>
+      withEvent(
+        {
+          ...s,
+          members: [
+            ...s.members,
+            {
+              ...input,
+              id: `m-${uid()}`,
+              status: "Invited",
+              lastActive: "Not yet",
+            },
+          ],
+        },
+        event(
+          "Settings",
+          `invited ${input.name} as ${input.access}`,
+          "No access",
+          input.access,
+        ),
+      ),
+    ),
+
+  updateMember: (id, patch) =>
+    update((s) => {
+      const m = s.members.find((x) => x.id === id);
+      const next = {
+        ...s,
+        members: s.members.map((x) => (x.id === id ? { ...x, ...patch } : x)),
+      };
+      return patch.access && m
+        ? withEvent(
+            next,
+            event(
+              "Settings",
+              `changed ${m.name}'s access`,
+              m.access,
+              patch.access,
+            ),
+          )
+        : next;
+    }),
+
+  dropMember: (id) =>
+    update((s) => {
+      const m = s.members.find((x) => x.id === id);
+      const next = { ...s, members: s.members.filter((x) => x.id !== id) };
+      return m
+        ? withEvent(
+            next,
+            event(
+              "Settings",
+              `took ${m.name} off the agency`,
+              m.access,
+              "No access",
+            ),
+          )
+        : next;
+    }),
+
+  addTask: (input) =>
+    update((s) => ({
+      ...s,
+      tasks: [
+        {
+          id: `t-${uid()}`,
+          t: input.t.trim(),
+          from: input.from ?? "By hand",
+          status: "Open",
+          where: input.where?.trim() || "General",
+          assignee: input.assignee,
+          due: input.due || undefined,
+          meetingId: input.meetingId,
+        },
+        ...s.tasks,
+      ],
+    })),
+
+  setTaskStatus: (id, status) =>
+    update((s) => ({
+      ...s,
+      tasks: s.tasks.map((t) => (t.id === id ? { ...t, status } : t)),
+    })),
+
+  dropTask: (id) =>
+    update((s) => ({ ...s, tasks: s.tasks.filter((t) => t.id !== id) })),
+
+  addEvent: (input) =>
+    update((s) => ({
+      ...s,
+      events: [...s.events, { ...input, id: `ev-${uid()}` }],
+    })),
+
+  dropEvent: (id) =>
+    update((s) => ({ ...s, events: s.events.filter((e) => e.id !== id) })),
+
+  addMeeting: (input) => {
+    const id = `mt-${uid()}`;
+    update((s) => ({ ...s, meetings: [{ ...input, id }, ...s.meetings] }));
+    return id;
+  },
+
+  addDiary: (input) =>
+    update((s) => ({
+      ...s,
+      diary: [{ ...input, id: `d-${uid()}`, time: nowTime() }, ...s.diary],
+    })),
+
+  dropDiary: (id) =>
+    update((s) => ({ ...s, diary: s.diary.filter((d) => d.id !== id) })),
+
   resetDemo: () => {
     clearProofs().catch(() => {});
     writeSaved(SEED);
@@ -616,6 +838,12 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       entries: state.entries,
       audit: state.audit,
       accreditations: state.accreditations,
+      members: state.members,
+      settings: state.settings,
+      tasks: state.tasks,
+      events: state.events,
+      meetings: state.meetings,
+      diary: state.diary,
       ...actions,
     }),
     [ready, state],
