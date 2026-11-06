@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { agency, me } from "@/lib/demo-data";
 import { Icon, type IconName } from "../Icons";
+import { useStore } from "./DemoStore";
 import { Avatar } from "./ui";
 
 const NAV: { href: string; label: string; icon: IconName }[] = [
@@ -18,6 +19,7 @@ const NAV: { href: string; label: string; icon: IconName }[] = [
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { resetDemo } = useStore();
   const current = NAV.find((n) =>
     n.href === "/dashboard" ? pathname === n.href : pathname.startsWith(n.href),
   );
@@ -145,8 +147,20 @@ export function AppShell({ children }: { children: ReactNode }) {
         </header>
 
         <div className="border-b border-line bg-tint/60 px-4 py-2 text-center text-xs text-ink-soft sm:px-8">
-          You are viewing a demo workspace with sample data. Changes are not
-          saved.
+          You are viewing a demo workspace with sample data. Changes are saved
+          in this browser only.{" "}
+          <button
+            type="button"
+            onClick={() => {
+              if (
+                window.confirm("Reset the demo workspace to its starting data?")
+              )
+                resetDemo();
+            }}
+            className="font-semibold underline"
+          >
+            Reset demo
+          </button>
         </div>
 
         <div className="mx-auto max-w-6xl p-4 sm:p-8">{children}</div>

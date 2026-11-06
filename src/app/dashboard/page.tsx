@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LiveStats } from "./LiveStats";
 import { Icon } from "@/components/Icons";
 import {
   Avatar,
@@ -9,18 +10,8 @@ import {
   PageHeading,
   Pill,
   Progress,
-  Stat,
 } from "@/components/app/ui";
-import {
-  aud,
-  audit,
-  kpis,
-  me,
-  people,
-  properties,
-  trust,
-  upcoming,
-} from "@/lib/demo-data";
+import { aud, audit, kpis, me, people, trust, upcoming } from "@/lib/demo-data";
 
 const attention = [
   {
@@ -66,13 +57,6 @@ const attention = [
 ];
 
 export default function DashboardHome() {
-  const open = properties.reduce(
-    (n, p) => n + p.checklist.filter((c) => !c.done).length,
-    0,
-  );
-  const live = properties.length;
-  const held = trust.sales.held + trust.rentals.held;
-
   return (
     <>
       <PageHeading
@@ -83,37 +67,14 @@ export default function DashboardHome() {
             <Link href="/dashboard/compliance" className={btnLight}>
               <Icon name="download" className="h-4 w-4" /> Audit pack
             </Link>
-            <Link href="/dashboard/properties" className={btnDark}>
+            <Link href="/dashboard/properties/new" className={btnDark}>
               <Icon name="plus" className="h-4 w-4" /> New property
             </Link>
           </>
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <Stat
-          label="Held in trust"
-          value={aud(held)}
-          note="Both accounts reconciled"
-        />
-        <Stat
-          label="Open checklist items"
-          value={String(open)}
-          note="2 due today or overdue"
-          tone="owed"
-        />
-        <Stat
-          label="Live properties"
-          value={String(live)}
-          note="4 sales, 2 managed"
-        />
-        <Stat
-          label="Licences expiring"
-          value="1"
-          note="J. Alvarez, in 25 days"
-          tone="owed"
-        />
-      </div>
+      <LiveStats />
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.5fr_1fr]">
         <Card>

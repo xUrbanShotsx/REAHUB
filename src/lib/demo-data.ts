@@ -15,192 +15,261 @@ export type ChecklistItem = {
   due?: string;
   file?: string;
 };
+export type PropertyType = "sale" | "management";
+
+export const STATUSES: Record<PropertyType, string[]> = {
+  sale: ["Appraised", "Listed", "Under offer", "Sold"],
+  management: ["Managed", "Vacant", "Notice given"],
+};
+
+export const TYPE_LABEL: Record<PropertyType, string> = {
+  sale: "For sale",
+  management: "Property management",
+};
+
 export type Property = {
   id: string;
+  type: PropertyType;
   address: string;
   suburb: string;
-  status: "Listed" | "Under offer" | "Managed" | "Appraised";
-  kind: "Sales campaign" | "Management period";
+  status: string;
   agent: string;
-  detail: string;
+  owner: string;
+  /** Price guide for a sale, weekly rent for a management. */
+  price: string;
+  note: string;
+  templateName: string;
+  createdAt: string;
   checklist: ChecklistItem[];
 };
+
+export type Template = {
+  id: string;
+  name: string;
+  type: PropertyType | "any";
+  items: string[];
+  builtIn?: boolean;
+};
+
+export const team = [
+  { name: "Sam Taylor", initials: "ST" },
+  { name: "Priya Nair", initials: "PN" },
+  { name: "Alex Chen", initials: "AC" },
+  { name: "Dana Whitfield", initials: "DW" },
+  { name: "Tom Becker", initials: "TB" },
+];
+export const initialsOf = (name: string) =>
+  team.find((t) => t.name === name)?.initials ??
+  name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+export const templates: Template[] = [
+  {
+    id: "tpl-residential-sale",
+    name: "Residential sale",
+    type: "sale",
+    builtIn: true,
+    items: [
+      "Form 6, agency agreement",
+      "Vendor identity verification",
+      "Vendor disclosure",
+      "Material fact notice",
+      "Estimated selling price recorded",
+      "Price guide check",
+      "Advertising approval",
+      "Smoke alarms checked",
+      "Contract for sale on file",
+      "Deposit receipted",
+      "Cooling-off release",
+    ],
+  },
+  {
+    id: "tpl-auction",
+    name: "Auction",
+    type: "sale",
+    builtIn: true,
+    items: [
+      "Form 6, agency agreement",
+      "Vendor identity verification",
+      "Material fact notice",
+      "Estimated selling price recorded",
+      "Auction authority signed",
+      "Reserve price recorded",
+      "Open home register",
+      "Contract for sale on file",
+      "Bidder registration records",
+    ],
+  },
+  {
+    id: "tpl-new-tenancy",
+    name: "New tenancy",
+    type: "management",
+    builtIn: true,
+    items: [
+      "Management agreement signed",
+      "Owner identity verified",
+      "Lease signed",
+      "Bond lodged",
+      "Condition report",
+      "Smoke alarm compliance",
+      "Routine inspection scheduled",
+    ],
+  },
+  {
+    id: "tpl-blank",
+    name: "Start blank",
+    type: "any",
+    builtIn: true,
+    items: [],
+  },
+];
+
+const item = (
+  id: string,
+  t: string,
+  who: string,
+  done: boolean,
+  extra: Partial<ChecklistItem> = {},
+): ChecklistItem => ({ id, t, who, done, ...extra });
 
 export const properties: Property[] = [
   {
     id: "12-smith-st",
+    type: "sale",
     address: "12 Smith Street",
     suburb: "Newtown",
     status: "Listed",
-    kind: "Sales campaign",
     agent: "Sam Taylor",
-    detail: "Listed 29 Aug · Guide A$1.15m to A$1.25m",
+    owner: "R. Hargreaves",
+    price: "A$1.15m to A$1.25m",
+    note: "Listed 29 Aug",
+    templateName: "Residential sale",
+    createdAt: "29 Aug",
     checklist: [
-      {
-        id: "a",
-        t: "Form 6, agency agreement",
-        who: "ST",
-        done: true,
-        file: "Form6.pdf",
-      },
-      {
-        id: "b",
-        t: "Vendor disclosure",
-        who: "PN",
-        done: true,
-        file: "Disclosure.pdf",
-      },
-      {
-        id: "c",
-        t: "Material fact notice",
-        who: "ST",
-        done: true,
-        file: "Notice.pdf",
-      },
-      {
-        id: "d",
-        t: "Identity verification",
-        who: "AC",
-        done: false,
-        due: "Due today",
-      },
-      {
-        id: "e",
-        t: "Smoke alarms checked",
-        who: "JA",
-        done: false,
-        due: "Due Fri",
-      },
+      item("a", "Form 6, agency agreement", "ST", true, { file: "Form6.pdf" }),
+      item("b", "Vendor disclosure", "PN", true, { file: "Disclosure.pdf" }),
+      item("c", "Material fact notice", "ST", true, { file: "Notice.pdf" }),
+      item("d", "Identity verification", "AC", false, { due: "Due today" }),
+      item("e", "Smoke alarms checked", "JA", false, { due: "Due Fri" }),
     ],
   },
   {
     id: "41-norton-st",
+    type: "sale",
     address: "41 Norton Street",
     suburb: "Leichhardt",
     status: "Under offer",
-    kind: "Sales campaign",
     agent: "Priya Nair",
-    detail: "Offer received 2 Nov · Deposit held in trust",
+    owner: "L. and T. Bianchi",
+    price: "A$1.42m",
+    note: "Offer received 2 Nov",
+    templateName: "Residential sale",
+    createdAt: "12 Sep",
     checklist: [
-      {
-        id: "a",
-        t: "Form 6, agency agreement",
-        who: "PN",
-        done: true,
-        file: "Form6.pdf",
-      },
-      {
-        id: "b",
-        t: "Contract for sale on file",
-        who: "PN",
-        done: true,
+      item("a", "Form 6, agency agreement", "PN", true, { file: "Form6.pdf" }),
+      item("b", "Contract for sale on file", "PN", true, {
         file: "Contract.pdf",
-      },
-      { id: "c", t: "Deposit receipted", who: "DW", done: true },
-      {
-        id: "d",
-        t: "Cooling-off release",
-        who: "PN",
-        done: false,
-        due: "Due Tue",
-      },
-    ],
-  },
-  {
-    id: "3-bay-st",
-    address: "3 Bay Street",
-    suburb: "Rozelle",
-    status: "Managed",
-    kind: "Management period",
-    agent: "Alex Chen",
-    detail: "A$720 a week · Lease ends 14 Mar",
-    checklist: [
-      {
-        id: "a",
-        t: "Management agreement",
-        who: "AC",
-        done: true,
-        file: "Agreement.pdf",
-      },
-      {
-        id: "b",
-        t: "Routine inspection report",
-        who: "AC",
-        done: true,
-        file: "Inspection.pdf",
-      },
-      {
-        id: "c",
-        t: "Arrears follow-up",
-        who: "AC",
-        done: false,
-        due: "Overdue 3 days",
-      },
+      }),
+      item("c", "Deposit receipted", "DW", true),
+      item("d", "Cooling-off release", "PN", false, { due: "Due Tue" }),
     ],
   },
   {
     id: "22-hill-st",
+    type: "sale",
     address: "22 Hill Street",
     suburb: "Balmain",
     status: "Appraised",
-    kind: "Sales campaign",
     agent: "Sam Taylor",
-    detail: "Appraised 30 Oct · Awaiting agreement",
+    owner: "M. Okafor",
+    price: "A$1.9m to A$2.05m",
+    note: "Appraised 30 Oct",
+    templateName: "Residential sale",
+    createdAt: "30 Oct",
     checklist: [
-      { id: "a", t: "Appraisal recorded", who: "ST", done: true },
-      {
-        id: "b",
-        t: "Form 6, agency agreement",
-        who: "ST",
-        done: false,
-        due: "Due Mon",
-      },
+      item("a", "Appraisal recorded", "ST", true),
+      item("b", "Form 6, agency agreement", "ST", false, { due: "Due Mon" }),
     ],
   },
   {
     id: "15-wharf-rd",
+    type: "sale",
     address: "15 Wharf Road",
     suburb: "Balmain",
     status: "Under offer",
-    kind: "Sales campaign",
     agent: "Priya Nair",
-    detail: "Exchanged 28 Oct · Settlement in 6 weeks",
+    owner: "A. Moretti",
+    price: "A$1.75m",
+    note: "Exchanged 28 Oct",
+    templateName: "Residential sale",
+    createdAt: "2 Oct",
     checklist: [
-      {
-        id: "a",
-        t: "Form 6, agency agreement",
-        who: "PN",
-        done: true,
-        file: "Form6.pdf",
-      },
-      { id: "b", t: "Deposit receipted", who: "DW", done: true },
-      {
-        id: "c",
-        t: "Identity verified",
-        who: "PN",
-        done: true,
-        file: "ID-check.pdf",
-      },
+      item("a", "Form 6, agency agreement", "PN", true, { file: "Form6.pdf" }),
+      item("b", "Deposit receipted", "DW", true),
+      item("c", "Identity verified", "PN", true, { file: "ID-check.pdf" }),
+    ],
+  },
+  {
+    id: "3-bay-st",
+    type: "management",
+    address: "3 Bay Street",
+    suburb: "Rozelle",
+    status: "Managed",
+    agent: "Alex Chen",
+    owner: "M. Haddad",
+    price: "A$720 a week",
+    note: "Lease ends 14 Mar",
+    templateName: "New tenancy",
+    createdAt: "14 Mar",
+    checklist: [
+      item("a", "Management agreement", "AC", true, { file: "Agreement.pdf" }),
+      item("b", "Routine inspection report", "AC", true, {
+        file: "Inspection.pdf",
+      }),
+      item("c", "Arrears follow-up", "AC", false, { due: "Overdue 3 days" }),
     ],
   },
   {
     id: "8-jones-ave",
+    type: "management",
     address: "4/8 Jones Avenue",
     suburb: "Glebe",
     status: "Managed",
-    kind: "Management period",
     agent: "Alex Chen",
-    detail: "A$780 a week · Rent receipted",
+    owner: "T. Nguyen",
+    price: "A$780 a week",
+    note: "Rent receipted monthly",
+    templateName: "New tenancy",
+    createdAt: "3 Jun",
     checklist: [
-      { id: "a", t: "Management agreement", who: "AC", done: true },
-      { id: "b", t: "Entry notice filed", who: "AC", done: true },
-      {
-        id: "c",
-        t: "Routine inspection booked",
-        who: "AC",
-        done: false,
+      item("a", "Management agreement", "AC", true),
+      item("b", "Entry notice filed", "AC", true),
+      item("c", "Routine inspection booked", "AC", false, {
         due: "Due 18 Nov",
-      },
+      }),
+    ],
+  },
+  {
+    id: "88-elliott-st",
+    type: "management",
+    address: "88 Elliott Street",
+    suburb: "Balmain",
+    status: "Managed",
+    agent: "Tom Becker",
+    owner: "L. Fraser",
+    price: "A$850 a week",
+    note: "Bond lodged 2 Nov",
+    templateName: "New tenancy",
+    createdAt: "2 Nov",
+    checklist: [
+      item("a", "Management agreement signed", "TB", true),
+      item("b", "Lease signed", "TB", true),
+      item("c", "Bond lodged", "TB", true),
+      item("d", "Condition report", "TB", false, { due: "Due Wed" }),
     ],
   },
 ];
