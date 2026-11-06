@@ -165,6 +165,7 @@ export function CalendarView() {
     <>
       <PageHeading
         title="Calendar"
+        compact
         sub="Inspections, open homes, meetings and statutory dates, with task deadlines and licence renewals alongside."
         actions={
           <button

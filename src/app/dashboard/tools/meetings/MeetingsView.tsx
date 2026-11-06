@@ -90,6 +90,7 @@ export function MeetingsView() {
     <>
       <PageHeading
         title="Meetings"
+        compact
         sub="Notes by meeting type, with actions that become tasks. Last meeting's open items stay at the top."
         actions={
           <button

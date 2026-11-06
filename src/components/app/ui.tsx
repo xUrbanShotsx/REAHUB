@@ -145,18 +145,31 @@ export function PageHeading({
   title,
   sub,
   actions,
+  compact = false,
 }: {
   title: string;
   sub?: string;
   actions?: ReactNode;
+  /** Inside a module that already shows the page title, only the intro text and actions are drawn. */
+  compact?: boolean;
 }) {
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <h1 className="font-display text-2xl font-extrabold tracking-tight sm:text-3xl">
-          {title}
-        </h1>
-        {sub && <p className="mt-1 text-sm text-ink-soft">{sub}</p>}
+      <div className="min-w-0">
+        {compact ? (
+          <p className="sr-only">{title}</p>
+        ) : (
+          <h1 className="font-display text-2xl font-extrabold tracking-tight sm:text-3xl">
+            {title}
+          </h1>
+        )}
+        {sub && (
+          <p
+            className={`text-sm text-ink-soft ${compact ? "max-w-xl" : "mt-1"}`}
+          >
+            {sub}
+          </p>
+        )}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>

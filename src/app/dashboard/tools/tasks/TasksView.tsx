@@ -76,6 +76,7 @@ export function TasksView() {
     <>
       <PageHeading
         title="Task list"
+        compact
         sub="Everything that needs doing, from checklists, meetings, reviews and by hand."
         actions={
           <button

@@ -67,6 +67,7 @@ export function DiaryView() {
     <>
       <PageHeading
         title="Diary"
+        compact
         sub="A running record of calls, viewings and follow-ups, kept in date order."
         actions={
           <button
