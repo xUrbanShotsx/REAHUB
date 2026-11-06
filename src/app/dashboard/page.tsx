@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { KpiPanel } from "@/components/app/KpiPanel";
 import { ExpiringSoon } from "./ExpiringSoon";
 import { LiveStats } from "./LiveStats";
 import { RecentActivity } from "./RecentActivity";
@@ -12,9 +13,8 @@ import {
   CardHead,
   PageHeading,
   Pill,
-  Progress,
 } from "@/components/app/ui";
-import { kpis, me } from "@/lib/demo-data";
+import { me } from "@/lib/demo-data";
 
 const attention = [
   {
@@ -114,23 +114,7 @@ export default function DashboardHome() {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <Card>
-          <CardHead title="KPIs against target" sub="This month" />
-          <ul className="space-y-4 p-5">
-            {kpis.map((k) => (
-              <li key={k.name}>
-                <div className="mb-1.5 flex justify-between text-sm">
-                  <span className="font-semibold">{k.name}</span>
-                  <span className="tabular-nums text-ink-soft">{k.pct}%</span>
-                </div>
-                <Progress pct={k.pct} tone={k.pct >= 80 ? "ink" : "accent"} />
-              </li>
-            ))}
-            <li className="text-xs text-ink-soft">
-              Dark from 80%, blue below.
-            </li>
-          </ul>
-        </Card>
+        <KpiPanel />
 
         <ExpiringSoon />
 

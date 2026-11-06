@@ -935,10 +935,51 @@ export const seedDiary: DiaryEntry[] = [
   },
 ];
 
-export const kpis = [
-  { name: "Appraisals", pct: 86 },
-  { name: "Listings", pct: 64 },
-  { name: "New managements", pct: 42 },
+export type KpiPeriod = "Week" | "Month" | "Quarter" | "Year";
+export const KPI_PERIODS: KpiPeriod[] = ["Week", "Month", "Quarter", "Year"];
+export type Kpi = {
+  id: string;
+  name: string;
+  /** A person, a team or the whole agency. */
+  owner: string;
+  period: KpiPeriod;
+  unit: "Count" | "A$";
+  target: number;
+  actual: number;
+};
+export const KPI_OWNERS = [
+  "Whole agency",
+  "Sales team",
+  "Property management team",
+];
+export const seedKpis: Kpi[] = [
+  {
+    id: "k1",
+    name: "Appraisals",
+    owner: "Sales team",
+    period: "Month",
+    unit: "Count",
+    target: 20,
+    actual: 17,
+  },
+  {
+    id: "k2",
+    name: "New listings",
+    owner: "Sales team",
+    period: "Month",
+    unit: "Count",
+    target: 14,
+    actual: 9,
+  },
+  {
+    id: "k3",
+    name: "New managements",
+    owner: "Property management team",
+    period: "Month",
+    unit: "Count",
+    target: 12,
+    actual: 5,
+  },
 ];
 
 export const upcoming = [

@@ -1,15 +1,10 @@
 "use client";
 
 import { useStore } from "@/components/app/DemoStore";
+import { KpiPanel } from "@/components/app/KpiPanel";
 import { Icon } from "@/components/Icons";
-import {
-  Card,
-  CardHead,
-  PageHeading,
-  Pill,
-  Progress,
-} from "@/components/app/ui";
-import { kpis, upcoming, type Task } from "@/lib/demo-data";
+import { Card, CardHead, PageHeading, Pill } from "@/components/app/ui";
+import { upcoming, type Task } from "@/lib/demo-data";
 
 const COLUMNS: Task["status"][] = ["Open", "In progress", "Done"];
 const NEXT: Record<Task["status"], Task["status"]> = {
@@ -94,20 +89,7 @@ export function OperationsView() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHead title="KPIs against target" sub="This month" />
-            <ul className="space-y-4 p-5">
-              {kpis.map((k) => (
-                <li key={k.name}>
-                  <div className="mb-1.5 flex justify-between text-sm">
-                    <span className="font-semibold">{k.name}</span>
-                    <span className="tabular-nums text-ink-soft">{k.pct}%</span>
-                  </div>
-                  <Progress pct={k.pct} tone={k.pct >= 80 ? "ink" : "accent"} />
-                </li>
-              ))}
-            </ul>
-          </Card>
+          <KpiPanel editable />
 
           <Card>
             <CardHead title="Coming up" sub="Statutory dates and inspections" />

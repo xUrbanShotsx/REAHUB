@@ -177,6 +177,6 @@ export function PageHeading({
 }
 
 export const btn =
-  "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-200";
+  "inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-200";
 export const btnDark = `${btn} bg-ink text-bg hover:bg-ink/85`;
 export const btnLight = `${btn} border border-line bg-surface hover:bg-tint`;

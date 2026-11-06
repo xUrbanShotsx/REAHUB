@@ -15,6 +15,7 @@ import {
   STATUSES,
   templates as seedTemplates,
   seedDiary,
+  seedKpis,
   seedEvents,
   seedMeetings,
   tasks as seedTasks,
@@ -24,6 +25,7 @@ import {
   type AuditEvent,
   type CalEvent,
   type DiaryEntry,
+  type Kpi,
   type Meeting,
   type Task,
   type TaskStatus,
@@ -66,7 +68,7 @@ import {
   type Values,
 } from "@/lib/registers";
 
-const KEY = "reahub-demo-v7";
+const KEY = "reahub-demo-v8";
 
 type Saved = {
   properties: Property[];
@@ -81,6 +83,7 @@ type Saved = {
   meetings: Meeting[];
   diary: DiaryEntry[];
   trust: TrustState;
+  kpis: Kpi[];
 };
 const SEED: Saved = {
   properties: seedProperties,
@@ -95,6 +98,7 @@ const SEED: Saved = {
   meetings: seedMeetings,
   diary: seedDiary,
   trust: seedTrust,
+  kpis: seedKpis,
 };
 
 export type NewProperty = {
@@ -123,6 +127,7 @@ type Store = {
   meetings: Meeting[];
   diary: DiaryEntry[];
   trust: TrustState;
+  kpis: Kpi[];
   addProperty: (input: NewProperty) => string;
   updateProperty: (id: string, patch: Partial<Property>) => void;
   deleteProperty: (id: string) => void;
@@ -183,6 +188,9 @@ type Store = {
     periodEnd: string,
     statementClosing: number,
   ) => void;
+  addKpi: (input: Omit<Kpi, "id">) => void;
+  updateKpi: (id: string, patch: Partial<Omit<Kpi, "id">>) => void;
+  dropKpi: (id: string) => void;
   resetDemo: () => void;
 };
 
@@ -231,6 +239,7 @@ function readSaved(): Saved | null {
       Array.isArray(p.meetings) &&
       Array.isArray(p.diary) &&
       !!p.trust &&
+      Array.isArray(p.kpis) &&
       Array.isArray(p.trust.entries) &&
       Array.isArray(p.audit)
         ? p
@@ -338,6 +347,7 @@ const actions: Omit<
   | "meetings"
   | "diary"
   | "trust"
+  | "kpis"
   | "members"
   | "settings"
 > = {
@@ -1065,6 +1075,21 @@ const actions: Omit<
     );
   },
 
+  addKpi: (input) =>
+    update((s) => ({
+      ...s,
+      kpis: [...s.kpis, { ...input, id: `k-${uid()}` }],
+    })),
+
+  updateKpi: (id, patch) =>
+    update((s) => ({
+      ...s,
+      kpis: s.kpis.map((k) => (k.id === id ? { ...k, ...patch } : k)),
+    })),
+
+  dropKpi: (id) =>
+    update((s) => ({ ...s, kpis: s.kpis.filter((k) => k.id !== id) })),
+
   resetDemo: () => {
     clearProofs().catch(() => {});
     writeSaved(SEED);
@@ -1097,6 +1122,7 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       meetings: state.meetings,
       diary: state.diary,
       trust: state.trust,
+      kpis: state.kpis,
       ...actions,
     }),
     [ready, state],
