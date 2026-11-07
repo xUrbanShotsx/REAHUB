@@ -11,6 +11,7 @@ import { Avatar } from "./ui";
 
 const NAV: { href: string; label: string; icon: IconName }[] = [
   { href: "/dashboard", label: "Dashboard", icon: "grid" },
+  { href: "/dashboard/assistant", label: "Assistance", icon: "sparkle" },
   { href: "/dashboard/properties", label: "Properties", icon: "building" },
   { href: "/dashboard/trust", label: "Trust", icon: "scale" },
   { href: "/dashboard/compliance", label: "Compliance", icon: "shield" },
@@ -87,24 +88,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         })}
       </nav>
 
-      <div className="shrink-0 px-3 pb-1">
-        <Link
-          href="/dashboard/assistant"
-          onClick={() => setOpen(false)}
-          aria-current={
-            pathname.startsWith("/dashboard/assistant") ? "page" : undefined
-          }
-          className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${
-            pathname.startsWith("/dashboard/assistant")
-              ? "bg-accent/15 text-ink"
-              : "text-ink-soft hover:bg-tint hover:text-ink"
-          }`}
-        >
-          <Icon name="sparkle" className="h-[18px] w-[18px]" />
-          Assistance
-        </Link>
-      </div>
-
       <div className="m-3 shrink-0 rounded-xl border border-line bg-surface p-3">
         <div className="flex items-center gap-3">
           <Avatar initials={me.initials} tone={0} />
@@ -157,9 +140,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {current?.label ??
               (pathname.startsWith("/dashboard/settings")
                 ? "Settings"
-                : pathname.startsWith("/dashboard/assistant")
-                  ? "Assistance"
-                  : "Dashboard")}
+                : "Dashboard")}
           </p>
           <label className="ml-auto hidden max-w-sm flex-1 items-center gap-2 rounded-full bg-bg px-4 py-2 text-sm text-ink-soft focus-within:ring-2 focus-within:ring-accent sm:flex lg:ml-0">
             <Icon name="search" className="h-4 w-4" />
