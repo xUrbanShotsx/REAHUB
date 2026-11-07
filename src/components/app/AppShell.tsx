@@ -16,6 +16,7 @@ const NAV: { href: string; label: string; icon: IconName }[] = [
   { href: "/dashboard/compliance", label: "Compliance", icon: "shield" },
   { href: "/dashboard/operations", label: "Operations", icon: "clock" },
   { href: "/dashboard/tools", label: "Tools", icon: "list" },
+  { href: "/dashboard/vault", label: "Document Vault", icon: "file" },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {

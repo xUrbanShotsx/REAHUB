@@ -68,6 +68,8 @@ import {
   type Values,
 } from "@/lib/registers";
 
+import type { VaultDoc } from "@/lib/vault";
+
 const KEY = "reahub-demo-v8";
 
 type Saved = {
@@ -84,6 +86,7 @@ type Saved = {
   diary: DiaryEntry[];
   trust: TrustState;
   kpis: Kpi[];
+  documents: VaultDoc[];
 };
 const SEED: Saved = {
   properties: seedProperties,
@@ -99,6 +102,7 @@ const SEED: Saved = {
   diary: seedDiary,
   trust: seedTrust,
   kpis: seedKpis,
+  documents: [],
 };
 
 export type NewProperty = {
@@ -128,6 +132,7 @@ type Store = {
   diary: DiaryEntry[];
   trust: TrustState;
   kpis: Kpi[];
+  documents: VaultDoc[];
   addProperty: (input: NewProperty) => string;
   updateProperty: (id: string, patch: Partial<Property>) => void;
   deleteProperty: (id: string) => void;
@@ -191,6 +196,8 @@ type Store = {
   addKpi: (input: Omit<Kpi, "id">) => void;
   updateKpi: (id: string, patch: Partial<Omit<Kpi, "id">>) => void;
   dropKpi: (id: string) => void;
+  saveDoc: (doc: VaultDoc) => void;
+  dropDoc: (id: string) => void;
   resetDemo: () => void;
 };
 
@@ -242,7 +249,7 @@ function readSaved(): Saved | null {
       Array.isArray(p.kpis) &&
       Array.isArray(p.trust.entries) &&
       Array.isArray(p.audit)
-        ? p
+        ? { ...p, documents: Array.isArray(p.documents) ? p.documents : [] }
         : null;
   } catch {
     cacheVal = null;
@@ -348,6 +355,7 @@ const actions: Omit<
   | "diary"
   | "trust"
   | "kpis"
+  | "documents"
   | "members"
   | "settings"
 > = {
@@ -1090,6 +1098,18 @@ const actions: Omit<
   dropKpi: (id) =>
     update((s) => ({ ...s, kpis: s.kpis.filter((k) => k.id !== id) })),
 
+  saveDoc: (doc) =>
+    update((s) => ({
+      ...s,
+      documents: [...s.documents.filter((d) => d.id !== doc.id), doc],
+    })),
+
+  dropDoc: (id) =>
+    update((s) => ({
+      ...s,
+      documents: s.documents.filter((d) => d.id !== id),
+    })),
+
   resetDemo: () => {
     clearProofs().catch(() => {});
     writeSaved(SEED);
@@ -1123,6 +1143,7 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
       diary: state.diary,
       trust: state.trust,
       kpis: state.kpis,
+      documents: state.documents,
       ...actions,
     }),
     [ready, state],

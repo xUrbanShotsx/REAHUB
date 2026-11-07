@@ -299,3 +299,119 @@ main .grid > * {
     overflow-wrap: anywhere;
   }
 }
+
+/* Document Vault: the page being written */
+@keyframes vault-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.vault-in {
+  animation: vault-in 0.5s ease-out both;
+}
+@keyframes vault-caret {
+  50% {
+    opacity: 0.2;
+  }
+}
+.vault-caret {
+  display: inline-block;
+  width: 0.5em;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.17em;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 14px 3px color-mix(in oklab, var(--accent) 65%, transparent);
+  animation: vault-caret 0.9s steps(2, jump-none) infinite;
+}
+@keyframes vault-sweep {
+  from {
+    background-position: -120% 0;
+  }
+  to {
+    background-position: 220% 0;
+  }
+}
+.vault-sheen {
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent),
+    transparent
+  );
+  background-size: 45% 100%;
+  background-repeat: no-repeat;
+  animation: vault-sweep 1.5s linear infinite;
+}
+@keyframes vault-aura {
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+.vault-aura {
+  animation: vault-aura 4.5s ease-in-out infinite;
+}
+@keyframes vault-line {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.vault-h2::after {
+  content: "";
+  display: block;
+  height: 2px;
+  width: 2.75rem;
+  margin-top: 0.45rem;
+  border-radius: 2px;
+  background: var(--accent);
+  transform-origin: left;
+  animation: vault-line 0.7s 0.15s ease-out both;
+}
+.vault-static .vault-h2::after {
+  animation: none;
+}
+@keyframes vault-skel {
+  50% {
+    opacity: 0.45;
+  }
+}
+.vault-skel {
+  animation: vault-skel 1.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vault-in,
+  .vault-caret,
+  .vault-sheen,
+  .vault-aura,
+  .vault-h2::after,
+  .vault-skel {
+    animation: none;
+  }
+}
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .vault-print,
+  .vault-print * {
+    visibility: visible;
+  }
+  .vault-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+}
