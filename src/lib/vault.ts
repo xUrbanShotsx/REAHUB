@@ -334,6 +334,8 @@ export type VaultDoc = {
   createdAt: string;
   answers: { q: string; a: string }[];
   version: number;
+  /** Placeholder text written while the AI writer was not connected. */
+  sample?: boolean;
 };
 
 export type VaultQuestion = {

@@ -7,9 +7,11 @@ import { useStore } from "@/components/app/DemoStore";
 import { Mascot, MascotHead } from "@/components/app/Mascot";
 import { btnDark, btnLight, Card, Pill } from "@/components/app/ui";
 import { docToHtml, parseDoc } from "@/lib/doc-markdown";
+import { me } from "@/lib/demo-data";
 import { fmtDate, todayISO } from "@/lib/format";
 import { vaultById, type VaultQuestion } from "@/lib/vault";
 import { buildAgencyProfile } from "@/lib/vault-profile";
+import { sampleDoc, sampleQuestions } from "@/lib/vault-sample";
 import { DocPaper } from "../DocPaper";
 import { useTypewriter } from "../useTypewriter";
 
@@ -43,6 +45,7 @@ export function DocFlow({ id }: { id: string }) {
   const [skip, setSkip] = useState(false);
   const [problem, setProblem] = useState<Problem | null>(null);
   const abort = useRef<AbortController | null>(null);
+  const demo = useRef(false);
 
   useEffect(() => () => abort.current?.abort(), []);
 
@@ -76,10 +79,21 @@ export function DocFlow({ id }: { id: string }) {
     try {
       const res = await post({ mode: "questions" }, ctrl);
       if (!res.ok) {
-        setProblem(await readProblem(res));
+        const p = await readProblem(res);
+        if (p.code === "not_configured") {
+          // not connected: run the whole flow with sample text so it can still be seen
+          demo.current = true;
+          await new Promise((r) => setTimeout(r, 1600));
+          setQuestions(sampleQuestions(def));
+          setAnswers({});
+          setPhase("questions");
+          return;
+        }
+        setProblem(p);
         setPhase(existing ? "done" : "intro");
         return;
       }
+      demo.current = false;
       const data = (await res.json()) as { questions?: VaultQuestion[] };
       const qs = data.questions ?? [];
       setQuestions(qs);
@@ -108,6 +122,32 @@ export function DocFlow({ id }: { id: string }) {
     setSkip(false);
     setPhase("writing");
     try {
+      if (demo.current) {
+        await new Promise((r) => setTimeout(r, 1800));
+        const content = sampleDoc(def, {
+          agency: agencyName,
+          entity: store.settings.agency.trading,
+          owner: me.name,
+          today: todayISO(),
+        });
+        for (let i = 0; i < content.length; i += 40) {
+          if (ctrl.signal.aborted) return;
+          setText(content.slice(0, i + 40));
+          await new Promise((r) => setTimeout(r, 18));
+        }
+        store.saveDoc({
+          id,
+          title: def.name,
+          content,
+          createdAt: `${todayISO()}T${new Date().toTimeString().slice(0, 5)}`,
+          answers: qa,
+          version: (existing?.version ?? 0) + 1,
+          sample: true,
+        });
+        setText(content);
+        setStreamDone(true);
+        return;
+      }
       const res = await post({ mode: "write", answers: qa }, ctrl);
       if (!res.ok || !res.body) {
         setProblem(await readProblem(res));
@@ -231,6 +271,7 @@ export function DocFlow({ id }: { id: string }) {
             }
           }}
           justWritten={streamDone}
+          sample={existing.sample}
         />
       )}
     </div>
@@ -656,6 +697,7 @@ function Done({
   onRegenerate,
   onDelete,
   justWritten,
+  sample,
 }: {
   docTitle: string;
   content: string;
@@ -666,6 +708,7 @@ function Done({
   onRegenerate: () => void;
   onDelete: () => void;
   justWritten: boolean;
+  sample?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -724,9 +767,9 @@ function Done({
       </div>
 
       <p className="mb-4 rounded-2xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm">
-        This is a draft written by AI from your agency details. Read it through,
-        change what does not fit, and have your licensee in charge or adviser
-        approve it before it is adopted.
+        {sample
+          ? "This is sample text, shown because the writer is not connected yet. Once it is connected, each document is written from your agency details and your answers."
+          : "This is a draft written by AI from your agency details. Read it through, change what does not fit, and have your licensee in charge or adviser approve it before it is adopted."}
       </p>
 
       <div
