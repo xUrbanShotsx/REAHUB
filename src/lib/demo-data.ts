@@ -620,7 +620,7 @@ export type AuditEvent = {
   act: string;
   from: string;
   to: string;
-  area: "Trust" | "Registers" | "Properties" | "Settings";
+  area: "Trust" | "Registers" | "Properties" | "Settings" | "Documents";
 };
 export const audit: AuditEvent[] = [
   {

@@ -1,3 +1,6 @@
+import { fmtDate } from "./format";
+import type { Approval } from "./vault";
+
 /** A small markdown subset used for generated policy documents. Everything else stays plain text. */
 
 export type DocBlock = {
@@ -53,7 +56,11 @@ const inlineHtml = (s: string) =>
   esc(s).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
 
 /** Plain HTML that Word opens as a document. */
-export function docToHtml(title: string, src: string): string {
+export function docToHtml(
+  title: string,
+  src: string,
+  approval?: Approval & { version: number },
+): string {
   const body = parseDoc(src)
     .map((b) => {
       const li = (l: string) => `<li>${inlineHtml(l)}</li>`;
@@ -75,5 +82,8 @@ export function docToHtml(title: string, src: string): string {
       }
     })
     .join("\n");
-  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title><style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.5;color:#1a2238}h1{font-size:22pt;margin:0 0 12pt}h2{font-size:14pt;margin:18pt 0 6pt;color:#2a47d6}h3{font-size:12pt;margin:12pt 0 4pt}</style></head><body>${body}</body></html>`;
+  const sign = approval
+    ? `<hr/><h2>Approval</h2><img src="${approval.signature}" alt="Signature" height="70"/><p><strong>${esc(approval.name)}</strong>, ${esc(approval.role)}<br/>Approved ${fmtDate(approval.date)} &middot; Version ${approval.version}.0 &middot; Next review ${fmtDate(approval.nextReview)}<br/>Fingerprint ${esc(approval.fingerprint)}</p>`
+    : `<hr/><h2>Approval</h2><p>Signature: ______________________ &nbsp; Name and position: ______________________ &nbsp; Date: ____________</p><p><em>Awaiting approval. Not yet in force.</em></p>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title><style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.5;color:#1a2238}h1{font-size:22pt;margin:0 0 12pt}h2{font-size:14pt;margin:18pt 0 6pt;color:#2a47d6}h3{font-size:12pt;margin:12pt 0 4pt}</style></head><body>${body}\n${sign}</body></html>`;
 }

@@ -326,6 +326,37 @@ export const VAULT: VaultDef[] = [
 
 export const vaultById = (id: string) => VAULT.find((d) => d.id === id);
 
+export type Approval = {
+  name: string;
+  role: string;
+  /** Date approved, yyyy-mm-dd. */
+  date: string;
+  /** When the document must be looked at again, yyyy-mm-dd. */
+  nextReview: string;
+  /** The drawn signature as a PNG data URL. */
+  signature: string;
+  /** Short SHA-256 of the exact text that was approved. */
+  fingerprint: string;
+};
+
+export type VaultStatus = "draft" | "approved" | "review-soon" | "review-due";
+
+/** Where a document stands today: draft, approved, or approved but due for review. */
+export function vaultStatus(
+  doc: { approval?: Approval } | undefined,
+  today: string,
+): VaultStatus | "none" {
+  if (!doc) return "none";
+  if (!doc.approval) return "draft";
+  if (!today) return "approved"; // before the browser knows the date
+  const r = doc.approval.nextReview;
+  if (r < today) return "review-due";
+  const soon = new Date(today);
+  soon.setDate(soon.getDate() + 30);
+  const lim = `${soon.getFullYear()}-${String(soon.getMonth() + 1).padStart(2, "0")}-${String(soon.getDate()).padStart(2, "0")}`;
+  return r <= lim ? "review-soon" : "approved";
+}
+
 export type VaultDoc = {
   /** Same as the definition id: one current document per type. */
   id: string;
@@ -336,6 +367,7 @@ export type VaultDoc = {
   version: number;
   /** Placeholder text written while the AI writer was not connected. */
   sample?: boolean;
+  approval?: Approval;
 };
 
 export type VaultQuestion = {

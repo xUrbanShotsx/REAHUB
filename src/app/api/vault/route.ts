@@ -30,11 +30,11 @@ Your task now: write the finished document named below, ready for the agency to 
 Quality bar: this must read like a polished policy from a good compliance consultant. Be specific and practical. Put real steps, responsibilities and timeframes the agency chooses into the procedure, not generic filler. Short paragraphs. Numbered steps where order matters, bullets for lists.
 
 Format, in a markdown subset that supports only these:
-- One "# " heading for the document title, then directly under it a short bulleted document control list (Agency, Document owner, Version 1.0, Effective date, Next review date, Approved by). Use today's date for the effective date and one year later for the next review.
+- One "# " heading for the document title, then directly under it a short bulleted document control list (Agency, Document owner, Version 1.0, Effective date, Next review date). Use today's date for the effective date and one year later for the next review.
 - Then a "## " heading for each required section, in the order given, with the section number in the heading text (for example "## 1. Purpose and scope"). You may use "### " for sub-points.
-- Use "- " bullets, "1. " numbered lists, **bold** for key terms, and a "---" line before the sign-off.
+- Use "- " bullets, "1. " numbered lists, **bold** for key terms, and a "---" line before the closing line.
 - Do NOT use tables, code blocks, images, links or HTML.
-- End with an approval block: a line "Approved by the licensee in charge" with a name and date placeholder, and a line telling the reader to review the document with their own adviser before adopting it.
+- Do NOT add a signature or approval block. REAHUB adds a signed approval block after the document. Finish with the last section, then a "---" line and one short line telling the reader to review the document with their own adviser before adopting it.
 
 Output only the document. No preamble, no commentary, no closing remarks.`;
 

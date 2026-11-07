@@ -4,12 +4,14 @@ import Link from "next/link";
 import { Icon } from "@/components/Icons";
 import { useStore } from "@/components/app/DemoStore";
 import { PageHeading, Pill, Progress } from "@/components/app/ui";
-import { fmtDate } from "@/lib/format";
-import { VAULT } from "@/lib/vault";
+import { fmtDate, todayISO } from "@/lib/format";
+import { VAULT, vaultStatus } from "@/lib/vault";
 
 export function VaultView() {
-  const { documents, settings } = useStore();
-  const done = VAULT.filter((d) => documents.some((x) => x.id === d.id)).length;
+  const { documents, settings, ready } = useStore();
+  const today = ready ? todayISO() : "";
+  const written = documents.filter((d) => VAULT.some((v) => v.id === d.id));
+  const approved = written.filter((d) => d.approval).length;
 
   return (
     <div>
@@ -21,10 +23,11 @@ export function VaultView() {
       <div className="mb-6 flex items-center gap-4 rounded-2xl border border-line bg-surface p-4 sm:p-5">
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold">
-            {done} of {VAULT.length} documents written
+            {written.length} of {VAULT.length} written, {approved} approved and
+            signed
           </p>
           <div className="mt-2">
-            <Progress pct={Math.round((done / VAULT.length) * 100)} />
+            <Progress pct={Math.round((approved / VAULT.length) * 100)} />
           </div>
         </div>
         <span className="hidden text-xs text-ink-soft sm:block">
@@ -45,11 +48,20 @@ export function VaultView() {
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/12 text-accent">
                     <Icon name={d.icon} className="h-5 w-5" />
                   </span>
-                  {doc ? (
-                    <Pill tone="ok">Written</Pill>
-                  ) : (
-                    <Pill tone="neutral">Not yet</Pill>
-                  )}
+                  {(() => {
+                    const st = vaultStatus(doc, today);
+                    return st === "none" ? (
+                      <Pill tone="neutral">Not yet</Pill>
+                    ) : st === "draft" ? (
+                      <Pill tone="neutral">Draft</Pill>
+                    ) : st === "approved" ? (
+                      <Pill tone="ok">Approved</Pill>
+                    ) : (
+                      <Pill tone="owed">
+                        {st === "review-due" ? "Review overdue" : "Review soon"}
+                      </Pill>
+                    );
+                  })()}
                 </div>
                 <h2 className="mt-4 font-display text-base font-extrabold leading-snug">
                   {d.name}
@@ -60,7 +72,10 @@ export function VaultView() {
                     <>
                       Open
                       <span className="font-normal text-ink-soft">
-                        · v{doc.version}, {fmtDate(doc.createdAt.slice(0, 10))}
+                        ·{" "}
+                        {doc.approval
+                          ? `signed ${fmtDate(doc.approval.date)}`
+                          : `draft v${doc.version}`}
                       </span>
                     </>
                   ) : (

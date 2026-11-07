@@ -9,9 +9,16 @@ import { btnDark, btnLight, Card, Pill } from "@/components/app/ui";
 import { docToHtml, parseDoc } from "@/lib/doc-markdown";
 import { me } from "@/lib/demo-data";
 import { fmtDate, todayISO } from "@/lib/format";
-import { vaultById, type VaultQuestion } from "@/lib/vault";
+import {
+  vaultById,
+  vaultStatus,
+  type VaultDoc,
+  type VaultQuestion,
+} from "@/lib/vault";
 import { buildAgencyProfile } from "@/lib/vault-profile";
 import { sampleDoc, sampleQuestions } from "@/lib/vault-sample";
+import { ApprovalBlock } from "../ApprovalBlock";
+import { ApproveDialog } from "../ApproveDialog";
 import { DocPaper } from "../DocPaper";
 import { useTypewriter } from "../useTypewriter";
 
@@ -37,7 +44,9 @@ export function DocFlow({ id }: { id: string }) {
   const existing = store.documents.find((d) => d.id === id);
   const agencyName = store.settings.agency.name;
 
-  const [phase, setPhase] = useState<Phase>(existing ? "done" : "intro");
+  const [phase, setPhase] = useState<Phase>("intro");
+  // a saved document opens straight to the page, once the browser copy has loaded
+  const view: Phase = phase === "intro" && existing ? "done" : phase;
   const [questions, setQuestions] = useState<VaultQuestion[]>([]);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [text, setText] = useState("");
@@ -213,7 +222,7 @@ export function DocFlow({ id }: { id: string }) {
 
       {problem && <ProblemCard problem={problem} />}
 
-      {phase === "intro" && (
+      {view === "intro" && store.ready && (
         <Intro
           name={def.name}
           why={def.why}
@@ -223,9 +232,9 @@ export function DocFlow({ id }: { id: string }) {
         />
       )}
 
-      {phase === "asking" && <Asking agency={agencyName} name={def.name} />}
+      {view === "asking" && <Asking agency={agencyName} name={def.name} />}
 
-      {phase === "questions" && (
+      {view === "questions" && (
         <Questions
           agency={agencyName}
           questions={questions}
@@ -236,7 +245,7 @@ export function DocFlow({ id }: { id: string }) {
         />
       )}
 
-      {phase === "writing" && (
+      {view === "writing" && (
         <Writing
           name={def.name}
           agency={agencyName}
@@ -249,15 +258,11 @@ export function DocFlow({ id }: { id: string }) {
         />
       )}
 
-      {phase === "done" && existing && (
+      {view === "done" && existing && (
         <Done
           key={existing.version}
-          docTitle={existing.title}
-          content={existing.content}
-          version={existing.version}
-          createdAt={existing.createdAt}
+          doc={existing}
           agency={agencyName}
-          answers={existing.answers}
           onRegenerate={begin}
           onDelete={() => {
             if (
@@ -271,7 +276,6 @@ export function DocFlow({ id }: { id: string }) {
             }
           }}
           justWritten={streamDone}
-          sample={existing.sample}
         />
       )}
     </div>
@@ -688,29 +692,23 @@ function Writing({
 }
 
 function Done({
-  docTitle,
-  content,
-  version,
-  createdAt,
+  doc,
   agency,
-  answers,
   onRegenerate,
   onDelete,
   justWritten,
-  sample,
 }: {
-  docTitle: string;
-  content: string;
-  version: number;
-  createdAt: string;
+  doc: VaultDoc;
   agency: string;
-  answers: { q: string; a: string }[];
   onRegenerate: () => void;
   onDelete: () => void;
   justWritten: boolean;
-  sample?: boolean;
 }) {
+  const store = useStore();
   const [copied, setCopied] = useState(false);
+  const [signing, setSigning] = useState(false);
+  const { title: docTitle, content, version, approval } = doc;
+  const status = vaultStatus(doc, todayISO());
 
   const copy = async () => {
     try {
@@ -723,14 +721,25 @@ function Done({
   };
 
   const download = () => {
-    const blob = new Blob([docToHtml(docTitle, content)], {
-      type: "application/msword",
-    });
+    const blob = new Blob(
+      [docToHtml(docTitle, content, approval && { ...approval, version })],
+      { type: "application/msword" },
+    );
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `${docTitle.replace(/[^\w]+/g, "-").replace(/^-|-$/g, "") || "document"}.doc`;
+    a.download = `${docTitle.replace(/[^\w]+/g, "-").replace(/^-|-$/g, "") || "document"}${approval ? "-approved" : "-draft"}.doc`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+
+  const rewrite = () => {
+    if (
+      !approval ||
+      window.confirm(
+        "This document is approved. Writing it again replaces it with a new draft that must be approved and signed again. Continue?",
+      )
+    )
+      onRegenerate();
   };
 
   return (
@@ -741,11 +750,30 @@ function Done({
             {docTitle}
           </h1>
           <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-ink-soft">
-            <Pill tone="neutral">Draft v{version}</Pill>
-            Written for {agency} on {fmtDate(createdAt.slice(0, 10))}
+            {status === "draft" && <Pill tone="neutral">Draft v{version}</Pill>}
+            {status === "approved" && (
+              <Pill tone="ok">Approved v{version}</Pill>
+            )}
+            {(status === "review-soon" || status === "review-due") && (
+              <Pill tone="owed">
+                {status === "review-due" ? "Review overdue" : "Review due soon"}
+              </Pill>
+            )}
+            {approval
+              ? `Approved by ${approval.name} on ${fmtDate(approval.date)}`
+              : `Written for ${agency} on ${fmtDate(doc.createdAt.slice(0, 10))}`}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {!approval && (
+            <button
+              type="button"
+              onClick={() => setSigning(true)}
+              className={btnDark}
+            >
+              <Icon name="check" className="h-4 w-4" /> Approve and sign
+            </button>
+          )}
           <button type="button" onClick={copy} className={btnLight}>
             <Icon name={copied ? "check" : "clip"} className="h-4 w-4" />
             {copied ? "Copied" : "Copy"}
@@ -760,17 +788,35 @@ function Done({
           >
             <Icon name="file" className="h-4 w-4" /> Print or PDF
           </button>
-          <button type="button" onClick={onRegenerate} className={btnDark}>
-            <Icon name="sparkle" className="h-4 w-4" /> Write again
+          <button type="button" onClick={rewrite} className={btnLight}>
+            <Icon name="sparkle" className="h-4 w-4" />{" "}
+            {approval ? "New version" : "Write again"}
           </button>
         </div>
       </div>
 
-      <p className="mb-4 rounded-2xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm">
-        {sample
-          ? "This is sample text, shown because the writer is not connected yet. Once it is connected, each document is written from your agency details and your answers."
-          : "This is a draft written by AI from your agency details. Read it through, change what does not fit, and have your licensee in charge or adviser approve it before it is adopted."}
-      </p>
+      {approval ? (
+        <p
+          className={`mb-4 rounded-2xl border px-4 py-3 text-sm ${
+            status === "review-due" || status === "review-soon"
+              ? "border-amber-400/50 bg-amber-400/10"
+              : "border-emerald-500/30 bg-emerald-500/10"
+          }`}
+        >
+          {status === "review-due"
+            ? `This was approved by ${approval.name} but its review date, ${fmtDate(approval.nextReview)}, has passed. Write a new version or review it and approve it again.`
+            : status === "review-soon"
+              ? `Approved by ${approval.name}. It is due for review on ${fmtDate(approval.nextReview)}.`
+              : `Approved and signed by ${approval.name}, ${approval.role}, on ${fmtDate(approval.date)}. Next review ${fmtDate(approval.nextReview)}.`}
+        </p>
+      ) : (
+        <p className="mb-4 rounded-2xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm">
+          {doc.sample
+            ? "This is sample text, shown because the writer is not connected yet. Once it is connected, each document is written from your agency details and your answers. "
+            : "This is a draft written by AI from your agency details. Read it through, then approve and sign it when it is ready to adopt. "}
+          It is not in force until it is signed.
+        </p>
+      )}
 
       <div
         className={`vault-print overflow-hidden rounded-2xl border border-line bg-white px-5 py-7 shadow-sm sm:px-12 sm:py-10 ${
@@ -778,16 +824,17 @@ function Done({
         }`}
       >
         <DocPaper text={content} />
+        <ApprovalBlock approval={approval} version={version} />
       </div>
 
       <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
-        {answers.length > 0 ? (
+        {doc.answers.length > 0 ? (
           <details className="min-w-0 max-w-xl text-sm">
             <summary className="cursor-pointer font-semibold">
               Answers this was based on
             </summary>
             <dl className="mt-2 space-y-2 text-ink-soft">
-              {answers.map((a) => (
+              {doc.answers.map((a) => (
                 <div key={a.q}>
                   <dt className="font-medium text-ink">{a.q}</dt>
                   <dd>{a.a}</dd>
@@ -798,14 +845,45 @@ function Done({
         ) : (
           <span />
         )}
-        <button
-          type="button"
-          onClick={onDelete}
-          className="text-sm font-semibold text-ink-soft underline hover:text-ink"
-        >
-          Delete from vault
-        </button>
+        <div className="flex gap-4">
+          {approval && (
+            <button
+              type="button"
+              onClick={() => {
+                if (
+                  window.confirm(
+                    "Withdraw the approval? The document goes back to a draft and the signature is removed. This is recorded in the audit log.",
+                  )
+                )
+                  store.withdrawApproval(doc.id);
+              }}
+              className="text-sm font-semibold text-ink-soft underline hover:text-ink"
+            >
+              Withdraw approval
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onDelete}
+            className="text-sm font-semibold text-ink-soft underline hover:text-ink"
+          >
+            Delete from vault
+          </button>
+        </div>
       </div>
+
+      {signing && (
+        <ApproveDialog
+          docTitle={docTitle}
+          content={content}
+          agency={agency}
+          onClose={() => setSigning(false)}
+          onApprove={(a) => {
+            store.approveDoc(doc.id, a);
+            setSigning(false);
+          }}
+        />
+      )}
     </div>
   );
 }

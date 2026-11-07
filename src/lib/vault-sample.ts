@@ -25,7 +25,6 @@ export function sampleDoc(
     "- **Version:** 1.0",
     `- **Effective date:** ${a.today}`,
     `- **Next review date:** ${addYear(a.today)}`,
-    "- **Approved by:** [Name of licensee in charge]",
     "",
   ];
   def.sections.forEach((s, i) => {
@@ -45,8 +44,6 @@ export function sampleDoc(
   });
   lines.push(
     "---",
-    "",
-    "Approved by the licensee in charge: [Name]  [Date]",
     "",
     "Review this document with your own adviser before adopting it.",
   );

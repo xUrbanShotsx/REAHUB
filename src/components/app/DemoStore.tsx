@@ -68,7 +68,7 @@ import {
   type Values,
 } from "@/lib/registers";
 
-import type { VaultDoc } from "@/lib/vault";
+import type { Approval, VaultDoc } from "@/lib/vault";
 
 const KEY = "reahub-demo-v8";
 
@@ -198,6 +198,8 @@ type Store = {
   dropKpi: (id: string) => void;
   saveDoc: (doc: VaultDoc) => void;
   dropDoc: (id: string) => void;
+  approveDoc: (id: string, approval: Approval) => void;
+  withdrawApproval: (id: string) => void;
   resetDemo: () => void;
 };
 
@@ -1099,16 +1101,77 @@ const actions: Omit<
     update((s) => ({ ...s, kpis: s.kpis.filter((k) => k.id !== id) })),
 
   saveDoc: (doc) =>
-    update((s) => ({
-      ...s,
-      documents: [...s.documents.filter((d) => d.id !== doc.id), doc],
-    })),
+    update((s) =>
+      withEvent(
+        {
+          ...s,
+          documents: [...s.documents.filter((d) => d.id !== doc.id), doc],
+        },
+        event(
+          "Documents",
+          `wrote ${doc.title}`,
+          doc.version > 1 ? `Version ${doc.version - 1}` : "New",
+          `Draft version ${doc.version}`,
+        ),
+      ),
+    ),
 
   dropDoc: (id) =>
-    update((s) => ({
-      ...s,
-      documents: s.documents.filter((d) => d.id !== id),
-    })),
+    update((s) => {
+      const d = s.documents.find((x) => x.id === id);
+      const next = { ...s, documents: s.documents.filter((x) => x.id !== id) };
+      return d
+        ? withEvent(
+            next,
+            event(
+              "Documents",
+              `deleted ${d.title}`,
+              d.approval ? "Approved" : "Draft",
+              "Removed",
+            ),
+          )
+        : next;
+    }),
+
+  approveDoc: (id, approval) =>
+    update((s) => {
+      const d = s.documents.find((x) => x.id === id);
+      if (!d) return s;
+      return withEvent(
+        {
+          ...s,
+          documents: s.documents.map((x) =>
+            x.id === id ? { ...x, approval } : x,
+          ),
+        },
+        event(
+          "Documents",
+          `${approval.name} approved and signed ${d.title}`,
+          `Draft version ${d.version}`,
+          `Approved, review by ${approval.nextReview}`,
+        ),
+      );
+    }),
+
+  withdrawApproval: (id) =>
+    update((s) => {
+      const d = s.documents.find((x) => x.id === id);
+      if (!d?.approval) return s;
+      return withEvent(
+        {
+          ...s,
+          documents: s.documents.map((x) =>
+            x.id === id ? { ...x, approval: undefined } : x,
+          ),
+        },
+        event(
+          "Documents",
+          `withdrew approval of ${d.title}`,
+          "Approved",
+          `Draft version ${d.version}`,
+        ),
+      );
+    }),
 
   resetDemo: () => {
     clearProofs().catch(() => {});
