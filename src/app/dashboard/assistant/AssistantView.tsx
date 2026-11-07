@@ -117,7 +117,7 @@ export function AssistantView() {
   const first = me.name.split(" ")[0];
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-11rem)] max-w-3xl flex-col">
+    <div className="mx-auto flex min-h-[calc(100dvh-11rem)] max-w-3xl flex-col">
       {!empty && (
         <div className="mb-4 flex justify-end">
           <button type="button" onClick={reset} className={btnLight}>
@@ -202,6 +202,9 @@ export function AssistantView() {
           />
           <div className="min-w-0 flex-1">
             {empty && (
+              <Mascot className="mascot-bob mb-2 h-20 w-20 sm:hidden" />
+            )}
+            {empty && (
               <div className="relative mb-3 max-w-md rounded-3xl rounded-bl-lg bg-ink px-5 py-3 text-bg shadow-lg">
                 <p className="font-display text-lg font-extrabold leading-snug">
                   G&apos;day {first}. What are we sorting out today?
@@ -236,7 +239,7 @@ export function AssistantView() {
                       void send(input);
                     }
                   }}
-                  placeholder="Ask about compliance, or about your office"
+                  placeholder="Ask me anything"
                   className="outline-none max-h-44 w-full resize-none bg-transparent px-3 py-2.5 text-[15px] text-ink placeholder:text-ink-soft"
                 />
               </label>

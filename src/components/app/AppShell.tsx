@@ -27,10 +27,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
 
   const sidebar = (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       <Link
         href="/dashboard"
-        className="flex h-16 items-center px-5"
+        className="flex h-16 shrink-0 items-center px-5"
         onClick={() => setOpen(false)}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -43,16 +43,27 @@ export function AppShell({ children }: { children: ReactNode }) {
         />
       </Link>
 
-      <div className="mx-3 rounded-xl border border-line bg-surface px-3 py-2.5">
+      <div className="mx-3 shrink-0 rounded-xl border border-line bg-surface px-3 py-2.5">
         <p className="truncate text-sm font-bold">{settings.agency.name}</p>
         <p className="text-xs text-ink-soft">
           {settings.plan} plan · demo workspace
         </p>
       </div>
 
+      <label className="mx-3 mt-3 flex shrink-0 items-center gap-2 rounded-full bg-tint px-4 py-2 text-sm text-ink-soft focus-within:ring-2 focus-within:ring-accent sm:hidden">
+        <Icon name="search" className="h-4 w-4" />
+        <input
+          type="search"
+          placeholder="Search"
+          className="w-full bg-transparent text-ink outline-none placeholder:text-ink-soft"
+          aria-label="Search"
+        />
+      </label>
+
       <nav
         aria-label="App"
-        className="mt-5 flex-1 space-y-1 overflow-y-auto px-3"
+        data-lenis-prevent
+        className="mt-5 min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain px-3"
       >
         {NAV.map((n) => {
           const active = n === current;
@@ -75,7 +86,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         })}
       </nav>
 
-      <div className="px-3 pb-1">
+      <div className="shrink-0 px-3 pb-1">
         <Link
           href="/dashboard/assistant"
           onClick={() => setOpen(false)}
@@ -93,7 +104,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </Link>
       </div>
 
-      <div className="m-3 rounded-xl border border-line bg-surface p-3">
+      <div className="m-3 shrink-0 rounded-xl border border-line bg-surface p-3">
         <div className="flex items-center gap-3">
           <Avatar initials={me.initials} tone={0} />
           <div className="min-w-0">
@@ -113,7 +124,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-bg text-ink lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
-      <aside className="sticky top-0 hidden h-screen border-r border-line bg-bg lg:block">
+      <aside className="sticky top-0 hidden h-dvh border-r border-line bg-bg lg:block">
         {sidebar}
       </aside>
 
@@ -135,7 +146,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-surface/90 px-4 backdrop-blur sm:px-8">
           <button
             type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-lg lg:hidden"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg lg:hidden"
             aria-label="Open menu"
             onClick={() => setOpen(true)}
           >
@@ -145,7 +156,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             {current?.label ??
               (pathname.startsWith("/dashboard/settings")
                 ? "Settings"
-                : "Dashboard")}
+                : pathname.startsWith("/dashboard/assistant")
+                  ? "Assistance"
+                  : "Dashboard")}
           </p>
           <label className="ml-auto hidden max-w-sm flex-1 items-center gap-2 rounded-full bg-bg px-4 py-2 text-sm text-ink-soft focus-within:ring-2 focus-within:ring-accent sm:flex lg:ml-0">
             <Icon name="search" className="h-4 w-4" />
@@ -156,7 +169,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               aria-label="Search"
             />
           </label>
-          <span className="ml-auto flex items-center gap-3 lg:ml-auto">
+          <span className="ml-auto flex items-center gap-2 sm:gap-3 lg:ml-auto">
             <span className="hidden rounded-full bg-tint px-3 py-1 text-[11px] font-semibold text-ink-soft sm:inline">
               Sample data
             </span>
@@ -194,7 +207,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </button>
         </div>
 
-        <div className="mx-auto max-w-6xl p-4 sm:p-8">{children}</div>
+        <div className="app-content mx-auto max-w-6xl p-4 sm:p-8">
+          {children}
+        </div>
       </div>
     </div>
   );

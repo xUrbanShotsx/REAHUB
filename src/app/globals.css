@@ -290,3 +290,12 @@ main .grid > * {
     animation: none;
   }
 }
+
+@media (max-width: 639px) {
+  .app-content .truncate {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+  }
+}
