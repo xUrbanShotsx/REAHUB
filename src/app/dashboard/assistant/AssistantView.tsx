@@ -4,7 +4,9 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Icon } from "@/components/Icons";
 import { useStore } from "@/components/app/DemoStore";
 import { btnLight } from "@/components/app/ui";
-import { buildContext, SUGGESTIONS } from "@/lib/assistant-context";
+import { buildContext } from "@/lib/assistant-context";
+import { me } from "@/lib/demo-data";
+import { Mascot, MascotHead } from "@/components/app/Mascot";
 import { todayISO } from "@/lib/format";
 import { Markdown } from "./Markdown";
 import {
@@ -112,84 +114,48 @@ export function AssistantView() {
   };
 
   const empty = messages.length === 0;
+  const first = me.name.split(" ")[0];
 
   return (
     <div className="mx-auto flex min-h-[calc(100vh-11rem)] max-w-3xl flex-col">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-extrabold tracking-tight sm:text-3xl">
-            Assistance
-          </h1>
-          <p className="mt-1 text-sm text-ink-soft">
-            Ask about real estate compliance, or anything about your office.
-          </p>
-        </div>
-        {!empty && (
+      {!empty && (
+        <div className="mb-4 flex justify-end">
           <button type="button" onClick={reset} className={btnLight}>
             <Icon name="plus" className="h-4 w-4" /> New chat
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="flex-1 space-y-6 pb-6">
-        {empty && (
-          <div className="pt-6">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-bg">
-              <Icon name="sparkle" className="h-6 w-6" />
-            </span>
-            <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight">
-              How can I help?
-            </h2>
-            <p className="mt-2 max-w-xl text-ink-soft">
-              I can explain NSW agency compliance, and I can see your
-              agency&apos;s properties, tasks, licences, registers and trust
-              accounts, so I can tell you what is outstanding.
-            </p>
-
-            {(
-              [
-                ["Compliance", SUGGESTIONS.compliance],
-                ["Your office", SUGGESTIONS.office],
-              ] as const
-            ).map(([label, list]) => (
-              <div key={label} className="mt-6">
-                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-ink-soft">
-                  {label}
-                </p>
-                <div className="grid gap-2 sm:grid-cols-3">
-                  {list.map((q) => (
-                    <button
-                      key={q}
-                      type="button"
-                      onClick={() => void send(q)}
-                      className="rounded-2xl border border-line bg-surface p-4 text-left text-sm font-medium transition-colors hover:border-ink hover:bg-tint/60"
-                    >
-                      {q}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
         {messages.map((m, i) =>
           m.role === "user" ? (
             <div key={m.id} className="flex justify-end">
-              <p className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-br-md bg-ink px-4 py-3 text-[15px] leading-relaxed text-bg">
+              <p className="max-w-[85%] whitespace-pre-wrap rounded-3xl rounded-br-lg bg-ink px-4 py-3 text-[15px] leading-relaxed text-bg shadow-sm">
                 {m.content}
               </p>
             </div>
           ) : (
             <div key={m.id} className="flex gap-3">
-              <span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-bg">
-                <Icon name="sparkle" className="h-4 w-4" />
-              </span>
-              <div className="min-w-0 flex-1 pt-1">
+              <MascotHead className="mt-0.5 h-10 w-10 shrink-0" />
+              <div className="min-w-0 flex-1">
                 {m.content ? (
-                  <Markdown text={m.content} />
+                  <div className="rounded-3xl rounded-tl-lg border border-line bg-surface px-4 py-3.5 shadow-sm">
+                    <Markdown text={m.content} />
+                  </div>
                 ) : busy && i === messages.length - 1 ? (
-                  <p className="text-sm text-ink-soft">Thinking</p>
+                  <div
+                    className="inline-flex items-center gap-1.5 rounded-3xl rounded-tl-lg border border-line bg-surface px-4 py-3.5"
+                    role="status"
+                    aria-label="Thinking"
+                  >
+                    {[0, 150, 300].map((d) => (
+                      <span
+                        key={d}
+                        className="h-2 w-2 animate-bounce rounded-full bg-accent"
+                        style={{ animationDelay: `${d}ms` }}
+                      />
+                    ))}
+                  </div>
                 ) : null}
               </div>
             </div>
@@ -197,87 +163,105 @@ export function AssistantView() {
         )}
 
         {problem && (
-          <div
-            role="alert"
-            className="rounded-2xl border border-accent/40 bg-accent/10 p-4 text-sm"
-          >
-            <p className="font-semibold">
-              {problem.code === "not_configured"
-                ? "The assistant is not connected yet"
-                : "Something went wrong"}
-            </p>
-            <p className="mt-1 text-ink-soft">
-              {problem.code === "not_configured"
-                ? "Ask whoever manages REAHUB to switch it on."
-                : problem.text}
-            </p>
-            {problem.code === "not_configured" && (
-              <p className="mt-2 text-xs text-ink-soft">
-                For whoever sets this up: add{" "}
-                <code className="rounded bg-tint px-1 py-0.5 font-mono">
-                  ANTHROPIC_API_KEY=...
-                </code>{" "}
-                to{" "}
-                <code className="rounded bg-tint px-1 py-0.5 font-mono">
-                  .env.local
-                </code>{" "}
-                and restart the server.
+          <div role="alert" className="flex gap-3">
+            <MascotHead className="mt-0.5 h-10 w-10 shrink-0" />
+            <div className="min-w-0 flex-1 rounded-3xl rounded-tl-lg border border-accent/50 bg-accent/10 px-4 py-3.5 text-sm">
+              <p className="font-semibold">
+                {problem.code === "not_configured"
+                  ? "I'm not connected yet"
+                  : "Something went wrong"}
               </p>
-            )}
+              <p className="mt-1 text-ink-soft">
+                {problem.code === "not_configured"
+                  ? "Ask whoever manages REAHUB to switch me on."
+                  : problem.text}
+              </p>
+              {problem.code === "not_configured" && (
+                <p className="mt-2 text-xs text-ink-soft">
+                  For whoever sets this up: add{" "}
+                  <code className="rounded bg-tint px-1 py-0.5 font-mono">
+                    ANTHROPIC_API_KEY=...
+                  </code>{" "}
+                  to{" "}
+                  <code className="rounded bg-tint px-1 py-0.5 font-mono">
+                    .env.local
+                  </code>{" "}
+                  and restart the server.
+                </p>
+              )}
+            </div>
           </div>
         )}
         <div ref={bottom} />
       </div>
 
       <div className="sticky bottom-0 -mx-4 bg-gradient-to-t from-bg from-70% to-transparent px-4 pb-4 pt-2 sm:-mx-8 sm:px-8">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void send(input);
-          }}
-          className="flex items-end gap-2 rounded-3xl border border-line bg-surface p-2 shadow-sm focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/30"
-        >
-          <label className="min-w-0 flex-1">
-            <span className="sr-only">Ask the assistant</span>
-            <textarea
-              ref={box}
-              value={input}
-              rows={1}
-              onChange={(e) => {
-                setInput(e.target.value);
-                e.target.style.height = "auto";
-                e.target.style.height = `${Math.min(e.target.scrollHeight, 180)}px`;
+        <div className="flex items-end gap-3">
+          <Mascot
+            className={`mascot-bob hidden h-24 w-24 shrink-0 sm:block ${busy ? "opacity-90" : ""}`}
+          />
+          <div className="min-w-0 flex-1">
+            {empty && (
+              <div className="relative mb-3 max-w-md rounded-3xl rounded-bl-lg bg-ink px-5 py-3 text-bg shadow-lg">
+                <p className="font-display text-lg font-extrabold leading-snug">
+                  G&apos;day {first}. What are we sorting out today?
+                </p>
+                <p className="mt-1 text-sm text-bg/75">
+                  Ask about NSW compliance, check what is outstanding in the
+                  office, or ask me to explain a rule.
+                </p>
+              </div>
+            )}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                void send(input);
               }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  void send(input);
-                }
-              }}
-              placeholder="Ask about compliance, or about your office"
-              className="outline-none max-h-44 w-full resize-none bg-transparent px-3 py-2.5 text-[15px] text-ink placeholder:text-ink-soft"
-            />
-          </label>
-          {busy ? (
-            <button
-              type="button"
-              onClick={stop}
-              aria-label="Stop"
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink text-bg"
+              className="flex items-end gap-2 rounded-[1.75rem] border border-line bg-surface p-2 shadow-[0_12px_40px_-16px_oklch(0.23_0.02_255/0.35)] focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/30"
             >
-              <span className="h-3 w-3 rounded-sm bg-bg" />
-            </button>
-          ) : (
-            <button
-              type="submit"
-              aria-label="Send"
-              disabled={!input.trim()}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink text-bg disabled:opacity-30"
-            >
-              <Icon name="arrow" className="h-4 w-4 -rotate-90" />
-            </button>
-          )}
-        </form>
+              <label className="min-w-0 flex-1">
+                <span className="sr-only">Ask the assistant</span>
+                <textarea
+                  ref={box}
+                  value={input}
+                  rows={1}
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    e.target.style.height = "auto";
+                    e.target.style.height = `${Math.min(e.target.scrollHeight, 180)}px`;
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      void send(input);
+                    }
+                  }}
+                  placeholder="Ask about compliance, or about your office"
+                  className="outline-none max-h-44 w-full resize-none bg-transparent px-3 py-2.5 text-[15px] text-ink placeholder:text-ink-soft"
+                />
+              </label>
+              {busy ? (
+                <button
+                  type="button"
+                  onClick={stop}
+                  aria-label="Stop"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink text-bg"
+                >
+                  <span className="h-3 w-3 rounded-sm bg-bg" />
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  aria-label="Send"
+                  disabled={!input.trim()}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-bg transition-opacity disabled:opacity-30"
+                >
+                  <Icon name="arrow" className="h-4 w-4 -rotate-90" />
+                </button>
+              )}
+            </form>
+          </div>
+        </div>
         <p className="mt-2 text-center text-[11px] text-ink-soft">
           The assistant can make mistakes. Compliance answers are general
           information, not legal advice. Your office data is sent with each

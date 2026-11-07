@@ -275,3 +275,18 @@ main .grid > * {
     left: 100%;
   }
 }
+
+/* the Assistance mascot bobs gently */
+@keyframes bob {
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.mascot-bob {
+  animation: bob 3.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mascot-bob {
+    animation: none;
+  }
+}
