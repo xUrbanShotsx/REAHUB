@@ -121,7 +121,7 @@ export const AGENT_TOOLS: AgentTool[] = [
     name: "list_documents",
     write: false,
     description:
-      "List the eleven Document Vault policies and procedures: which are written, approved and signed, or due for review.",
+      "List the Document Vault policies and procedures: which are written, approved and signed, or due for review.",
     input_schema: { type: "object", properties: {} },
   },
   {

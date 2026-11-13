@@ -43,6 +43,11 @@ export function sampleDoc(
     );
   });
   lines.push(
+    `## ${def.sections.length + 1}. Items to confirm before adoption`,
+    "",
+    "- This is sample text. Every section needs to be replaced with wording written for your agency.",
+    "- Confirm each legal point, time limit and form with NSW Fair Trading or your adviser.",
+    "",
     "---",
     "",
     "Review this document with your own adviser before adopting it.",

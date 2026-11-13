@@ -12,6 +12,7 @@ import { fmtDate, todayISO } from "@/lib/format";
 import {
   vaultById,
   vaultStatus,
+  type Review,
   type VaultDoc,
   type VaultQuestion,
 } from "@/lib/vault";
@@ -123,6 +124,7 @@ export function DocFlow({ id }: { id: string }) {
   const write = async (
     qa: { q: string; a: string }[],
     ctrl: AbortController = new AbortController(),
+    revise?: { content: string; gaps: string[] },
   ) => {
     abort.current = ctrl;
     setProblem(null);
@@ -157,7 +159,7 @@ export function DocFlow({ id }: { id: string }) {
         setStreamDone(true);
         return;
       }
-      const res = await post({ mode: "write", answers: qa }, ctrl);
+      const res = await post({ mode: "write", answers: qa, revise }, ctrl);
       if (!res.ok || !res.body) {
         setProblem(await readProblem(res));
         setPhase(existing ? "done" : questions.length ? "questions" : "intro");
@@ -202,6 +204,40 @@ export function DocFlow({ id }: { id: string }) {
       });
       setPhase(existing ? "done" : "intro");
     }
+  };
+
+  /* checks the saved document against what it must cover; returns a message if it could not */
+  const runReview = async (): Promise<string | null> => {
+    if (!existing) return null;
+    try {
+      const res = await post(
+        { mode: "review", document: existing.content },
+        new AbortController(),
+      );
+      if (!res.ok) {
+        const p = await readProblem(res);
+        return p.code === "not_configured"
+          ? "Connect the AI writer to run the compliance check. Until then, use the list as a checklist of what the document must cover."
+          : p.text;
+      }
+      const data = (await res.json()) as { items?: Review["items"] };
+      store.setDocReview(id, {
+        at: `${todayISO()}T${new Date().toTimeString().slice(0, 5)}`,
+        items: data.items ?? [],
+      });
+      return null;
+    } catch {
+      return "Could not reach the checker. Try again.";
+    }
+  };
+
+  const fixGaps = (gaps: string[]) => {
+    if (!existing) return;
+    demo.current = false;
+    void write(existing.answers, new AbortController(), {
+      content: existing.content,
+      gaps,
+    });
   };
 
   const submitAnswers = () =>
@@ -264,6 +300,9 @@ export function DocFlow({ id }: { id: string }) {
           doc={existing}
           agency={agencyName}
           onRegenerate={begin}
+          onReview={runReview}
+          onFix={fixGaps}
+          requirements={def.mustInclude}
           onDelete={() => {
             if (
               window.confirm(
@@ -695,12 +734,18 @@ function Done({
   doc,
   agency,
   onRegenerate,
+  onReview,
+  onFix,
+  requirements,
   onDelete,
   justWritten,
 }: {
   doc: VaultDoc;
   agency: string;
   onRegenerate: () => void;
+  onReview: () => Promise<string | null>;
+  onFix: (gaps: string[]) => void;
+  requirements: string[];
   onDelete: () => void;
   justWritten: boolean;
 }) {
@@ -827,6 +872,22 @@ function Done({
         <ApprovalBlock approval={approval} version={version} />
       </div>
 
+      <CompliancePanel
+        requirements={requirements}
+        review={doc.review}
+        sample={doc.sample}
+        onReview={onReview}
+        onFix={(gaps) => {
+          if (
+            !doc.approval ||
+            window.confirm(
+              "Fixing gaps replaces this approved document with a new draft that must be approved and signed again. Continue?",
+            )
+          )
+            onFix(gaps);
+        }}
+      />
+
       <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
         {doc.answers.length > 0 ? (
           <details className="min-w-0 max-w-xl text-sm">
@@ -877,6 +938,13 @@ function Done({
           docTitle={docTitle}
           content={content}
           agency={agency}
+          checkNote={
+            doc.review
+              ? doc.review.items.some((i) => i.status !== "met")
+                ? `The compliance check found ${doc.review.items.filter((i) => i.status !== "met").length} requirement(s) not fully covered. You can still approve, but consider fixing them first.`
+                : "The compliance check found every requirement covered."
+              : "The compliance check has not been run on this document yet."
+          }
           onClose={() => setSigning(false)}
           onApprove={(a) => {
             store.approveDoc(doc.id, a);
@@ -885,5 +953,141 @@ function Done({
         />
       )}
     </div>
+  );
+}
+
+function CompliancePanel({
+  requirements,
+  review,
+  sample,
+  onReview,
+  onFix,
+}: {
+  requirements: string[];
+  review?: Review;
+  sample?: boolean;
+  onReview: () => Promise<string | null>;
+  onFix: (gaps: string[]) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const items = requirements.map((r) => ({
+    requirement: r,
+    status: review?.items.find((i) => i.requirement === r)?.status ?? null,
+    note: review?.items.find((i) => i.requirement === r)?.note ?? "",
+  }));
+  const gaps = items.filter(
+    (i) => i.status === "partial" || i.status === "missing",
+  );
+  const met = items.filter((i) => i.status === "met").length;
+
+  const run = async () => {
+    setBusy(true);
+    setMsg(null);
+    setMsg(await onReview());
+    setBusy(false);
+  };
+
+  return (
+    <section className="mt-6 overflow-hidden rounded-2xl border border-line bg-surface">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
+        <div className="min-w-0">
+          <h2 className="font-display text-base font-extrabold">
+            Compliance check
+          </h2>
+          <p className="mt-0.5 text-sm text-ink-soft">
+            {review
+              ? `${met} of ${items.length} requirements clearly covered, checked ${fmtDate(review.at.slice(0, 10))}.`
+              : `${items.length} things this document must cover. Run the check to test it against each one.`}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {gaps.length > 0 && !sample && (
+            <button
+              type="button"
+              onClick={() =>
+                onFix(
+                  gaps.map(
+                    (g) => `${g.requirement}${g.note ? ` (${g.note})` : ""}`,
+                  ),
+                )
+              }
+              className={btnDark}
+            >
+              <Icon name="sparkle" className="h-4 w-4" /> Fix {gaps.length} gap
+              {gaps.length === 1 ? "" : "s"}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={run}
+            disabled={busy}
+            className={btnLight}
+          >
+            {busy ? (
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
+            ) : (
+              <Icon name="shield" className="h-4 w-4" />
+            )}
+            {busy ? "Checking" : review ? "Check again" : "Run check"}
+          </button>
+        </div>
+      </div>
+      {msg && (
+        <p
+          role="alert"
+          className="border-b border-line bg-accent/10 px-5 py-3 text-sm"
+        >
+          {msg}
+        </p>
+      )}
+      <ul className="divide-y divide-line">
+        {items.map((i) => (
+          <li key={i.requirement} className="flex gap-3 px-5 py-3 text-sm">
+            <span
+              aria-label={
+                i.status === "met"
+                  ? "Covered"
+                  : i.status === "partial"
+                    ? "Partly covered"
+                    : i.status === "missing"
+                      ? "Missing"
+                      : "Not checked"
+              }
+              className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
+                i.status === "met"
+                  ? "bg-emerald-500 text-white"
+                  : i.status === "partial"
+                    ? "bg-amber-400 text-ink"
+                    : i.status === "missing"
+                      ? "bg-red-500 text-white"
+                      : "border border-line text-ink-soft"
+              }`}
+            >
+              {i.status === "met" ? (
+                <Icon name="check" className="h-3 w-3" />
+              ) : i.status === "partial" ? (
+                "!"
+              ) : i.status === "missing" ? (
+                <Icon name="close" className="h-3 w-3" />
+              ) : null}
+            </span>
+            <span className="min-w-0">
+              <span className="block">{i.requirement}</span>
+              {i.note && (
+                <span className="mt-0.5 block text-xs text-ink-soft">
+                  {i.note}
+                </span>
+              )}
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p className="border-t border-line bg-tint/50 px-5 py-3 text-xs text-ink-soft">
+        This check tests the wording against the list above. It cannot guarantee
+        compliance: laws change, so confirm the items listed at the end of the
+        document with NSW Fair Trading or your adviser.
+      </p>
+    </section>
   );
 }

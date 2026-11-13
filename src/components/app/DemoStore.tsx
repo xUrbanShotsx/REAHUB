@@ -68,7 +68,7 @@ import {
   type Values,
 } from "@/lib/registers";
 
-import type { Approval, VaultDoc } from "@/lib/vault";
+import type { Approval, Review, VaultDoc } from "@/lib/vault";
 
 const KEY = "reahub-demo-v8";
 
@@ -200,6 +200,7 @@ type Store = {
   dropDoc: (id: string) => void;
   approveDoc: (id: string, approval: Approval) => void;
   withdrawApproval: (id: string) => void;
+  setDocReview: (id: string, review: Review) => void;
   resetDemo: () => void;
 };
 
@@ -1152,6 +1153,12 @@ const actions: Omit<
         ),
       );
     }),
+
+  setDocReview: (id, review) =>
+    update((s) => ({
+      ...s,
+      documents: s.documents.map((x) => (x.id === id ? { ...x, review } : x)),
+    })),
 
   withdrawApproval: (id) =>
     update((s) => {

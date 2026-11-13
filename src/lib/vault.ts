@@ -1,6 +1,17 @@
 import type { IconName } from "@/components/Icons";
+import { CATEGORY, MORE, MUST } from "./vault-requirements";
 
-export type VaultDef = {
+export const CATEGORIES = [
+  "Governance and conduct",
+  "Trust and money",
+  "Sales",
+  "Property management",
+  "People and safety",
+  "Information and risk",
+] as const;
+export type VaultCategory = (typeof CATEGORIES)[number];
+
+export type BaseDef = {
   id: string;
   name: string;
   icon: IconName;
@@ -16,7 +27,13 @@ export type VaultDef = {
   basis: string;
 };
 
-export const VAULT: VaultDef[] = [
+export type VaultDef = BaseDef & {
+  category: VaultCategory;
+  /** Specific obligations the document must address. The writer covers each one and the check tests them. */
+  mustInclude: string[];
+};
+
+const BASE: BaseDef[] = [
   {
     id: "complaints-policy",
     name: "Complaints handling policy",
@@ -324,6 +341,12 @@ export const VAULT: VaultDef[] = [
   },
 ];
 
+export const VAULT: VaultDef[] = [...BASE, ...MORE].map((d) => ({
+  ...d,
+  category: CATEGORY[d.id] ?? "Governance and conduct",
+  mustInclude: MUST[d.id] ?? [],
+}));
+
 export const vaultById = (id: string) => VAULT.find((d) => d.id === id);
 
 export type Approval = {
@@ -368,6 +391,14 @@ export type VaultDoc = {
   /** Placeholder text written while the AI writer was not connected. */
   sample?: boolean;
   approval?: Approval;
+  /** Result of checking the text against what the document must cover. */
+  review?: Review;
+};
+
+export type ReqStatus = "met" | "partial" | "missing";
+export type Review = {
+  at: string;
+  items: { requirement: string; status: ReqStatus; note: string }[];
 };
 
 export type VaultQuestion = {

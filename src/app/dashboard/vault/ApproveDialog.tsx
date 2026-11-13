@@ -38,12 +38,15 @@ export function ApproveDialog({
   docTitle,
   content,
   agency,
+  checkNote,
   onClose,
   onApprove,
 }: {
   docTitle: string;
   content: string;
   agency: string;
+  /** Where the document stands on its compliance check, shown before signing. */
+  checkNote?: string;
   onClose: () => void;
   onApprove: (a: Approval) => void;
 }) {
@@ -209,6 +212,12 @@ export function ApproveDialog({
           <SignaturePad onChange={setSignature} />
           {err("signature")}
         </div>
+
+        {checkNote && (
+          <p className="mt-5 rounded-xl border border-accent/30 bg-accent/10 px-3.5 py-2.5 text-sm">
+            {checkNote}
+          </p>
+        )}
 
         <label className="mt-5 flex cursor-pointer items-start gap-3 text-sm">
           <input
