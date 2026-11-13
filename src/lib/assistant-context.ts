@@ -166,15 +166,61 @@ export function buildContext(s: Snapshot, today: string): string {
   return text.length > MAX ? `${text.slice(0, MAX)}\n[context trimmed]` : text;
 }
 
-export const SUGGESTIONS = {
-  compliance: [
-    "What do I need on file before a NSW listing goes live?",
-    "How should a trust account reconciliation be done each month?",
-    "What records would NSW Fair Trading ask for in an inspection?",
-  ],
-  office: [
-    "What is outstanding across the office this week?",
-    "Whose licences or CPD need attention soon?",
-    "Summarise the trust accounts and what is left to reconcile.",
-  ],
+export type Suggestion = {
+  /** Short heading on the card. */
+  title: string;
+  /** What gets sent when it is chosen. */
+  prompt: string;
 };
+
+export const SUGGESTIONS: { label: string; items: Suggestion[] }[] = [
+  {
+    label: "Get things done",
+    items: [
+      {
+        title: "Clear what is overdue",
+        prompt:
+          "Find everything overdue across properties and tasks, and set up tasks for whoever owns each item so nothing is missed.",
+      },
+      {
+        title: "Get inspection ready",
+        prompt:
+          "Get us ready for a NSW Fair Trading inspection. Check our registers, licences, trust accounts and policies, tell me the gaps, and create tasks to close them.",
+      },
+      {
+        title: "Plan an open home",
+        prompt:
+          "Help me book an open home. Ask me which property and when, then put it in the calendar and add a task to prepare.",
+      },
+      {
+        title: "Add a new listing",
+        prompt:
+          "I want to add a new property. Ask me for the details you need, then set it up with the right checklist.",
+      },
+    ],
+  },
+  {
+    label: "Ask about your office",
+    items: [
+      {
+        title: "This week's priorities",
+        prompt:
+          "What is outstanding across the office this week? Rank it by urgency.",
+      },
+      {
+        title: "Licences and CPD",
+        prompt:
+          "Whose licences or CPD need attention soon, and what should they do?",
+      },
+      {
+        title: "Trust position",
+        prompt: "Summarise the trust accounts and what is left to reconcile.",
+      },
+      {
+        title: "Policy gaps",
+        prompt:
+          "Which policies and procedures in the Document Vault are missing, unsigned or due for review?",
+      },
+    ],
+  },
+];
