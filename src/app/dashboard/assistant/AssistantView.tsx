@@ -406,9 +406,11 @@ export function AssistantView() {
         </div>
       )}
 
-      <div className="flex-1 space-y-7 pb-6">
+      <div
+        className={`flex-1 space-y-7 pb-6 ${empty ? "flex flex-col justify-center" : ""}`}
+      >
         {empty && (
-          <div className="pt-4 sm:pt-10">
+          <div>
             <h1 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
               Assistance
             </h1>
@@ -419,34 +421,25 @@ export function AssistantView() {
               happens.
             </p>
 
-            <div className="mt-8 space-y-6">
-              {SUGGESTIONS.map((g) => (
-                <div key={g.label}>
-                  <p className="mb-2 text-xs font-bold uppercase tracking-wider text-ink-soft">
-                    {g.label}
-                  </p>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {g.items.map((s) => (
-                      <button
-                        key={s.title}
-                        type="button"
-                        onClick={() => void send(s.prompt)}
-                        className="group rounded-2xl border border-line bg-surface p-4 text-left transition-colors hover:border-ink hover:bg-tint/60"
-                      >
-                        <span className="flex items-center justify-between gap-2 text-sm font-bold">
-                          {s.title}
-                          <Icon
-                            name="arrow"
-                            className="h-4 w-4 shrink-0 text-ink-soft transition-transform group-hover:translate-x-0.5"
-                          />
-                        </span>
-                        <span className="mt-1 line-clamp-2 block text-[13px] leading-snug text-ink-soft">
-                          {s.prompt}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+            <div className="mt-8 grid gap-2 sm:grid-cols-2">
+              {SUGGESTIONS.map((sg) => (
+                <button
+                  key={sg.title}
+                  type="button"
+                  onClick={() => void send(sg.prompt)}
+                  className="group rounded-2xl border border-line bg-surface p-4 text-left transition-colors hover:border-ink hover:bg-tint/60"
+                >
+                  <span className="flex items-center justify-between gap-2 text-sm font-bold">
+                    {sg.title}
+                    <Icon
+                      name="arrow"
+                      className="h-4 w-4 shrink-0 text-ink-soft transition-transform group-hover:translate-x-0.5"
+                    />
+                  </span>
+                  <span className="mt-1 line-clamp-2 block text-[13px] leading-snug text-ink-soft">
+                    {sg.prompt}
+                  </span>
+                </button>
               ))}
             </div>
           </div>
