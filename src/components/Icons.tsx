@@ -1,6 +1,12 @@
 import type { ReactNode } from "react";
 
 const paths: Record<string, ReactNode> = {
+  mic: (
+    <>
+      <rect x="9" y="3" width="6" height="11" rx="3" />
+      <path d="M5 11a7 7 0 0014 0M12 18v3" />
+    </>
+  ),
   shield: (
     <path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6l8-3zM9 12l2 2 4-4" />
   ),

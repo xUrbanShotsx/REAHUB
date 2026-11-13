@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Icon } from "@/components/Icons";
 import { useStore } from "@/components/app/DemoStore";
 import { btnLight } from "@/components/app/ui";
+import { VoiceButton } from "@/components/app/VoiceButton";
 import { toolByName } from "@/lib/agent-tools";
 import { buildContext, SUGGESTIONS } from "@/lib/assistant-context";
 import { todayISO } from "@/lib/format";
@@ -503,13 +504,13 @@ export function AssistantView() {
         <div ref={bottom} />
       </div>
 
-      <div className="sticky bottom-0 -mx-4 bg-gradient-to-t from-bg from-70% to-transparent px-4 pb-4 pt-2 sm:-mx-8 sm:px-8">
+      <div className="sticky bottom-0 -mx-4 bg-bg px-4 pb-4 pt-3 sm:-mx-8 sm:px-8">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             void send(input);
           }}
-          className="flex items-end gap-2 rounded-[1.75rem] border border-line bg-surface p-2 shadow-[0_12px_40px_-16px_oklch(0.23_0.02_255/0.35)] focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/30"
+          className="flex items-center gap-1.5 rounded-full border border-line bg-surface py-1.5 pl-5 pr-1.5 shadow-sm transition-colors focus-within:border-ink-soft"
         >
           <label className="min-w-0 flex-1">
             <span className="sr-only">Ask or instruct the assistant</span>
@@ -520,7 +521,7 @@ export function AssistantView() {
               onChange={(e) => {
                 setInput(e.target.value);
                 e.target.style.height = "auto";
-                e.target.style.height = `${Math.min(e.target.scrollHeight, 180)}px`;
+                e.target.style.height = `${Math.min(e.target.scrollHeight, 160)}px`;
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -528,34 +529,13 @@ export function AssistantView() {
                   void send(input);
                 }
               }}
-              placeholder="Ask or tell me what to do"
-              className="max-h-44 w-full resize-none bg-transparent px-3 py-2.5 text-[15px] text-ink outline-none placeholder:text-ink-soft"
+              placeholder="Ask, or tell me what to do"
+              className="block max-h-40 w-full resize-none bg-transparent py-2 text-[15px] leading-6 text-ink outline-none placeholder:text-ink-soft"
             />
           </label>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={askFirst}
-            onClick={toggleAsk}
-            title={
-              askFirst
-                ? "Asks before making changes. Click to let it act without asking."
-                : "Acts without asking. Click to have it ask before making changes."
-            }
-            className={`mb-0.5 flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-semibold transition-colors ${
-              askFirst
-                ? "bg-accent/12 text-accent"
-                : "bg-tint text-ink-soft hover:text-ink"
-            }`}
-          >
-            <Icon name="shield" className="h-4 w-4" />
-            <span className="hidden sm:inline">
-              {askFirst ? "Ask first" : "Auto"}
-            </span>
-            <span className="sr-only">
-              {askFirst ? "Asks before making changes" : "Acts without asking"}
-            </span>
-          </button>
+          <VoiceButton
+            onText={(t) => setInput((v) => `${v}${v ? " " : ""}${t}`)}
+          />
           {busy ? (
             <button
               type="button"
@@ -577,9 +557,29 @@ export function AssistantView() {
           )}
         </form>
 
-        <p className="mt-2 text-center text-[11px] text-ink-soft">
-          Can make mistakes. General information, not legal advice.
-        </p>
+        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 px-1">
+          <label className="flex cursor-pointer items-center gap-2 text-xs font-semibold text-ink-soft">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={askFirst}
+              onClick={toggleAsk}
+              className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
+                askFirst ? "bg-accent" : "bg-line"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${
+                  askFirst ? "left-[1.1rem]" : "left-0.5"
+                }`}
+              />
+            </button>
+            Ask before making changes
+          </label>
+          <p className="text-[11px] text-ink-soft">
+            Can make mistakes. General information, not legal advice.
+          </p>
+        </div>
       </div>
     </div>
   );
