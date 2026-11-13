@@ -532,6 +532,30 @@ export function AssistantView() {
               className="max-h-44 w-full resize-none bg-transparent px-3 py-2.5 text-[15px] text-ink outline-none placeholder:text-ink-soft"
             />
           </label>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={askFirst}
+            onClick={toggleAsk}
+            title={
+              askFirst
+                ? "Asks before making changes. Click to let it act without asking."
+                : "Acts without asking. Click to have it ask before making changes."
+            }
+            className={`mb-0.5 flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-semibold transition-colors ${
+              askFirst
+                ? "bg-accent/12 text-accent"
+                : "bg-tint text-ink-soft hover:text-ink"
+            }`}
+          >
+            <Icon name="shield" className="h-4 w-4" />
+            <span className="hidden sm:inline">
+              {askFirst ? "Ask first" : "Auto"}
+            </span>
+            <span className="sr-only">
+              {askFirst ? "Asks before making changes" : "Acts without asking"}
+            </span>
+          </button>
           {busy ? (
             <button
               type="button"
@@ -553,29 +577,9 @@ export function AssistantView() {
           )}
         </form>
 
-        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 px-1">
-          <label className="flex cursor-pointer items-center gap-2 text-xs font-semibold text-ink-soft">
-            <button
-              type="button"
-              role="switch"
-              aria-checked={askFirst}
-              onClick={toggleAsk}
-              className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
-                askFirst ? "bg-accent" : "bg-line"
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${
-                  askFirst ? "left-[1.1rem]" : "left-0.5"
-                }`}
-              />
-            </button>
-            Ask before making changes
-          </label>
-          <p className="text-[11px] text-ink-soft">
-            Can make mistakes. General information, not legal advice.
-          </p>
-        </div>
+        <p className="mt-2 text-center text-[11px] text-ink-soft">
+          Can make mistakes. General information, not legal advice.
+        </p>
       </div>
     </div>
   );
