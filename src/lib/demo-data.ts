@@ -9,7 +9,6 @@ export const PLANS: Record<
   {
     price: number;
     people: number;
-    teams: number;
     vaultGb: number;
     queries: number | null;
     blurb: string;
@@ -18,7 +17,6 @@ export const PLANS: Record<
   "Agent Pro": {
     price: 99,
     people: 5,
-    teams: 1,
     vaultGb: 10,
     queries: 500,
     blurb: "One sales team inside an agency.",
@@ -26,7 +24,6 @@ export const PLANS: Record<
   Boutique: {
     price: 249,
     people: 40,
-    teams: 4,
     vaultGb: 40,
     queries: 2000,
     blurb: "A single-office agency with a few teams.",
@@ -34,7 +31,6 @@ export const PLANS: Record<
   Large: {
     price: 369,
     people: 80,
-    teams: 8,
     vaultGb: 100,
     queries: null,
     blurb: "A large or multi-branch agency.",

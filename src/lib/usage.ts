@@ -1,5 +1,5 @@
 import type { Member, PlanName } from "./demo-data";
-import { PLANS, TEAMS } from "./demo-data";
+import { PLANS } from "./demo-data";
 import type { Accreditation } from "./accreditations";
 import type { Property } from "./demo-data";
 import type { RegisterEntry } from "./registers";
@@ -7,14 +7,6 @@ import type { RegisterEntry } from "./registers";
 /** Auditors are free and read-only, so they never count against the plan. */
 export const billablePeople = (members: Member[]) =>
   members.filter((m) => m.access !== "Auditor");
-
-/** Teams in use, not counting the office group. */
-export const teamsInUse = (members: Member[]) =>
-  new Set(
-    billablePeople(members)
-      .map((m) => m.team)
-      .filter((t) => t !== "Office" && TEAMS.includes(t)),
-  ).size;
 
 /** Bytes of proof files stored in this browser, across checklists, registers and accreditations. */
 export function storedBytes(
@@ -37,11 +29,8 @@ export function storedBytes(
 export function planBlocker(plan: PlanName, members: Member[]): string | null {
   const limits = PLANS[plan];
   const people = billablePeople(members).length;
-  const teams = teamsInUse(members);
   if (people > limits.people)
     return `${plan} allows ${limits.people} people and you have ${people}.`;
-  if (teams > limits.teams)
-    return `${plan} allows ${limits.teams} team${limits.teams === 1 ? "" : "s"} and you have ${teams}.`;
   return null;
 }
 

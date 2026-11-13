@@ -238,7 +238,22 @@ export function TeamSection() {
                 </label>
 
                 <span className="flex flex-wrap items-center gap-2 text-xs text-ink-soft">
-                  <span>{m.access === "Auditor" ? "Read-only" : m.team}</span>
+                  {m.access === "Auditor" ? (
+                    <span>Read-only</span>
+                  ) : (
+                    <select
+                      value={m.team}
+                      aria-label={`Team for ${m.name}`}
+                      onChange={(e) =>
+                        updateMember(m.id, { team: e.target.value })
+                      }
+                      className="rounded-lg border border-line bg-surface px-2 py-1.5 text-xs font-medium text-ink"
+                    >
+                      {TEAMS.map((t) => (
+                        <option key={t}>{t}</option>
+                      ))}
+                    </select>
+                  )}
                   {m.status === "Invited" ? (
                     <Pill tone="owed">Invited</Pill>
                   ) : (
@@ -267,6 +282,96 @@ export function TeamSection() {
             );
           })}
         </ul>
+      </Card>
+
+      <Card>
+        <CardHead
+          title="Teams and team leaders"
+          sub="Make as many people team leaders as you like, in any team. Only your total staff count against your plan."
+        />
+        <div className="divide-y divide-line">
+          {TEAMS.map((t) => {
+            const inTeam = members
+              .filter((m) => m.team === t && m.access !== "Auditor")
+              .sort(
+                (a, b) =>
+                  Number(b.access === "Team Lead") -
+                  Number(a.access === "Team Lead"),
+              );
+            const leaders = inTeam.filter((m) => m.access === "Team Lead");
+            return (
+              <div key={t} className="px-5 py-4">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="font-display text-base font-extrabold">{t}</p>
+                  <p className="text-xs text-ink-soft">
+                    {leaders.length} team leader
+                    {leaders.length === 1 ? "" : "s"} · {inTeam.length} people
+                  </p>
+                </div>
+                {inTeam.length === 0 ? (
+                  <p className="mt-2 text-sm text-ink-soft">
+                    No one is in this team yet. Move someone here from the list
+                    above.
+                  </p>
+                ) : (
+                  <ul className="mt-3 space-y-2">
+                    {inTeam.map((m, i) => {
+                      const leader = m.access === "Team Lead";
+                      const fixed =
+                        m.access === "Owner" || m.access === "Admin";
+                      return (
+                        <li
+                          key={m.id}
+                          className="flex items-center justify-between gap-3 rounded-xl border border-line px-3 py-2.5"
+                        >
+                          <span className="flex min-w-0 items-center gap-3">
+                            <Avatar
+                              initials={initialsOf(m.name)}
+                              tone={(i % 3) as 0 | 1 | 2}
+                            />
+                            <span className="min-w-0">
+                              <span className="block truncate text-sm font-semibold">
+                                {m.name}
+                              </span>
+                              <span className="block text-xs text-ink-soft">
+                                {m.access}
+                              </span>
+                            </span>
+                          </span>
+                          {fixed ? (
+                            <span className="shrink-0 text-xs text-ink-soft">
+                              Runs the agency
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              aria-pressed={leader}
+                              onClick={() =>
+                                updateMember(m.id, {
+                                  access: leader ? "Team Member" : "Team Lead",
+                                })
+                              }
+                              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                                leader
+                                  ? "border-accent bg-accent text-bg"
+                                  : "border-line bg-surface hover:border-ink"
+                              }`}
+                            >
+                              {leader && (
+                                <Icon name="check" className="h-3.5 w-3.5" />
+                              )}
+                              {leader ? "Team leader" : "Make team leader"}
+                            </button>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </Card>
 
       <Card>

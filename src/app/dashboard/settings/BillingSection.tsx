@@ -27,7 +27,7 @@ export function BillingSection() {
     const blocker = plan === settings.plan ? null : planBlocker(plan, members);
     if (blocker)
       return setError(
-        `You cannot switch to ${plan} yet. ${blocker} Remove people or teams first.`,
+        `You cannot switch to ${plan} yet. ${blocker} Remove people first.`,
       );
     setError("");
     if (plan === settings.plan) return;
@@ -139,9 +139,7 @@ export function BillingSection() {
                 </p>
                 <ul className="mt-3 flex-1 space-y-1 text-xs text-ink-soft">
                   <li>Up to {p.people} people</li>
-                  <li>
-                    {p.teams} team{p.teams === 1 ? "" : "s"}
-                  </li>
+                  <li>As many teams as you need</li>
                   <li>{p.vaultGb} GB document vault</li>
                   <li>
                     {p.queries

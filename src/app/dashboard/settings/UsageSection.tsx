@@ -4,7 +4,7 @@ import { useStore } from "@/components/app/DemoStore";
 import { Card, CardHead, Progress } from "@/components/app/ui";
 import { PLANS } from "@/lib/demo-data";
 import { formatSize } from "@/lib/proofs";
-import { billablePeople, storedBytes, teamsInUse } from "@/lib/usage";
+import { billablePeople, storedBytes } from "@/lib/usage";
 
 /** A baseline so the demo vault is not empty. It is sample data, like everything else here. */
 const BASELINE_GB = 3.2;
@@ -45,7 +45,6 @@ export function UsageSection() {
     useStore();
   const plan = PLANS[settings.plan];
   const people = billablePeople(members).length;
-  const teams = teamsInUse(members);
   const bytes = ready ? storedBytes(properties, entries, accreditations) : 0;
   const vaultGb = BASELINE_GB + bytes / 1024 ** 3;
   const campaigns = properties.filter((p) => p.type === "sale").length;
@@ -65,13 +64,7 @@ export function UsageSection() {
             used={people}
             of={plan.people}
             display={`${people} of ${plan.people}`}
-            note="Auditors are free and do not count."
-          />
-          <Meter
-            label="Teams"
-            used={teams}
-            of={plan.teams}
-            display={`${teams} of ${plan.teams}`}
+            note="Auditors are free and do not count. Teams and team leaders are unlimited."
           />
           <Meter
             label="Document vault"
