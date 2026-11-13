@@ -6,6 +6,7 @@ import { useState, type ReactNode } from "react";
 import { me } from "@/lib/demo-data";
 import { Icon, type IconName } from "../Icons";
 import { useStore } from "./DemoStore";
+import { GlobalSearch } from "./GlobalSearch";
 import { NotificationsBell } from "./NotificationsBell";
 import { Avatar } from "./ui";
 
@@ -52,15 +53,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         </p>
       </div>
 
-      <label className="mx-3 mt-3 flex shrink-0 items-center gap-2 rounded-full bg-tint px-4 py-2 text-sm text-ink-soft focus-within:ring-2 focus-within:ring-accent sm:hidden">
-        <Icon name="search" className="h-4 w-4" />
-        <input
-          type="search"
-          placeholder="Search"
-          className="w-full bg-transparent text-ink outline-none placeholder:text-ink-soft"
-          aria-label="Search"
-        />
-      </label>
+      <GlobalSearch
+        tone="tint"
+        placeholder="Search"
+        onNavigate={() => setOpen(false)}
+        className="mx-3 mt-3 shrink-0 sm:hidden"
+      />
 
       <nav
         aria-label="App"
@@ -142,15 +140,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 ? "Settings"
                 : "Dashboard")}
           </p>
-          <label className="ml-auto hidden max-w-sm flex-1 items-center gap-2 rounded-full bg-bg px-4 py-2 text-sm text-ink-soft focus-within:ring-2 focus-within:ring-accent sm:flex lg:ml-0">
-            <Icon name="search" className="h-4 w-4" />
-            <input
-              type="search"
-              placeholder="Search properties, parties, receipts"
-              className="w-full bg-transparent text-ink outline-none placeholder:text-ink-soft"
-              aria-label="Search"
-            />
-          </label>
+          <GlobalSearch className="ml-auto hidden max-w-md flex-1 sm:block lg:ml-0" />
           <span className="ml-auto flex items-center gap-2 sm:gap-3 lg:ml-auto">
             <span className="hidden rounded-full bg-tint px-3 py-1 text-[11px] font-semibold text-ink-soft sm:inline">
               Sample data
