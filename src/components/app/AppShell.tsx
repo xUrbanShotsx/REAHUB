@@ -138,7 +138,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             {current?.label ??
               (pathname.startsWith("/dashboard/settings")
                 ? "Settings"
-                : "Dashboard")}
+                : pathname.startsWith("/dashboard/help")
+                  ? "Help"
+                  : "Dashboard")}
           </p>
           <GlobalSearch className="ml-auto hidden max-w-md flex-1 sm:block lg:ml-0" />
           <span className="ml-auto flex items-center gap-2 sm:gap-3 lg:ml-auto">
@@ -146,6 +148,19 @@ export function AppShell({ children }: { children: ReactNode }) {
               Sample data
             </span>
             <NotificationsBell />
+            <Link
+              href="/dashboard/help"
+              aria-label="Help"
+              title="Help"
+              aria-current={
+                pathname.startsWith("/dashboard/help") ? "page" : undefined
+              }
+              className={`flex h-10 w-10 items-center justify-center rounded-full hover:bg-tint ${
+                pathname.startsWith("/dashboard/help") ? "bg-accent/15" : ""
+              }`}
+            >
+              <Icon name="help" className="h-5 w-5" />
+            </Link>
             <Link
               href="/dashboard/settings"
               aria-label="Settings"

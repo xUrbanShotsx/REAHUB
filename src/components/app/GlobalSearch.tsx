@@ -16,6 +16,7 @@ import { typeName } from "@/lib/accreditations";
 import { fmtDate } from "@/lib/format";
 import { registerById } from "@/lib/registers";
 import { ledgers } from "@/lib/trust";
+import { HELP } from "@/lib/help";
 import { VAULT } from "@/lib/vault";
 
 type Hit = {
@@ -111,6 +112,12 @@ const PAGES: { title: string; href: string; icon: IconName; words: string }[] =
       words: "policies procedures documents",
     },
     {
+      title: "Help",
+      href: "/dashboard/help",
+      icon: "help",
+      words: "guides how to support articles",
+    },
+    {
       title: "Settings",
       href: "/dashboard/settings",
       icon: "settings",
@@ -130,6 +137,7 @@ const ORDER = [
   "Trust",
   "KPIs",
   "People",
+  "Help",
 ];
 
 const norm = (s: string) => s.toLowerCase();
@@ -326,6 +334,17 @@ export function GlobalSearch({
         sub: `${m.access} · ${m.team}`,
         href: "/dashboard/settings",
         text: `${m.name} ${m.email} ${m.team} ${m.access}`,
+      });
+
+    for (const a of HELP)
+      hits.push({
+        id: `h-${a.id}`,
+        group: "Help",
+        icon: "help",
+        title: a.title,
+        sub: `Help · ${a.category}`,
+        href: `/dashboard/help/${a.id}`,
+        text: `${a.title} ${a.summary} ${a.category} help how`,
       });
 
     return hits;
