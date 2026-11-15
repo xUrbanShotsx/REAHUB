@@ -139,7 +139,7 @@ export function PricingGrid() {
             </p>
 
             <Link
-              href="https://auth.briesa.com/signup"
+              href={`/signup?plan=${encodeURIComponent(p.name)}`}
               className={`mt-7 rounded-xl px-5 py-3.5 text-center font-semibold transition-colors duration-200 ${
                 on
                   ? "bg-bg text-ink hover:bg-surface"

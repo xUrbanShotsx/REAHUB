@@ -67,9 +67,7 @@ export default function Home() {
             </p>
             <div data-load className="mt-9 flex flex-wrap items-center gap-4">
               <Magnetic>
-                <ButtonLink href="https://auth.briesa.com/signup">
-                  Sign up
-                </ButtonLink>
+                <ButtonLink href="/signup">Sign up</ButtonLink>
               </Magnetic>
               <ButtonLink href="/solutions" variant="ghost">
                 See how a file gets cleared

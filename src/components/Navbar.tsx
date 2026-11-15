@@ -87,7 +87,7 @@ export function Navbar() {
               Login
             </Link>
             <Link
-              href="https://auth.briesa.com/signup"
+              href="/signup"
               className={`hidden rounded-full bg-ink font-semibold text-bg transition-all duration-500 hover:bg-ink/85 sm:inline-block ${pill ? "px-5 py-2 text-sm" : "px-6 py-2.5 text-base"}`}
             >
               Sign up
@@ -133,7 +133,7 @@ export function Navbar() {
               Login
             </Link>
             <Link
-              href="https://auth.briesa.com/signup"
+              href="/signup"
               onClick={() => setOpen(false)}
               className="rounded-full bg-ink py-3 text-center font-semibold text-bg"
             >

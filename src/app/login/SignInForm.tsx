@@ -137,7 +137,7 @@ export function SignInForm() {
       <p className="text-center text-sm text-ink-soft">
         Don&apos;t have an account?{" "}
         <Link
-          href="https://auth.briesa.com/signup"
+          href="/signup"
           className="font-semibold text-accent hover:underline"
         >
           Sign up
