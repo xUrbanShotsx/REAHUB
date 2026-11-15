@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
-/** Marketing pages get the navbar and footer; the app dashboard brings its own shell. */
+/** Marketing pages get the navbar and footer; the app dashboard and sign-in bring their own. */
 export function SiteChrome({
   nav,
   footer,
@@ -13,7 +13,8 @@ export function SiteChrome({
   footer: ReactNode;
   children: ReactNode;
 }) {
-  const inApp = usePathname().startsWith("/dashboard");
+  const path = usePathname();
+  const inApp = path.startsWith("/dashboard") || path === "/login";
   if (inApp) return <main className="flex-1">{children}</main>;
   return (
     <>

@@ -95,7 +95,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
         <Link
-          href="/"
+          href="/login"
           className="mt-3 flex items-center gap-2 text-xs font-semibold text-ink-soft hover:text-ink"
         >
           <Icon name="logout" className="h-3.5 w-3.5" /> Sign out
