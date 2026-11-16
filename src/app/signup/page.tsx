@@ -13,10 +13,7 @@ export const metadata: Metadata = {
 
 export default function SignUpPage() {
   return (
-    <AuthShell
-      title="Create your account"
-      subtitle="Set up your agency workspace. Free for 7 days."
-    >
+    <AuthShell fixed>
       <Suspense fallback={<SignUpForm />}>
         <SignUpForm withPlanFromUrl />
       </Suspense>

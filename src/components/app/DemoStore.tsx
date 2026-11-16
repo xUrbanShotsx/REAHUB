@@ -1188,6 +1188,41 @@ const actions: Omit<
 
 const Ctx = createContext<Store | null>(null);
 
+/** Applies a finished sign up to the demo workspace: agency, plan, card on file and trial end. */
+export function startTrial(input: {
+  agency: string;
+  abn: string;
+  plan: PlanName;
+  card: NonNullable<Settings["card"]>;
+  trialEnds: string;
+}) {
+  update((s) =>
+    withEvent(
+      {
+        ...s,
+        settings: {
+          ...s.settings,
+          agency: {
+            ...s.settings.agency,
+            name: input.agency,
+            trading: input.agency,
+            abn: input.abn,
+          },
+          plan: input.plan,
+          card: input.card,
+          trialEnds: input.trialEnds,
+        },
+      },
+      event(
+        "Settings",
+        `started a 7-day free trial on ${input.plan}`,
+        "Sign up",
+        input.plan,
+      ),
+    ),
+  );
+}
+
 export function DemoStoreProvider({ children }: { children: ReactNode }) {
   const saved = useSyncExternalStore(subscribe, readSaved, () => null);
   const ready = useSyncExternalStore(

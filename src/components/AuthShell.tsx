@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/Icons";
 
-/** Split layout for sign in and sign up: the form on the left, the brand panel on the right. */
 /** Squares on the brand panel that glow faintly, as [column, row, strength] from the centre. */
 const LIT: [number, number, number][] = [
   [-2, -2, 0.07],
@@ -13,18 +12,28 @@ const LIT: [number, number, number][] = [
   [1, -3, 0.05],
 ];
 
+/**
+ * Split layout for sign in and sign up: the form on the left, the brand panel on the right.
+ * `fixed` pins the page to the screen height so it never scrolls.
+ */
 export function AuthShell({
   title,
   subtitle,
+  fixed = false,
   children,
 }: {
-  title: string;
-  subtitle: string;
+  title?: string;
+  subtitle?: string;
+  fixed?: boolean;
   children: ReactNode;
 }) {
   return (
-    <div className="grid min-h-dvh bg-bg lg:grid-cols-2">
-      <div className="flex flex-col px-6 py-8 sm:px-12 lg:px-16">
+    <div
+      className={`grid bg-bg lg:grid-cols-2 ${fixed ? "h-dvh overflow-hidden" : "min-h-dvh"}`}
+    >
+      <div
+        className={`flex min-h-0 flex-col px-6 sm:px-12 lg:px-16 ${fixed ? "py-5 sm:py-6" : "py-8"}`}
+      >
         <Link
           href="/"
           className="inline-flex w-fit items-center gap-1.5 text-sm text-ink-soft transition-colors hover:text-ink"
@@ -33,19 +42,23 @@ export function AuthShell({
           Back to website
         </Link>
 
-        <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-12">
+        <div
+          className={`mx-auto flex min-h-0 w-full max-w-sm flex-1 flex-col ${fixed ? "justify-center-safe overflow-y-auto py-4 [scrollbar-width:none]" : "justify-center py-12"}`}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo.svg"
             alt="REAHUB"
             width={403}
             height={82}
-            className="mb-10 h-8 w-auto self-start lg:hidden"
+            className={`w-auto self-start lg:hidden ${fixed ? "mb-5 h-6" : "mb-10 h-8"}`}
           />
-          <h1 className="font-display text-3xl font-bold tracking-tight text-ink">
-            {title}
-          </h1>
-          <p className="mt-2 text-ink-soft">{subtitle}</p>
+          {title && (
+            <h1 className="font-display text-3xl font-bold tracking-tight text-ink">
+              {title}
+            </h1>
+          )}
+          {subtitle && <p className="mt-2 text-ink-soft">{subtitle}</p>}
           {children}
         </div>
 

@@ -5,10 +5,18 @@ import { Icon } from "@/components/Icons";
 import { useStore } from "@/components/app/DemoStore";
 import { btnDark, btnLight, Card, CardHead, Pill } from "@/components/app/ui";
 import { PLANS, type PlanName } from "@/lib/demo-data";
+import { todayISO } from "@/lib/format";
 import { gstOn, planBlocker } from "@/lib/usage";
 
 const money = (n: number) =>
   `A$${n.toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+const longDate = (iso: string) =>
+  new Date(`${iso}T00:00:00`).toLocaleDateString("en-AU", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
 const INVOICES = [
   { id: "INV-2026-011", period: "November 2026", date: "1 Nov 2026" },
@@ -21,6 +29,7 @@ export function BillingSection() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const current = PLANS[settings.plan];
+  const trial = !!settings.trialEnds && settings.trialEnds >= todayISO();
 
   const choose = (plan: PlanName) => {
     setNotice("");
@@ -89,7 +98,16 @@ export function BillingSection() {
       )}
 
       <Card>
-        <CardHead title="Current plan" right={<Pill tone="ok">Active</Pill>} />
+        <CardHead
+          title="Current plan"
+          right={
+            trial ? (
+              <Pill tone="solid">Free trial</Pill>
+            ) : (
+              <Pill tone="ok">Active</Pill>
+            )
+          }
+        />
         <div className="grid gap-4 p-5 sm:grid-cols-[1fr_auto] sm:items-end">
           <div>
             <p className="font-display text-3xl font-extrabold tracking-tight">
@@ -109,10 +127,29 @@ export function BillingSection() {
             </p>
           </div>
           <div className="text-sm text-ink-soft sm:text-right">
-            <p>Next invoice</p>
-            <p className="font-semibold text-ink">1 Dec 2026</p>
+            <p>{trial ? "Trial ends" : "Next invoice"}</p>
+            <p className="font-semibold text-ink">
+              {trial ? longDate(settings.trialEnds!) : "1 Dec 2026"}
+            </p>
           </div>
         </div>
+        {settings.card && (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-4 text-sm">
+            <p className="flex items-center gap-3">
+              <span className="rounded-md border border-line bg-bg px-2 py-1 text-xs font-bold">
+                {settings.card.brand}
+              </span>
+              <span>
+                Ending {settings.card.last4}, expires {settings.card.exp}
+              </span>
+            </p>
+            <p className="text-xs text-ink-soft">
+              {trial
+                ? `First charge on ${longDate(settings.trialEnds!)}`
+                : "Charged on the 1st of each month"}
+            </p>
+          </div>
+        )}
       </Card>
 
       <Card>

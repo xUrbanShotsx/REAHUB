@@ -139,6 +139,10 @@ export type Settings = {
   };
   plan: PlanName;
   notify: { renewals: boolean; cpd: boolean };
+  /** Set by sign up. Only the brand, last four digits and expiry are kept, never the full number. */
+  card?: { brand: string; last4: string; exp: string; name: string };
+  /** ISO date the free trial ends, set by sign up. */
+  trialEnds?: string;
 };
 
 export const seedSettings: Settings = {
