@@ -2,18 +2,43 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Lenis from "lenis";
+
+/** Pages with no scroll animation: the app, sign in and sign up. They never download GSAP or Lenis. */
+const still = (path: string) =>
+  path.startsWith("/dashboard") || path === "/login" || path === "/signup";
+
+type Libs = {
+  gsap: typeof import("gsap").default;
+  ScrollTrigger: typeof import("gsap/ScrollTrigger").ScrollTrigger;
+  Lenis: typeof import("lenis").default;
+};
+let libs: Promise<Libs> | null = null;
+const loadLibs = () =>
+  (libs ??= Promise.all([
+    import("gsap"),
+    import("gsap/ScrollTrigger"),
+    import("lenis"),
+  ]).then(([g, st, l]) => {
+    g.default.registerPlugin(st.ScrollTrigger);
+    return {
+      gsap: g.default,
+      ScrollTrigger: st.ScrollTrigger,
+      Lenis: l.default,
+    };
+  }));
+
+// Start the download while the page hydrates, not after, so reveals are not held back.
+if (typeof window !== "undefined" && !still(window.location.pathname))
+  void loadLibs().catch(() => {});
 
 export function Motion() {
   const pathname = usePathname();
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (pathname.startsWith("/dashboard")) return;
-    gsap.registerPlugin(ScrollTrigger);
+    if (still(pathname)) return;
 
+    let cancelled = false;
     let cleanup: (() => void) | undefined;
     let frame = 0;
     const started = performance.now();
@@ -26,14 +51,17 @@ export function Motion() {
 
     const wait = () => {
       if (hydrated()) {
-        try {
-          cleanup = start();
-          begun = true;
-        } catch (err) {
-          // never leave content hidden if motion fails to start
-          console.error("Motion failed to start", err);
-          document.documentElement.classList.remove("motion");
-        }
+        loadLibs()
+          .then((l) => {
+            if (cancelled) return;
+            cleanup = start(l);
+            begun = true;
+          })
+          .catch((err) => {
+            // never leave content hidden if motion fails to load or start
+            console.error("Motion failed to start", err);
+            document.documentElement.classList.remove("motion");
+          });
       } else if (performance.now() - started > 4000)
         document.documentElement.classList.remove("motion");
       else frame = requestAnimationFrame(wait);
@@ -46,6 +74,7 @@ export function Motion() {
     wait();
 
     return () => {
+      cancelled = true;
       window.clearTimeout(safety);
       cancelAnimationFrame(frame);
       cleanup?.();
@@ -55,7 +84,7 @@ export function Motion() {
   return null;
 }
 
-function start() {
+function start({ gsap, ScrollTrigger, Lenis }: Libs) {
   const lenis = new Lenis({ lerp: 0.1 });
   lenis.on("scroll", ScrollTrigger.update);
   const tick = (t: number) => lenis.raf(t * 1000);

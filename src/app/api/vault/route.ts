@@ -78,6 +78,15 @@ function limited(ip: string) {
   return recent.length > MAX_HITS;
 }
 
+/** The host of an Origin header, or "" when it is not a URL (for example "null" from a sandboxed frame). */
+const hostOf = (origin: string) => {
+  try {
+    return new URL(origin).host;
+  } catch {
+    return "";
+  }
+};
+
 const fail = (status: number, error: string, message: string) =>
   Response.json({ error, message }, { status });
 
@@ -118,7 +127,7 @@ export async function POST(req: Request) {
 
   const origin = req.headers.get("origin");
   const host = req.headers.get("host");
-  if (origin && host && new URL(origin).host !== host)
+  if (origin && host && hostOf(origin) !== host)
     return fail(403, "forbidden", "Requests must come from this site.");
 
   const ip = (req.headers.get("x-forwarded-for") ?? "local")

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Icon } from "@/components/Icons";
 
 type Recognition = {
@@ -18,16 +18,17 @@ type Recognition = {
   stop: () => void;
 };
 
+const noop = () => () => {};
+const hasSpeech = () => {
+  const w = window as unknown as Record<string, unknown>;
+  return !!(w.SpeechRecognition || w.webkitSpeechRecognition);
+};
+
 /** Dictation through the browser's speech recognition. Hidden where the browser has none. */
 export function VoiceButton({ onText }: { onText: (t: string) => void }) {
-  const [supported] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      !!(
-        (window as unknown as Record<string, unknown>).SpeechRecognition ||
-        (window as unknown as Record<string, unknown>).webkitSpeechRecognition
-      ),
-  );
+  // Read through useSyncExternalStore so the server and the first browser render agree (no button),
+  // then the browser shows it where speech recognition exists.
+  const supported = useSyncExternalStore(noop, hasSpeech, () => false);
   const [on, setOn] = useState(false);
   const rec = useRef<Recognition | null>(null);
 
