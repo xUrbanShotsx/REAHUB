@@ -1,3 +1,5 @@
+import type { Invoice } from "./billing";
+
 /** Sample data for the demo workspace. Nothing here is a real agency, person or amount. */
 
 export const agency = { name: "Inner West Realty", plan: "Boutique" };
@@ -143,6 +145,10 @@ export type Settings = {
   card?: { brand: string; last4: string; exp: string; name: string };
   /** ISO date the free trial ends, set by sign up. */
   trialEnds?: string;
+  /** A downgrade booked for the next billing date. */
+  pendingPlan?: { plan: PlanName; on: string };
+  /** Tax invoices, newest first. Missing means the demo's sample invoices. */
+  invoices?: Invoice[];
 };
 
 export const seedSettings: Settings = {

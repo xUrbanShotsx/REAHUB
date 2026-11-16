@@ -3,6 +3,7 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useSyncExternalStore,
   type ReactNode,
@@ -68,7 +69,16 @@ import {
   type Values,
 } from "@/lib/registers";
 
+import { fmtDate, todayISO } from "@/lib/format";
 import type { Approval, Review, VaultDoc } from "@/lib/vault";
+import {
+  makeInvoice,
+  MIN_CHARGE,
+  nextInvoiceId,
+  prorationLines,
+  SEED_INVOICES,
+  type Proration,
+} from "@/lib/billing";
 
 const KEY = "reahub-demo-v8";
 
@@ -160,6 +170,13 @@ type Store = {
   startNextCpdYear: (id: string) => void;
   updateAgency: (patch: Partial<Settings["agency"]>) => void;
   setPlan: (plan: PlanName) => void;
+  /** Upgrade now and record the part-month invoice (none if the amount is under the minimum charge). */
+  upgradePlan: (p: Proration) => void;
+  /** Book a downgrade for the next billing date. */
+  scheduleDowngrade: (plan: PlanName, on: string) => void;
+  cancelPlanChange: () => void;
+  /** Applies a booked downgrade once its date has arrived. */
+  applyDuePlanChange: (today: string) => void;
   setNotify: (patch: Partial<Settings["notify"]>) => void;
   inviteMember: (input: Omit<Member, "id" | "status" | "lastActive">) => void;
   updateMember: (id: string, patch: Partial<Member>) => void;
@@ -284,6 +301,13 @@ function subscribe(cb: () => void) {
 
 const current = (): Saved => readSaved() ?? cacheVal ?? SEED;
 const update = (fn: (s: Saved) => Saved) => writeSaved(fn(current()));
+
+/** Settings with any booked plan change removed. */
+function withoutPending(settings: Settings): Settings {
+  const next = { ...settings };
+  delete next.pendingPlan;
+  return next;
+}
 
 const uid = () =>
   Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3);
@@ -766,6 +790,85 @@ const actions: Omit<
       );
     }),
 
+  upgradePlan: (p) =>
+    update((s) => {
+      const invoices = s.settings.invoices ?? SEED_INVOICES;
+      const charge = p.total >= MIN_CHARGE;
+      const invoice = charge
+        ? makeInvoice(
+            nextInvoiceId(invoices, new Date().getFullYear()),
+            todayISO(),
+            `Plan change, ${p.from} to ${p.to}`,
+            prorationLines(p),
+          )
+        : null;
+      return withEvent(
+        {
+          ...s,
+          settings: {
+            ...withoutPending(s.settings),
+            plan: p.to,
+            invoices: invoice ? [invoice, ...invoices] : invoices,
+          },
+        },
+        event(
+          "Settings",
+          charge
+            ? `upgraded to ${p.to} and paid A$${p.total.toFixed(2)} for the rest of the month`
+            : `upgraded to ${p.to}`,
+          p.from,
+          p.to,
+        ),
+      );
+    }),
+
+  scheduleDowngrade: (plan, on) =>
+    update((s) =>
+      withEvent(
+        { ...s, settings: { ...s.settings, pendingPlan: { plan, on } } },
+        event(
+          "Settings",
+          `booked a move to ${plan} from ${fmtDate(on)}`,
+          s.settings.plan,
+          `${plan} from ${fmtDate(on)}`,
+        ),
+      ),
+    ),
+
+  cancelPlanChange: () =>
+    update((s) => {
+      const pending = s.settings.pendingPlan;
+      if (!pending) return s;
+      return withEvent(
+        { ...s, settings: withoutPending(s.settings) },
+        event(
+          "Settings",
+          `cancelled the move to ${pending.plan}`,
+          pending.plan,
+          s.settings.plan,
+        ),
+      );
+    }),
+
+  applyDuePlanChange: (today) => {
+    const pending = current().settings.pendingPlan;
+    if (!pending || pending.on > today) return;
+    update((s) =>
+      withEvent(
+        {
+          ...s,
+          settings: { ...withoutPending(s.settings), plan: pending.plan },
+        },
+        event(
+          "Settings",
+          `moved to ${pending.plan} at the start of the billing period`,
+          s.settings.plan,
+          pending.plan,
+        ),
+      ),
+    );
+  },
+
   setNotify: (patch) =>
     update((s) => ({
       ...s,
@@ -1233,6 +1336,7 @@ export function startTrial(input: {
           plan: input.plan,
           card: input.card,
           trialEnds: input.trialEnds,
+          invoices: [],
         },
       },
       event(
@@ -1253,6 +1357,11 @@ export function DemoStoreProvider({ children }: { children: ReactNode }) {
     () => false,
   );
   const state = saved ?? SEED;
+
+  // A downgrade booked for the next billing date takes effect once that date arrives.
+  useEffect(() => {
+    if (ready) actions.applyDuePlanChange(todayISO());
+  }, [ready]);
 
   const value = useMemo<Store>(
     () => ({

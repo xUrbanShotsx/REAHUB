@@ -377,13 +377,23 @@ Under **Teams and team leaders**, choose **Make team leader** next to anyone. A 
     title: "Plans, usage and billing",
     category: "Settings and team",
     icon: "file",
-    summary: "What your plan includes and how to change it.",
+    summary:
+      "What your plan includes, and what upgrading or downgrading costs.",
     open: { href: "/dashboard/settings", label: "Open settings" },
     body: `## Usage
 **Settings**, then **Usage**, shows what your plan includes and what you have used: people who sign in, Document Vault storage, and assistant queries this month. Auditors do not count. Teams and team leaders are unlimited.
 
 ## Changing plan
-**Settings**, then **Billing**, lists the plans. Choose one to switch. If you have more people than a plan allows, REAHUB tells you before you switch.
+**Settings**, then **Billing**, lists the plans. Choose one and REAHUB shows exactly what it costs and when it starts before anything changes.
+
+- **Upgrading** starts straight away. You pay the difference for the days left in the month: the new plan for those days, less what you already paid for the old one, plus GST. It is charged that day with a tax invoice, and the new monthly price applies from the 1st.
+- **Moving to a smaller plan** starts on the 1st of next month. You keep your current plan until then, and there is no refund for the rest of the month. Until the 1st you can choose **Keep** to cancel the change.
+- **During the free trial** you can switch freely and nothing is charged. You pay for whichever plan you are on when the trial ends.
+
+If you have more people than a plan allows, REAHUB tells you before you switch.
+
+### Example
+On 16 November you upgrade from Boutique (A$249) to Large (A$369). There are 15 of 30 days left, so you pay half the A$120 difference: A$60 plus A$6 GST, A$66 that day. From 1 December you pay A$369 plus GST a month.
 
 ## Your agency details
 **Settings**, then **Agency**, holds your agency name, legal entity, licence number, ABN, address and phone. These details are used in your documents.`,

@@ -59,7 +59,10 @@ Send from a server route only. Keep the Resend key server-side (no `NEXT_PUBLIC_
 |---|---|---|
 | `src/app/signup/SignUpForm.tsx`, `CardStep` | card number typed into our own fields, checked in the browser, only brand, last four and expiry kept | Stripe Elements (Payment Element) or Checkout. **Do not send raw card numbers to your server**; that brings the full card-security (PCI) burden. |
 | `startTrial` in `DemoStore.tsx` | writes plan, card and trial end locally | server route creates the customer and a subscription with a 7-day trial; a webhook writes plan and status to Supabase |
-| `src/app/dashboard/settings/BillingSection.tsx`, `choose` | switches plan locally | update the subscription, with proration |
+| `PlanChangeDialog.tsx`, the price shown | worked out by `prorate()` in `src/lib/billing.ts` | Stripe's preview invoice (`invoices.createPreview` with the new price), so the figure shown is Stripe's own |
+| `upgradePlan` in `DemoStore.tsx` | records the plan and a part-month invoice | update the subscription item to the new price with `proration_behavior: "always_invoice"` |
+| `scheduleDowngrade` / `cancelPlanChange` | stores `pendingPlan` | a subscription schedule that switches price at the period end, with no proration; release the schedule to cancel |
+| `applyDuePlanChange` | applies the booked downgrade on the date | the `customer.subscription.updated` webhook writes the new plan to Supabase |
 | `INVOICES` in `BillingSection.tsx` | three fixed sample invoices | list the customer's Stripe invoices |
 | card on file in Billing | from sign up | Stripe customer portal for changing the card |
 
