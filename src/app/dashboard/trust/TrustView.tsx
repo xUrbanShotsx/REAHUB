@@ -108,10 +108,10 @@ export function TrustView() {
             <p className="mt-1">
               A live feed needs an Australian open banking provider and your
               bank&apos;s consent, which this demo does not have. Until then,
-              download your statement from internet banking as a CSV and import
-              it under Reconcile. REAHUB matches each line to the cash book,
-              lists what is left, and locks the month when the difference is
-              nil.
+              export your statement from internet banking as CSV, OFX or QIF and
+              import it under Reconcile. REAHUB matches each line to the cash
+              book, lists what is left, and locks the month when the difference
+              is nil.
             </p>
           </div>
         )}

@@ -42,6 +42,8 @@ export type BankLine = {
   /** Credits are positive, debits negative. */
   amount: number;
   balance?: number;
+  /** The bank's own transaction id, when the file gives one (OFX). */
+  ref?: string;
   entryId?: string;
 };
 
@@ -252,107 +254,15 @@ export function summarise(
   };
 }
 
-/* ---------- bank statement CSV ---------- */
-
-function splitCsv(line: string): string[] {
-  const out: string[] = [];
-  let cur = "";
-  let q = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (q) {
-      if (ch === '"' && line[i + 1] === '"') {
-        cur += '"';
-        i++;
-      } else if (ch === '"') q = false;
-      else cur += ch;
-    } else if (ch === '"') q = true;
-    else if (ch === ",") {
-      out.push(cur.trim());
-      cur = "";
-    } else cur += ch;
-  }
-  out.push(cur.trim());
-  return out;
-}
-
-export function parseDate(v: string): string | null {
-  const t = v.trim();
-  let m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(t);
-  if (m) return `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}`;
-  m = /^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/.exec(t);
-  if (m) {
-    const y = m[3].length === 2 ? `20${m[3]}` : m[3];
-    return `${y}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
-  }
-  return null;
-}
-
-const num = (v: string | undefined) => {
-  if (v === undefined || v.trim() === "") return null;
-  const cleaned = v.replace(/[$,\s]/g, "").replace(/^\((.*)\)$/, "-$1");
-  const n = Number(cleaned);
-  return Number.isFinite(n) ? n : null;
-};
+/* ---------- bank statement lines (files are read by src/lib/bank-import.ts) ---------- */
 
 export type ParsedLine = {
   date: string;
   description: string;
   amount: number;
   balance?: number;
+  ref?: string;
 };
-
-/** Reads a bank export. Needs a Date column and either Amount, or Debit and Credit columns. */
-export function parseStatement(text: string): {
-  lines: ParsedLine[];
-  errors: string[];
-} {
-  const rows = text.split(/\r?\n/).filter((r) => r.trim() !== "");
-  const errors: string[] = [];
-  if (rows.length < 2)
-    return { lines: [], errors: ["The file has no data rows."] };
-  const head = splitCsv(rows[0]).map((h) => h.toLowerCase());
-  const col = (...names: string[]) =>
-    head.findIndex((h) => names.some((n) => h.includes(n)));
-  const iDate = col("date");
-  const iDesc = col(
-    "description",
-    "narration",
-    "details",
-    "particulars",
-    "memo",
-  );
-  const iAmt = head.findIndex((h) => h === "amount" || h.includes("amount"));
-  const iDeb = col("debit", "withdrawal");
-  const iCre = col("credit", "deposit");
-  const iBal = col("balance");
-  if (iDate < 0) errors.push("No Date column found.");
-  if (iAmt < 0 && (iDeb < 0 || iCre < 0))
-    errors.push("Need an Amount column, or both Debit and Credit columns.");
-  if (errors.length) return { lines: [], errors };
-
-  const lines: ParsedLine[] = [];
-  rows.slice(1).forEach((r, i) => {
-    const c = splitCsv(r);
-    const date = parseDate(c[iDate] ?? "");
-    const amount =
-      iAmt >= 0 ? num(c[iAmt]) : (num(c[iCre]) ?? 0) - (num(c[iDeb]) ?? 0);
-    if (!date || amount === null || amount === 0) {
-      errors.push(
-        `Row ${i + 2} skipped: ${!date ? "unreadable date" : "no amount"}.`,
-      );
-      return;
-    }
-    const bal = iBal >= 0 ? num(c[iBal]) : null;
-    lines.push({
-      date,
-      description: (iDesc >= 0 ? c[iDesc] : "") || "Bank transaction",
-      amount,
-      ...(bal !== null ? { balance: bal } : {}),
-    });
-  });
-  return { lines, errors };
-}
 
 export function statementCsv(
   lines: { date: string; description: string; amount: number }[],

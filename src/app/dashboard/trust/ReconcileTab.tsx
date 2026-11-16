@@ -10,8 +10,8 @@ import type { Field } from "@/lib/registers";
 import {
   AUTHORITIES,
   METHODS,
+  accountOf,
   money,
-  parseStatement,
   signed,
   statementCsv,
   summarise,
@@ -19,6 +19,7 @@ import {
   type ParsedLine,
 } from "@/lib/trust";
 import { download } from "./export";
+import { StatementImport } from "./StatementImport";
 
 const monthEnd = (iso: string) => {
   const [y, m] = iso.split("-").map(Number);
@@ -78,21 +79,15 @@ export function ReconcileTab({ account }: { account: AccountId }) {
     );
 
   /* ----- import ----- */
-  const onFile = async (file: File | undefined) => {
-    if (!file) return;
-    const { lines: parsed, errors } = parseStatement(await file.text());
-    if (parsed.length === 0)
-      return setMsg({
-        ok: false,
-        text: errors[0] ?? "No transactions found in that file.",
-      });
+  const onImport = (parsed: ParsedLine[]) => {
     const added = importStatement(account, parsed);
     const auto = autoMatch(account);
+    const dupes = parsed.length - added;
     setPe("");
     setClosing(null);
     setMsg({
       ok: true,
-      text: `Imported ${added} new line${added === 1 ? "" : "s"}${parsed.length - added ? ` (${parsed.length - added} already imported)` : ""}. ${auto} matched automatically.${errors.length ? ` ${errors.length} row${errors.length === 1 ? "" : "s"} skipped.` : ""}`,
+      text: `Imported ${added} new line${added === 1 ? "" : "s"}${dupes ? ` (${dupes} already imported, skipped)` : ""}. ${auto} matched automatically.`,
     });
   };
 
@@ -228,41 +223,24 @@ export function ReconcileTab({ account }: { account: AccountId }) {
         </p>
       )}
 
-      <Card>
-        <CardHead
-          title="1. Import the bank statement"
-          sub="Download a CSV from internet banking. It needs a Date column and an Amount (or Debit and Credit) column."
-        />
-        <div className="flex flex-wrap items-center gap-3 p-5">
-          <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-bg hover:bg-ink/85 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent has-[:focus-visible]:ring-offset-2">
-            <Icon name="download" className="h-4 w-4 rotate-180" /> Choose CSV
-            file
-            <input
-              type="file"
-              accept=".csv,.txt,text/csv"
-              className="sr-only"
-              onChange={(e) => {
-                void onFile(e.target.files?.[0]);
-                e.target.value = "";
-              }}
-            />
-          </label>
-          <button type="button" onClick={useSample} className={btnLight}>
-            Try a sample statement
-          </button>
-          <button
-            type="button"
-            onClick={templateCsv}
-            className="text-sm font-semibold underline"
-          >
-            Download a sample CSV
-          </button>
-        </div>
-        <p className="border-t border-line bg-bg px-5 py-3 text-xs text-ink-soft">
-          Live bank feeds are not connected. Importing a file reads it in your
-          browser and nothing is sent anywhere.
-        </p>
-      </Card>
+      <StatementImport
+        account={accountOf(trust, account)}
+        onImport={onImport}
+        extra={
+          <>
+            <button type="button" onClick={useSample} className={btnLight}>
+              Try a sample statement
+            </button>
+            <button
+              type="button"
+              onClick={templateCsv}
+              className="text-sm font-semibold underline"
+            >
+              Download a sample CSV
+            </button>
+          </>
+        }
+      />
 
       <Card>
         <CardHead

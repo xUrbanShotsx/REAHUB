@@ -167,10 +167,19 @@ The **Ledgers** tab shows how much is held for each client at each property. The
     open: { href: "/dashboard/trust", label: "Open trust accounts" },
     body: `## Steps
 1. Go to **Trust** and the **Reconcile** tab.
-2. **Import the bank statement** as a CSV file exported from your bank. It needs a Date column, and either an Amount column or Debit and Credit columns. Dates in day/month/year order are fine. To practise, choose **Try a sample statement**.
-3. Choose **Auto-match**. REAHUB pairs bank lines with cash book entries of the same amount and close dates.
-4. Work through anything left: match a line to an entry by hand, or record a missing receipt or payment straight from the bank line.
-5. When the bank balance, the cash book and the ledgers agree, choose **Sign and lock**. The reconciliation is signed by you and the period is locked, so it cannot be changed afterwards.
+2. **Import the bank statement.** In internet banking, export the trust account's transactions as **CSV, OFX or QIF** (OFX is sometimes called Money or Quicken format; QFX also works). Drop the file on the Reconcile tab or choose **Choose file**.
+3. **Check the preview.** REAHUB shows how many transactions it found, the dates, money in and out, and the closing balance. If the file is for a different account, it warns you. If a CSV's columns were read wrongly, choose **Change columns** and pick the Date, Description and Amount (or Debit and Credit) columns. Then choose **Import**. To practise, choose **Try a sample statement**.
+4. Choose **Auto-match**. REAHUB pairs bank lines with cash book entries of the same amount and close dates.
+5. Work through anything left: match a line to an entry by hand, or record a missing receipt or payment straight from the bank line.
+6. When the bank balance, the cash book and the ledgers agree, choose **Sign and lock**. The reconciliation is signed by you and the period is locked, so it cannot be changed afterwards.
+
+## Importing the next statement
+Lines you have already imported are skipped, so an overlapping date range is safe. Two identical transactions on the same day (two rent payments of the same amount, say) are kept as two.
+
+## Which file to choose
+- **CommBank, ANZ, Westpac, NAB, St.George, Bankwest, Macquarie** and most others offer CSV. Most also offer OFX or QIF.
+- OFX is the most reliable: it carries the bank's own transaction ids and the closing balance.
+- Excel and PDF statements can't be read. Choose CSV, OFX or QIF instead.
 
 ## History
 Every signed reconciliation is kept on the **History** tab for your auditor and for Fair Trading.`,

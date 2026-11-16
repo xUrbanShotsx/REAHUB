@@ -934,21 +934,43 @@ const actions: Omit<
   },
 
   importStatement: (account, lines) => {
-    const have = new Set(
-      current()
-        .trust.lines.filter((l) => l.account === account)
-        .map((l) => `${l.date}|${l.description}|${cents(l.amount)}`),
-    );
-    const fresh: BankLine[] = lines
-      .filter((l) => !have.has(`${l.date}|${l.description}|${cents(l.amount)}`))
-      .map((l) => ({
+    // Skip lines already imported (an overlapping statement), but keep genuine repeats:
+    // two identical $500 receipts on one day are two transactions. With a bank id, match on that;
+    // otherwise only add copies beyond the number already held.
+    const existing = current().trust.lines.filter((l) => l.account === account);
+    const refs = new Set(existing.flatMap((l) => (l.ref ? [l.ref] : [])));
+    const keyOf = (l: { date: string; description: string; amount: number }) =>
+      `${l.date}|${l.description}|${cents(l.amount)}`;
+    const count = (from: BankLine[]) => {
+      const m = new Map<string, number>();
+      for (const l of from) m.set(keyOf(l), (m.get(keyOf(l)) ?? 0) + 1);
+      return m;
+    };
+    const heldAll = count(existing);
+    // Lines imported earlier from a file without bank ids (CSV, QIF) can still match an OFX line.
+    const heldNoRef = count(existing.filter((l) => !l.ref));
+    const take = (m: Map<string, number>, k: string) => {
+      const n = m.get(k) ?? 0;
+      if (n > 0) m.set(k, n - 1);
+      return n > 0;
+    };
+    const fresh: BankLine[] = [];
+    for (const l of lines) {
+      const k = keyOf(l);
+      if (l.ref) {
+        if (refs.has(l.ref) || take(heldNoRef, k)) continue;
+        refs.add(l.ref);
+      } else if (take(heldAll, k)) continue;
+      fresh.push({
         id: `bl-${uid()}`,
         account,
         date: l.date,
         description: l.description,
         amount: l.amount,
-        balance: l.balance,
-      }));
+        ...(l.balance !== undefined ? { balance: l.balance } : {}),
+        ...(l.ref ? { ref: l.ref } : {}),
+      });
+    }
     if (fresh.length)
       update((s) =>
         withEvent(

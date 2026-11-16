@@ -80,6 +80,10 @@ Before going live:
 
 ---
 
+## Bank feeds (later, optional)
+
+Statement files are the free option and are built: Trust > Reconcile reads CSV (CommBank, ANZ, Westpac, NAB and others, with or without a heading row), OFX/QFX and QIF in the browser (`src/lib/bank-import.ts`). A live feed (Basiq, Fiskil) would call the same `importStatement` action with lines from the provider, so matching and reconciliation stay the same. Pass the provider's transaction id as `ref` so re-syncs never duplicate a line.
+
 ## Environment variables
 
 | Name | Used by | Public? |
